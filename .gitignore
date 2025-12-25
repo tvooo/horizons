@@ -6,6 +6,7 @@ bun.lockb
 dist/
 build/
 .next/
+apps/backend/public/
 
 # Environment
 .env
