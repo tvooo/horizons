@@ -16,9 +16,10 @@ app.use(
   }),
 )
 
-// Serve static files in production
+// Serve static files in production (before API routes)
 if (process.env.NODE_ENV === 'production') {
-  app.use('/*', serveStatic({ root: './public' }))
+  console.log('Serving static files from apps/backend/public')
+  app.use('/*', serveStatic({ root: './apps/backend/public' }))
 }
 
 // API routes
@@ -28,7 +29,7 @@ app.route('/api/tasks', tasksRoutes)
 
 // SPA fallback for React Router in production
 if (process.env.NODE_ENV === 'production') {
-  app.get('/*', serveStatic({ path: './public/index.html' }))
+  app.get('/*', serveStatic({ path: './apps/backend/public/index.html' }))
 }
 
 const port = process.env.PORT || 3000
