@@ -1,26 +1,25 @@
-import { useState } from 'react'
+import { observer } from 'mobx-react-lite'
 import { useParams } from 'react-router-dom'
-import { lists, tasks } from '../mockData'
+import { useRootStore } from '../models/RootStore'
+import { NewTaskInput } from './NewTaskInput'
+import { TaskItem } from './TaskItem'
 
-export function ListView() {
+export const ListView = observer(() => {
   const { listId } = useParams<{ listId: string }>()
-  const [taskStates, setTaskStates] = useState<Record<string, boolean>>(() => {
-    const initial: Record<string, boolean> = {}
-    tasks.forEach((task) => {
-      initial[task.id] = task.completed
-    })
-    return initial
-  })
+  const store = useRootStore()
 
-  const toggleTask = (taskId: string) => {
-    setTaskStates((prev) => ({
-      ...prev,
-      [taskId]: !prev[taskId],
-    }))
+  if (!listId) {
+    return (
+      <div className="h-full overflow-y-auto p-8">
+        <div className="mx-auto max-w-3xl">
+          <h1 className="mb-8 font-bold text-3xl text-red-600">Invalid list</h1>
+        </div>
+      </div>
+    )
   }
 
-  const list = lists.find((l) => l.id === listId)
-  const listTasks = tasks.filter((task) => task.listId === listId)
+  const list = store.getListById(listId)
+  const listTasks = store.getTasksByListId(listId)
 
   if (!list) {
     return (
@@ -38,7 +37,7 @@ export function ListView() {
       <div className="mx-auto max-w-3xl">
         <div className="mb-8">
           <h1 className="font-bold text-3xl">{list.name}</h1>
-          {list.description && <p className="mt-2 text-gray-600">{list.description}</p>}
+          {/* {list.description && <p className="mt-2 text-gray-600">{list.description}</p>} */}
           {list.type === 'project' && (
             <div className="mt-4">
               {list.completionPercentage !== undefined && (
@@ -52,55 +51,23 @@ export function ListView() {
                   <span className="text-gray-600 text-sm">{list.completionPercentage}%</span>
                 </div>
               )}
-              {list.dueDate && (
+              {list.scheduledDate && (
                 <p className="mt-2 text-gray-600 text-sm">
-                  Due: {list.dueDate.toLocaleDateString()}
+                  Due: {list.scheduledDate.anchorDate.toLocaleDateString()}
                 </p>
               )}
             </div>
           )}
         </div>
 
-        {listTasks.length === 0 ? (
-          <div className="py-12 text-center text-gray-500">
-            <p className="text-lg">No tasks in this list yet.</p>
-          </div>
-        ) : (
-          <div className="space-y-2">
-            {listTasks.map((task) => (
-              <label
-                key={task.id}
-                className="flex cursor-pointer items-start gap-3 rounded-lg p-3 hover:bg-gray-50"
-              >
-                <input
-                  type="checkbox"
-                  checked={taskStates[task.id]}
-                  onChange={() => toggleTask(task.id)}
-                  className="mt-0.5 rounded border-gray-300 text-blue-600 focus:ring-blue-500"
-                />
-                <div className="flex-1">
-                  <span
-                    className={`${taskStates[task.id] ? 'text-gray-400 line-through' : 'text-gray-900'}`}
-                  >
-                    {task.title}
-                  </span>
-                  {task.description && (
-                    <p className="mt-1 text-gray-500 text-sm">{task.description}</p>
-                  )}
-                  {task.scheduledDate && (
-                    <p className="mt-1 text-gray-400 text-xs">
-                      Scheduled:{' '}
-                      {task.scheduledDate.periodType === 'day'
-                        ? task.scheduledDate.anchorDate.toLocaleDateString()
-                        : `${task.scheduledDate.periodType} of ${task.scheduledDate.anchorDate.toLocaleDateString()}`}
-                    </p>
-                  )}
-                </div>
-              </label>
-            ))}
-          </div>
-        )}
+        <div className="space-y-2">
+          {listTasks.map((task) => (
+            <TaskItem key={task.id} task={task} />
+          ))}
+
+          <NewTaskInput onCreateTask={(title) => store.createTask(title, listId)} />
+        </div>
       </div>
     </div>
   )
-}
+})

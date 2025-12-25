@@ -34,7 +34,7 @@ app.get('/', async (c) => {
 
 // GET /api/lists/:id - Get a specific list
 app.get('/:id', async (c) => {
-  const id = Number.parseInt(c.req.param('id'))
+  const id = Number.parseInt(c.req.param('id'), 10)
 
   if (Number.isNaN(id)) {
     return c.json({ error: 'Invalid list ID' }, 400)
@@ -76,7 +76,7 @@ app.patch('/:id', zValidator('json', updateListSchema), async (c) => {
     return c.json({ error: 'Invalid list ID' }, 400)
   }
 
-  const updateData: any = {
+  const updateData: Record<string, unknown> = {
     ...data,
     updatedAt: new Date(),
   }

@@ -10,8 +10,11 @@ import {
 } from 'date-fns'
 import { Folder, List as ListIcon, Target } from 'lucide-react'
 import { useState } from 'react'
-import { lists, tasks } from '../mockData'
-import type { List, PeriodType, Task } from '../types'
+// import { lists, tasks } from '../mockData'
+import type { ListModel } from '../models/ListModel'
+import { useRootStore } from '../models/RootStore'
+import type { TaskModel } from '../models/TaskModel'
+import type { PeriodType } from '../types'
 
 // Use actual current date
 const TODAY = new Date()
@@ -36,6 +39,7 @@ const PERIOD_TO_TYPE: Record<string, { periodType: PeriodType; anchorDate: Date 
 const TIME_PERIODS = ['This Week', 'This Month', 'This Quarter']
 
 export function Upcoming() {
+  const { tasks, lists } = useRootStore()
   const [taskStates, setTaskStates] = useState<Record<string, boolean>>(() => {
     const initial: Record<string, boolean> = {}
     tasks.forEach((task) => {
@@ -55,7 +59,7 @@ export function Upcoming() {
   }
 
   // Rollover logic: if scheduled for the past, show it today
-  const getTasksForDay = (targetDate: Date): Task[] => {
+  const getTasksForDay = (targetDate: Date): TaskModel[] => {
     const targetDayStart = startOfDay(targetDate)
     const todayStart = startOfDay(TODAY)
     const isTargetToday = isSameDay(targetDate, TODAY)
@@ -68,7 +72,9 @@ export function Upcoming() {
 
       // If target is today, show today's tasks AND past tasks (rollover)
       if (isTargetToday) {
-        return isSameDay(taskDate, todayStart) || isBefore(taskDate, todayStart)
+        return (
+          isSameDay(taskDate, todayStart) || (isBefore(taskDate, todayStart) && !task.completed)
+        )
       }
 
       // For future days, only show tasks scheduled for that specific day
@@ -76,7 +82,7 @@ export function Upcoming() {
     })
   }
 
-  const getTasksForPeriod = (period: string): Task[] => {
+  const getTasksForPeriod = (period: string): TaskModel[] => {
     const periodConfig = PERIOD_TO_TYPE[period]
     if (!periodConfig) return []
 
@@ -96,7 +102,7 @@ export function Upcoming() {
     })
   }
 
-  const getListsForDay = (targetDate: Date): List[] => {
+  const getListsForDay = (targetDate: Date): ListModel[] => {
     const targetDayStart = startOfDay(targetDate)
     const todayStart = startOfDay(TODAY)
     const isTargetToday = isSameDay(targetDate, TODAY)
@@ -117,7 +123,7 @@ export function Upcoming() {
     })
   }
 
-  const getListsForPeriod = (period: string): List[] => {
+  const getListsForPeriod = (period: string): ListModel[] => {
     const periodConfig = PERIOD_TO_TYPE[period]
     if (!periodConfig) return []
 
@@ -173,7 +179,7 @@ export function Upcoming() {
                       key={list.id}
                       className="flex items-center gap-2 rounded bg-blue-100 p-2 font-medium text-blue-900 text-sm"
                     >
-                      <IconComponent size={14} className="flex-shrink-0" />
+                      <IconComponent size={14} className="shrink-0" />
                       <span className="flex-1">{list.name}</span>
                     </div>
                   )
