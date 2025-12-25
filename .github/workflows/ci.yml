@@ -30,3 +30,21 @@ jobs:
 
       - name: Build frontend
         run: bun run --filter frontend build
+
+  deploy:
+    needs: ci
+    runs-on: ubuntu-slim
+    if: github.ref == 'refs/heads/main' && github.event_name == 'push'
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Install Railway CLI
+        run: npm install -g @railway/cli
+
+      - name: Deploy to Railway
+        working-directory: ./apps/backend
+        run: railway up --service horizons-backend
+        env:
+          RAILWAY_TOKEN: ${{ secrets.RAILWAY_TOKEN }}

@@ -4,6 +4,10 @@
   "scripts": {
     "dev": "bun --watch src/index.ts",
     "start": "bun src/index.ts",
+    "build": "bun run build:frontend && bun run build:prepare",
+    "build:frontend": "cd ../frontend && bun install && bun run build",
+    "build:prepare": "mkdir -p public && cp -r ../frontend/dist/* public/",
+    "deploy": "bun src/db/migrate.ts && bun src/index.ts",
     "type-check": "tsc --noEmit",
     "db:generate": "drizzle-kit generate",
     "db:migrate": "bun src/db/migrate.ts"
