@@ -7,6 +7,7 @@ export const lists = sqliteTable('lists', {
   type: text('type', { enum: ['area', 'project', 'list'] })
     .notNull()
     .default('list'),
+  // biome-ignore lint/suspicious/noExplicitAny: Cannot reference itself, apparently
   parentListId: integer('parent_list_id').references((): any => lists.id, { onDelete: 'set null' }),
   scheduledPeriodType: text('scheduled_period_type', {
     enum: ['day', 'week', 'month', 'quarter', 'year'],

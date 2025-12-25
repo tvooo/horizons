@@ -72,7 +72,7 @@ app.post('/', zValidator('json', createTaskSchema), async (c) => {
 
 // PATCH /api/tasks/:id - Update a task
 app.patch('/:id', zValidator('json', updateTaskSchema), async (c) => {
-  const id = Number.parseInt(c.req.param('id'))
+  const id = Number.parseInt(c.req.param('id'), 10)
   const data = c.req.valid('json')
 
   if (Number.isNaN(id)) {
