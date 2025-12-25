@@ -2,7 +2,9 @@
   "$schema": "https://railway.app/railway.schema.json",
   "build": {
     "builder": "NIXPACKS",
-    "buildCommand": "bun run build"
+    "nixpacksPlan": {
+      "providers": ["bun"]
+    }
   },
   "deploy": {
     "startCommand": "bun run deploy",
