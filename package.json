@@ -12,7 +12,12 @@
     "lint": "biome check .",
     "format": "biome format --write .",
     "type-check": "bun run --filter '*' type-check",
-    "prepare": "husky"
+    "prepare": "husky",
+    "build": "bun run build:frontend && bun run build:prepare",
+    "build:frontend": "bun run --filter frontend build",
+    "build:prepare": "mkdir -p apps/backend/public && cp -r apps/frontend/dist/* apps/backend/public/",
+    "start": "bun apps/backend/src/index.ts",
+    "deploy": "bun apps/backend/src/db/migrate.ts && bun apps/backend/src/index.ts"
   },
   "devDependencies": {
     "@biomejs/biome": "^2.3.8",
