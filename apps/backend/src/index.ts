@@ -1,6 +1,8 @@
 import { Hono } from 'hono'
 import { cors } from 'hono/cors'
 import { logger } from 'hono/logger'
+import listsRoutes from './routes/lists'
+import tasksRoutes from './routes/tasks'
 
 const app = new Hono()
 
@@ -15,9 +17,8 @@ app.use(
 
 app.get('/api/health', (c) => c.json({ status: 'ok' }))
 
-app.get('/api/users', (c) => {
-  return c.json({ users: [] })
-})
+app.route('/api/lists', listsRoutes)
+app.route('/api/tasks', tasksRoutes)
 
 const port = process.env.PORT || 3000
 console.log(`🚀 Server running on http://localhost:${port}`)
