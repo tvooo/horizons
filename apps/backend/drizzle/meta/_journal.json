@@ -8,6 +8,48 @@
       "when": 1766650125119,
       "tag": "0000_deep_scourge",
       "breakpoints": true
+    },
+    {
+      "idx": 1,
+      "version": "6",
+      "when": 1766696166000,
+      "tag": "0001_dashing_roughhouse",
+      "breakpoints": true
+    },
+    {
+      "idx": 2,
+      "version": "6",
+      "when": 1766759034878,
+      "tag": "0002_blushing_the_enforcers",
+      "breakpoints": true
+    },
+    {
+      "idx": 3,
+      "version": "6",
+      "when": 1766759196610,
+      "tag": "0003_free_butterfly",
+      "breakpoints": true
+    },
+    {
+      "idx": 4,
+      "version": "6",
+      "when": 1766759587073,
+      "tag": "0004_ambitious_purple_man",
+      "breakpoints": true
+    },
+    {
+      "idx": 5,
+      "version": "6",
+      "when": 1766759873382,
+      "tag": "0005_illegal_valeria_richards",
+      "breakpoints": true
+    },
+    {
+      "idx": 6,
+      "version": "6",
+      "when": 1766760014084,
+      "tag": "0006_reflective_doctor_faustus",
+      "breakpoints": true
     }
   ]
 }

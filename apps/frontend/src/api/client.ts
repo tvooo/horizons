@@ -70,13 +70,17 @@ class APIClient {
 
   // Lists
   async getLists(): Promise<BackendList[]> {
-    const response = await fetch(`${this.baseUrl}/api/lists`)
+    const response = await fetch(`${this.baseUrl}/api/lists`, {
+      credentials: 'include',
+    })
     if (!response.ok) throw new Error('Failed to fetch lists')
     return response.json()
   }
 
   async getList(id: number): Promise<BackendList> {
-    const response = await fetch(`${this.baseUrl}/api/lists/${id}`)
+    const response = await fetch(`${this.baseUrl}/api/lists/${id}`, {
+      credentials: 'include',
+    })
     if (!response.ok) throw new Error('Failed to fetch list')
     return response.json()
   }
@@ -85,6 +89,7 @@ class APIClient {
     const response = await fetch(`${this.baseUrl}/api/lists`, {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
+      credentials: 'include',
       body: JSON.stringify(data),
     })
     if (!response.ok) throw new Error('Failed to create list')
@@ -95,6 +100,7 @@ class APIClient {
     const response = await fetch(`${this.baseUrl}/api/lists/${id}`, {
       method: 'PATCH',
       headers: { 'Content-Type': 'application/json' },
+      credentials: 'include',
       body: JSON.stringify(data),
     })
     if (!response.ok) throw new Error('Failed to update list')
@@ -103,13 +109,17 @@ class APIClient {
 
   // Tasks
   async getTasks(): Promise<BackendTask[]> {
-    const response = await fetch(`${this.baseUrl}/api/tasks`)
+    const response = await fetch(`${this.baseUrl}/api/tasks`, {
+      credentials: 'include',
+    })
     if (!response.ok) throw new Error('Failed to fetch tasks')
     return response.json()
   }
 
   async getTask(id: number): Promise<BackendTask> {
-    const response = await fetch(`${this.baseUrl}/api/tasks/${id}`)
+    const response = await fetch(`${this.baseUrl}/api/tasks/${id}`, {
+      credentials: 'include',
+    })
     if (!response.ok) throw new Error('Failed to fetch task')
     return response.json()
   }
@@ -118,6 +128,7 @@ class APIClient {
     const response = await fetch(`${this.baseUrl}/api/tasks`, {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
+      credentials: 'include',
       body: JSON.stringify(data),
     })
     if (!response.ok) throw new Error('Failed to create task')
@@ -128,6 +139,7 @@ class APIClient {
     const response = await fetch(`${this.baseUrl}/api/tasks/${id}`, {
       method: 'PATCH',
       headers: { 'Content-Type': 'application/json' },
+      credentials: 'include',
       body: JSON.stringify(data),
     })
     if (!response.ok) throw new Error('Failed to update task')
