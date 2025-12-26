@@ -8,8 +8,9 @@ import {
   startOfQuarter,
   startOfWeek,
 } from 'date-fns'
-import { Folder, List as ListIcon } from 'lucide-react'
+import { List as ListIcon } from 'lucide-react'
 import { useState } from 'react'
+import { HexagonIcon } from '../components/HexagonIcon'
 import { ProjectIcon } from '../components/ProjectIcon'
 // import { lists, tasks } from '../mockData'
 import type { ListModel } from '../models/ListModel'
@@ -174,7 +175,7 @@ export function Upcoming() {
                 {/* Scheduled Lists */}
                 {dayLists.map((list) => {
                   const IconComponent =
-                    list.type === 'area' ? Folder : list.type === 'project' ? null : ListIcon
+                    list.type === 'area' ? HexagonIcon : list.type === 'project' ? null : ListIcon
                   return (
                     <div
                       key={list.id}
@@ -229,7 +230,7 @@ export function Upcoming() {
                 {/* Scheduled Lists */}
                 {periodLists.map((list) => {
                   const IconComponent =
-                    list.type === 'area' ? Folder : list.type === 'project' ? null : ListIcon
+                    list.type === 'area' ? HexagonIcon : list.type === 'project' ? null : ListIcon
                   return (
                     <div
                       key={list.id}
