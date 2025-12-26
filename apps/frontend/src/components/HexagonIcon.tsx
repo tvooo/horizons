@@ -1,13 +1,18 @@
 interface HexagonIconProps {
   size?: number
   className?: string
+  filledVertices?: number[] // Indices of vertices to fill (0-5)
 }
 
-export function HexagonIcon({ size = 24, className = '' }: HexagonIconProps) {
+export function HexagonIcon({
+  size = 24,
+  className = '',
+  filledVertices = [5, 0],
+}: HexagonIconProps) {
   const viewBoxSize = 24
   const center = viewBoxSize / 2
   const strokeWidth = 2
-  const radius = 9.5
+  const radius = 10
 
   // Calculate hexagon vertices (pointy-top orientation)
   // Starting from top (0°) and going clockwise
@@ -23,11 +28,16 @@ export function HexagonIcon({ size = 24, className = '' }: HexagonIconProps) {
   const hexagonPath = `M ${vertices.map((v) => `${v.x},${v.y}`).join(' L ')} Z`
 
   // Create dividing lines from center to each vertex
-  const dividerLines = vertices.map((v) => `M ${center},${center} L ${v.x},${v.y}`)
+  const dividerLines: string[] = [vertices[3]].map((v) => `M ${center},${center} L ${v.x},${v.y}`)
 
   // Upper-left piece (vertices[5] to center to vertices[0])
   // This is the piece between 270° and 330° (top-left to top vertex)
-  const upperLeftPiece = `M ${center},${center} L ${vertices[5].x},${vertices[5].y} L ${vertices[0].x},${vertices[0].y} Z`
+  const verticesToFill = filledVertices.map(
+    (v) =>
+      `M ${center},${center} L ${vertices[v].x},${vertices[v].y} L ${
+        vertices[(v + 1) % 6].x
+      },${vertices[(v + 1) % 6].y} Z`,
+  )
 
   return (
     <svg
@@ -38,6 +48,7 @@ export function HexagonIcon({ size = 24, className = '' }: HexagonIconProps) {
       fill="none"
       xmlns="http://www.w3.org/2000/svg"
       className={className}
+      strokeLinejoin="round"
     >
       {/* Outer hexagon */}
       <path d={hexagonPath} stroke="currentColor" strokeWidth={strokeWidth} fill="none" />
@@ -48,8 +59,11 @@ export function HexagonIcon({ size = 24, className = '' }: HexagonIconProps) {
         <path key={i} d={line} stroke="currentColor" strokeWidth={strokeWidth} />
       ))}
 
-      {/* Upper-left filled piece */}
-      <path d={upperLeftPiece} fill="currentColor" />
+      {/* Filled vertices */}
+      {verticesToFill.map((line, i) => (
+        // biome-ignore lint/suspicious/noArrayIndexKey: The order here won't ever change
+        <path key={i} d={line} fill="currentColor" />
+      ))}
     </svg>
   )
 }
