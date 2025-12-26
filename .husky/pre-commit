@@ -1,3 +1,4 @@
-bun run format --staged
-bun run lint --staged
+bun run format --staged --no-errors-on-unmatched
+git add -u
+bun run lint --staged --no-errors-on-unmatched
 bun run type-check
