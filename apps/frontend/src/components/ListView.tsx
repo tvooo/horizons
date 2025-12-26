@@ -1,6 +1,7 @@
 import { observer } from 'mobx-react-lite'
 import { useParams } from 'react-router-dom'
 import { useRootStore } from '../models/RootStore'
+import { scheduledDateLabel } from '../utils/dateUtils'
 import { NewTaskInput } from './NewTaskInput'
 import { TaskItem } from './TaskItem'
 
@@ -53,7 +54,7 @@ export const ListView = observer(() => {
               )}
               {list.scheduledDate && (
                 <p className="mt-2 text-gray-600 text-sm">
-                  Due: {list.scheduledDate.anchorDate.toLocaleDateString()}
+                  {scheduledDateLabel(list.scheduledDate)}
                 </p>
               )}
             </div>
