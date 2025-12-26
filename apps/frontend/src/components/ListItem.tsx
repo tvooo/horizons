@@ -1,11 +1,12 @@
 import * as ContextMenu from '@radix-ui/react-context-menu'
 import clsx from 'clsx'
-import { Folder, List as ListIcon } from 'lucide-react'
+import { List as ListIcon } from 'lucide-react'
 import { observer } from 'mobx-react-lite'
 import { Link, useMatch } from 'react-router-dom'
 import { twMerge } from 'tailwind-merge'
 import type { ListModel } from '../models/ListModel'
 import { useRootStore } from '../models/RootStore'
+import { HexagonIcon } from './HexagonIcon'
 import { ProjectIcon } from './ProjectIcon'
 
 interface ListItemProps {
@@ -18,7 +19,8 @@ export const ListItem = observer(({ list, isNested = false }: ListItemProps) => 
   const match = useMatch(`/list/${list.id}`)
   const isActive = !!match
 
-  const IconComponent = list.type === 'area' ? Folder : list.type === 'project' ? null : ListIcon
+  const IconComponent =
+    list.type === 'area' ? HexagonIcon : list.type === 'project' ? null : ListIcon
 
   const areas = store.areas
 
