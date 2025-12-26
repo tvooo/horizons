@@ -8,8 +8,9 @@ import {
   startOfQuarter,
   startOfWeek,
 } from 'date-fns'
-import { Folder, List as ListIcon, Target } from 'lucide-react'
+import { Folder, List as ListIcon } from 'lucide-react'
 import { useState } from 'react'
+import { ProjectIcon } from '../components/ProjectIcon'
 // import { lists, tasks } from '../mockData'
 import type { ListModel } from '../models/ListModel'
 import { useRootStore } from '../models/RootStore'
@@ -173,13 +174,21 @@ export function Upcoming() {
                 {/* Scheduled Lists */}
                 {dayLists.map((list) => {
                   const IconComponent =
-                    list.type === 'area' ? Folder : list.type === 'project' ? Target : ListIcon
+                    list.type === 'area' ? Folder : list.type === 'project' ? null : ListIcon
                   return (
                     <div
                       key={list.id}
                       className="flex items-center gap-2 rounded bg-blue-100 p-2 font-medium text-blue-900 text-sm"
                     >
-                      <IconComponent size={14} className="shrink-0" />
+                      {list.type === 'project' ? (
+                        <ProjectIcon
+                          size={14}
+                          className="shrink-0"
+                          percentage={list.completionPercentage ?? 0}
+                        />
+                      ) : IconComponent ? (
+                        <IconComponent size={14} className="shrink-0" />
+                      ) : null}
                       <span className="flex-1">{list.name}</span>
                     </div>
                   )
@@ -220,13 +229,21 @@ export function Upcoming() {
                 {/* Scheduled Lists */}
                 {periodLists.map((list) => {
                   const IconComponent =
-                    list.type === 'area' ? Folder : list.type === 'project' ? Target : ListIcon
+                    list.type === 'area' ? Folder : list.type === 'project' ? null : ListIcon
                   return (
                     <div
                       key={list.id}
                       className="flex items-center gap-2 rounded bg-blue-100 p-2 font-medium text-blue-900 text-sm"
                     >
-                      <IconComponent size={14} className="shrink-0" />
+                      {list.type === 'project' ? (
+                        <ProjectIcon
+                          size={14}
+                          className="shrink-0"
+                          percentage={list.completionPercentage ?? 0}
+                        />
+                      ) : IconComponent ? (
+                        <IconComponent size={14} className="shrink-0" />
+                      ) : null}
                       <span className="flex-1">{list.name}</span>
                     </div>
                   )
