@@ -1,11 +1,15 @@
 import { zValidator } from '@hono/zod-validator'
-import { eq } from 'drizzle-orm'
+import { and, eq } from 'drizzle-orm'
 import { Hono } from 'hono'
 import { z } from 'zod'
 import { db } from '../db'
 import { tasks } from '../db/schema'
+import { getUser, requireAuth } from '../middleware/auth'
 
 const app = new Hono()
+
+// Apply authentication middleware to all routes
+app.use('/*', requireAuth)
 
 const scheduledDateSchema = z.object({
   periodType: z.enum(['day', 'week', 'month', 'quarter', 'year']),
@@ -30,19 +34,24 @@ const updateTaskSchema = z.object({
 
 // GET /api/tasks - Get all tasks
 app.get('/', async (c) => {
-  const allTasks = await db.select().from(tasks)
+  const user = getUser(c)
+  const allTasks = await db.select().from(tasks).where(eq(tasks.userId, user.id))
   return c.json(allTasks)
 })
 
 // GET /api/tasks/:id - Get a specific task
 app.get('/:id', async (c) => {
   const id = Number.parseInt(c.req.param('id'), 10)
+  const user = getUser(c)
 
   if (Number.isNaN(id)) {
     return c.json({ error: 'Invalid task ID' }, 400)
   }
 
-  const task = await db.select().from(tasks).where(eq(tasks.id, id))
+  const task = await db
+    .select()
+    .from(tasks)
+    .where(and(eq(tasks.id, id), eq(tasks.userId, user.id)))
 
   if (task.length === 0) {
     return c.json({ error: 'Task not found' }, 404)
@@ -54,12 +63,14 @@ app.get('/:id', async (c) => {
 // POST /api/tasks - Create a new task
 app.post('/', zValidator('json', createTaskSchema), async (c) => {
   const data = c.req.valid('json')
+  const user = getUser(c)
 
   const result = await db
     .insert(tasks)
     .values({
       title: data.title,
       description: data.description,
+      userId: user.id,
       listId: data.listId,
       completed: data.completed ?? false,
       scheduledPeriodType: data.scheduledDate?.periodType,
@@ -74,6 +85,7 @@ app.post('/', zValidator('json', createTaskSchema), async (c) => {
 app.patch('/:id', zValidator('json', updateTaskSchema), async (c) => {
   const id = Number.parseInt(c.req.param('id'), 10)
   const data = c.req.valid('json')
+  const user = getUser(c)
 
   if (Number.isNaN(id)) {
     return c.json({ error: 'Invalid task ID' }, 400)
@@ -92,7 +104,11 @@ app.patch('/:id', zValidator('json', updateTaskSchema), async (c) => {
     updateData.scheduledAnchorDate = new Date(data.scheduledDate.anchorDate)
   }
 
-  const result = await db.update(tasks).set(updateData).where(eq(tasks.id, id)).returning()
+  const result = await db
+    .update(tasks)
+    .set(updateData)
+    .where(and(eq(tasks.id, id), eq(tasks.userId, user.id)))
+    .returning()
 
   if (result.length === 0) {
     return c.json({ error: 'Task not found' }, 404)
