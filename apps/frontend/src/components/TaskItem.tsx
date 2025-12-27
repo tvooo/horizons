@@ -1,7 +1,9 @@
 import * as Popover from '@radix-ui/react-popover'
 import { CalendarDays } from 'lucide-react'
 import { observer } from 'mobx-react-lite'
+import { twMerge } from 'tailwind-merge'
 import type { TaskModel } from '../models/TaskModel'
+import { scheduledDateLabel } from '../utils/dateUtils'
 
 interface TaskItemProps {
   task: TaskModel
@@ -36,30 +38,33 @@ export const TaskItem = observer(({ task }: TaskItemProps) => {
         <span className={`${task.completed ? 'text-gray-400 line-through' : 'text-gray-900'}`}>
           {task.title}
         </span>
-        {task.description && <p className="mt-1 text-gray-500 text-sm">{task.description}</p>}
-        {task.scheduledDate && (
-          <p className="mt-1 text-gray-400 text-xs">
-            Scheduled: {task.scheduledDate.anchorDate.toLocaleDateString()} (
-            {task.scheduledDate.periodType})
-          </p>
-        )}
+        {/* {task.description && <p className="mt-1 text-gray-500 text-sm">{task.description}</p>} */}
       </div>
 
       {/* Schedule Button with Popover */}
       <Popover.Root>
         <Popover.Trigger asChild>
           <button
-            className="flex-shrink-0 rounded p-1 text-gray-400 opacity-0 hover:bg-gray-100 hover:text-gray-600 focus:opacity-100 group-hover:opacity-100"
+            className={twMerge(
+              'shrink-0 rounded p-1 text-gray-400 text-xs hover:bg-gray-100 hover:text-gray-600 focus:opacity-100',
+              !task.scheduledDate && 'opacity-0 group-hover:opacity-100',
+            )}
             aria-label="Schedule task"
             type="button"
           >
-            <CalendarDays size={16} />
+            {task.scheduledDate ? (
+              scheduledDateLabel(task.scheduledDate)
+            ) : (
+              <CalendarDays size={16} />
+            )}
           </button>
         </Popover.Trigger>
         <Popover.Portal>
           <Popover.Content
             className="z-50 w-48 rounded-lg border border-gray-200 bg-white p-2 shadow-lg"
             sideOffset={5}
+            side="bottom"
+            align="end"
           >
             <div className="space-y-1">
               <button
