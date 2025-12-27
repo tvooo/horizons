@@ -8,7 +8,7 @@ interface NewTaskInputProps {
 
 export function NewTaskInput({ onCreateTask, placeholder = 'Add a task...' }: NewTaskInputProps) {
   const [title, setTitle] = useState('')
-  const [isAdding, setIsAdding] = useState(false)
+  const [_isAdding, setIsAdding] = useState(false)
 
   const handleSubmit = async () => {
     if (!title.trim()) return
@@ -26,7 +26,7 @@ export function NewTaskInput({ onCreateTask, placeholder = 'Add a task...' }: Ne
 
   return (
     <div className="flex items-center gap-3 rounded-lg p-3">
-      <Plus size={20} className="flex-shrink-0 text-gray-400" />
+      <Plus size={20} className="shrink-0 text-gray-400" />
       <input
         type="text"
         value={title}
@@ -38,7 +38,7 @@ export function NewTaskInput({ onCreateTask, placeholder = 'Add a task...' }: Ne
           }
         }}
         placeholder={placeholder}
-        disabled={isAdding}
+        // disabled={isAdding}
         className="flex-1 border-none bg-transparent text-gray-900 placeholder-gray-400 focus:outline-none"
       />
     </div>
