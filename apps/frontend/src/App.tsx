@@ -7,6 +7,7 @@ import { ProtectedRoute } from './components/ProtectedRoute'
 import { Sidebar } from './components/Sidebar'
 import { RootStore, RootStoreProvider, useRootStore } from './models/RootStore'
 import { Inbox } from './pages/Inbox'
+import { Now } from './pages/Now'
 import { OnIce } from './pages/OnIce'
 import SignIn from './pages/SignIn'
 import SignUp from './pages/SignUp'
@@ -51,6 +52,7 @@ const AppContent = observer(() => {
                   <Routes>
                     <Route path="/" element={<Navigate to="/upcoming" replace />} />
                     <Route path="/inbox" element={<Inbox />} />
+                    <Route path="/now" element={<Now />} />
                     <Route path="/upcoming" element={<Upcoming />} />
                     <Route path="/on-ice" element={<OnIce />} />
                     <Route path="/list/:listId" element={<ListView />} />

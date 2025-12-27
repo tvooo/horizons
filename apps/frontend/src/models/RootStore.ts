@@ -1,7 +1,9 @@
+import { isPast } from 'date-fns'
 import { action, computed, makeObservable, observable, runInAction } from 'mobx'
 import { createContext, useContext } from 'react'
 import { api, type BackendScheduledDate } from '../api/client'
 import { toBackendTaskId } from '../api/converter'
+import { isCurrentPeriod } from '../utils/dateUtils'
 import { ListModel } from './ListModel'
 import { TaskModel } from './TaskModel'
 
@@ -117,6 +119,22 @@ export class RootStore {
 
   get inboxTasks() {
     return this.tasks.filter((task) => !task.listId)
+  }
+
+  get nowTasks() {
+    return this.tasks.filter(
+      (task) =>
+        task.scheduledDate &&
+        (isCurrentPeriod(task.scheduledDate) || isPast(task.scheduledDate.anchorDate)),
+    )
+  }
+
+  get nowLists() {
+    return this.lists.filter(
+      (task) =>
+        task.scheduledDate &&
+        (isCurrentPeriod(task.scheduledDate) || isPast(task.scheduledDate.anchorDate)),
+    )
   }
 
   get areas() {

@@ -1,5 +1,12 @@
 import clsx from 'clsx'
-import { CalendarDaysIcon, IceCreamConeIcon, InboxIcon, LogOut, Plus } from 'lucide-react'
+import {
+  CalendarDaysIcon,
+  CalendarIcon,
+  IceCreamConeIcon,
+  InboxIcon,
+  LogOut,
+  Plus,
+} from 'lucide-react'
 import { observer } from 'mobx-react-lite'
 import { NavLink, useNavigate } from 'react-router-dom'
 import { twMerge } from 'tailwind-merge'
@@ -41,6 +48,22 @@ export const Sidebar = observer(({ onAddListClick }: SidebarProps) => {
         >
           <InboxIcon size={16} className="shrink-0 text-gray-500" />
           <span className="flex-1">Inbox</span>
+        </NavLink>
+        <NavLink
+          to="/now"
+          className={({ isActive }) =>
+            twMerge(
+              clsx(
+                'flex cursor-pointer items-center gap-2 rounded px-2 py-1.5 text-gray-700 text-sm hover:bg-gray-100',
+                {
+                  'bg-blue-50 text-blue-900': isActive,
+                },
+              ),
+            )
+          }
+        >
+          <CalendarIcon size={16} className="shrink-0 text-gray-500" />
+          <span className="flex-1">Now</span>
         </NavLink>
         <NavLink
           to="/upcoming"
