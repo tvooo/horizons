@@ -1,9 +1,42 @@
 import * as Popover from '@radix-ui/react-popover'
-import { CalendarDays } from 'lucide-react'
+import { CalendarDays, CheckIcon } from 'lucide-react'
 import { observer } from 'mobx-react-lite'
 import { twMerge } from 'tailwind-merge'
 import type { TaskModel } from '../models/TaskModel'
 import { scheduledDateLabel } from '../utils/dateUtils'
+import { RoundedSquareFilledIcon } from './RoundedSquareFilledIcon'
+import { RoundedSquareIcon } from './RoundedSquareIcon'
+
+export interface TaskCheckboxProps extends React.InputHTMLAttributes<HTMLInputElement> {
+  // asChild?: boolean;
+}
+
+const TaskCheckbox = ({ checked, onChange, className, ...props }: TaskCheckboxProps) => {
+  return (
+    <label
+      className={twMerge(
+        'relative size-4 cursor-pointer text-gray-500 hover:text-gray-700',
+        className,
+      )}
+    >
+      <input
+        type="checkbox"
+        className="invisible absolute size-0 rounded border-gray-300 text-blue-600 focus:ring-blue-500"
+        checked={checked}
+        onChange={onChange}
+        {...props}
+      />
+      {checked ? (
+        <>
+          <RoundedSquareFilledIcon size={16} className="absolute top-0 left-0 text-indigo-700" />
+          <CheckIcon className="absolute top-0.5 left-0.5 z-10 text-white" size={12} />
+        </>
+      ) : (
+        <RoundedSquareIcon size={16} />
+      )}
+    </label>
+  )
+}
 
 interface TaskItemProps {
   task: TaskModel
@@ -27,14 +60,16 @@ export const TaskItem = observer(({ task }: TaskItemProps) => {
   }
 
   return (
-    <div className="group flex items-start gap-3 rounded-lg p-3 hover:bg-gray-50">
-      <input
+    <div className="group flex items-center gap-3 rounded-lg p-2 hover:bg-gray-50">
+      {/* <input
         type="checkbox"
         checked={task.completed}
         onChange={() => task.toggleCompleted()}
         className="mt-0.5 rounded border-gray-300 text-blue-600 focus:ring-blue-500"
-      />
-      <div className="flex-1">
+      /> */}
+      <TaskCheckbox checked={task.completed} onChange={() => task.toggleCompleted()} />
+
+      <div className="flex-1 text-sm">
         <span className={`${task.completed ? 'text-gray-400 line-through' : 'text-gray-900'}`}>
           {task.title}
         </span>
