@@ -24,6 +24,8 @@ export class RootStore {
       updateList: action,
       updateListParent: action,
       inboxTasks: computed,
+      nowTasks: computed,
+      nowLists: computed,
       areas: computed,
       projects: computed,
       regularLists: computed,
@@ -125,15 +127,16 @@ export class RootStore {
     return this.tasks.filter(
       (task) =>
         task.scheduledDate &&
-        (isCurrentPeriod(task.scheduledDate) || isPast(task.scheduledDate.anchorDate)),
+        (isCurrentPeriod(task.scheduledDate) ||
+          (isPast(task.scheduledDate.anchorDate) && !task.completed)),
     )
   }
 
   get nowLists() {
     return this.lists.filter(
-      (task) =>
-        task.scheduledDate &&
-        (isCurrentPeriod(task.scheduledDate) || isPast(task.scheduledDate.anchorDate)),
+      (list) =>
+        list.scheduledDate &&
+        (isCurrentPeriod(list.scheduledDate) || isPast(list.scheduledDate.anchorDate)),
     )
   }
 
