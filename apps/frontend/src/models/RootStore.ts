@@ -120,7 +120,7 @@ export class RootStore {
   }
 
   get inboxTasks() {
-    return this.tasks.filter((task) => !task.listId)
+    return this.tasks.filter((task) => !task.listId && !task.completed)
   }
 
   get nowTasks() {

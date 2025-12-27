@@ -66,12 +66,17 @@ export function isCurrentPeriod(scheduledDate: {
 }
 
 export function sortByPeriodTypeAndDate(
-  am: { scheduledDate: { periodType: PeriodType; anchorDate: Date } | null },
-  bm: { scheduledDate: { periodType: PeriodType; anchorDate: Date } | null },
+  am: { scheduledDate: { periodType: PeriodType; anchorDate: Date } | null; completed?: boolean },
+  bm: { scheduledDate: { periodType: PeriodType; anchorDate: Date } | null; completed?: boolean },
 ): number {
   const periodTypeOrder: PeriodType[] = ['day', 'week', 'month', 'quarter', 'year']
   const a = am.scheduledDate
   const b = bm.scheduledDate
+
+  // Sort completed tasks last
+  if (am.completed !== bm.completed) {
+    return am.completed ? 1 : -1
+  }
 
   if (!a && !b) return 0
   if (!a) return 1
