@@ -1,4 +1,12 @@
-import { format, isThisMonth, isThisWeek, isToday, subDays } from 'date-fns'
+import {
+  format,
+  isThisMonth,
+  isThisQuarter,
+  isThisWeek,
+  isThisYear,
+  isToday,
+  subDays,
+} from 'date-fns'
 import type { PeriodType } from '../types'
 
 export function scheduledDateLabel(scheduledDate: {
@@ -34,5 +42,25 @@ export function scheduledDateLabel(scheduledDate: {
       }
       // TODO: if this year, skip year in format
       return format(anchorDate, 'PPP')
+  }
+}
+
+export function isCurrentPeriod(scheduledDate: {
+  periodType: PeriodType
+  anchorDate: Date
+}): boolean {
+  const { anchorDate, periodType } = scheduledDate
+
+  switch (periodType) {
+    case 'year':
+      return isThisYear(anchorDate)
+    case 'quarter':
+      return isThisQuarter(anchorDate)
+    case 'month':
+      return isThisMonth(anchorDate)
+    case 'week':
+      return isThisWeek(anchorDate, { weekStartsOn: 1 })
+    default:
+      return isToday(anchorDate)
   }
 }
