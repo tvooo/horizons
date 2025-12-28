@@ -79,6 +79,7 @@ export class RootStore {
       title?: string
       description?: string
       scheduledDate?: BackendScheduledDate
+      listId?: number | null
     },
   ) {
     await api.updateTask(toBackendTaskId(taskId), updates)
