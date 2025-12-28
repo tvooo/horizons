@@ -18,6 +18,23 @@
 
 @theme {
   --font-sans: "Inter", ui-sans-serif, system-ui, sans-serif;
+  --font-heading: "Petrona", serif;
+
+  --color-neutral-lightest: white;
+  --color-neutral-lighter: #faf9f9;
+  --color-neutral-light: #f1eced;
+  --color-neutral-medium-light: #dbd0d2;
+
+  --color-neutral-medium: #948687;
+
+  --color-focus: #7c5ea5;
+
+  --color-project: #437659;
+  --color-project: #7c5ea5;
+  --color-today: #6166aa;
+  --color-next: #6166aa;
+  --color-area: #437659;
+  --color-destructive: #9c595e;
 }
 
 @layer base {

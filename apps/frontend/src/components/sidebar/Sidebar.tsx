@@ -105,15 +105,20 @@ export const Sidebar = observer(({ onAddListClick }: SidebarProps) => {
 
         {/* All lists */}
         <div className="space-y-1">
-          {standaloneLists.map((list) => (
-            <ListItem key={list.id} list={list} />
-          ))}
+          {standaloneLists
+            .filter((list) => !list.archived)
+            .map((list) => (
+              <ListItem key={list.id} list={list} />
+            ))}
           {areas.map((area) => (
             <div key={area.id}>
               <ListItem list={area} />
-              {store.getChildLists(area.id).map((childList) => (
-                <ListItem key={childList.id} list={childList} isNested />
-              ))}
+              {store
+                .getChildLists(area.id)
+                .filter((childList) => !childList.archived)
+                .map((childList) => (
+                  <ListItem key={childList.id} list={childList} isNested />
+                ))}
             </div>
           ))}
         </div>

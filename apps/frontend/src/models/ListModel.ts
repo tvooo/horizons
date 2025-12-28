@@ -7,6 +7,7 @@ export class ListModel {
   name: string
   type: 'area' | 'project' | 'list'
   parentListId: string | null
+  archived: boolean
   scheduledDate: { periodType: PeriodType; anchorDate: Date } | null
   createdAt: Date
   updatedAt: Date
@@ -18,6 +19,7 @@ export class ListModel {
     this.name = data.name
     this.type = data.type === 'list' ? 'list' : data.type
     this.parentListId = data.parentListId ? String(data.parentListId) : null
+    this.archived = data.archived
     this.scheduledDate =
       data.scheduledPeriodType && data.scheduledAnchorDate
         ? {
@@ -33,9 +35,11 @@ export class ListModel {
       name: observable,
       type: observable,
       parentListId: observable,
+      archived: observable,
       scheduledDate: observable,
       updatedAt: observable,
       updateScheduledDate: action,
+      setArchived: action,
       numberOfOpenTasks: computed,
       numberOfTasks: computed,
     })
@@ -51,6 +55,10 @@ export class ListModel {
 
   get isList(): boolean {
     return this.type === 'list'
+  }
+
+  get isArchived(): boolean {
+    return this.archived
   }
 
   get numberOfTasks(): number {
@@ -82,6 +90,21 @@ export class ListModel {
     } catch (err) {
       runInAction(() => {
         this.scheduledDate = oldScheduledDate
+      })
+      throw err
+    }
+  }
+
+  async setArchived(archived: boolean) {
+    const oldArchived = this.archived
+    this.archived = archived
+    this.updatedAt = new Date()
+
+    try {
+      await this.rootStore.updateList(this.id, { archived })
+    } catch (err) {
+      runInAction(() => {
+        this.archived = oldArchived
       })
       throw err
     }

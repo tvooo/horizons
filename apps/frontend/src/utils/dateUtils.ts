@@ -1,5 +1,6 @@
 import {
   format,
+  isPast,
   isThisMonth,
   isThisQuarter,
   isThisWeek,
@@ -13,35 +14,35 @@ export function scheduledDateLabel(scheduledDate: {
   periodType: PeriodType
   anchorDate: Date
 }): string {
-  const { anchorDate, periodType } = scheduledDate
+  const referenceDate = isPast(scheduledDate.anchorDate) ? new Date() : scheduledDate.anchorDate
 
-  switch (periodType) {
+  switch (scheduledDate.periodType) {
     case 'year':
       return 'Some year'
     case 'quarter':
       return 'Some quarter'
     case 'month':
-      if (isThisMonth(anchorDate)) {
+      if (isThisMonth(referenceDate)) {
         return 'This month'
       }
-      return anchorDate.toLocaleString('default', { month: 'long', year: 'numeric' })
+      return referenceDate.toLocaleString('default', { month: 'long', year: 'numeric' })
     case 'week':
-      if (isThisWeek(anchorDate, { weekStartsOn: 1 })) {
+      if (isThisWeek(referenceDate, { weekStartsOn: 1 })) {
         return 'This week'
       }
-      if (isThisWeek(subDays(anchorDate, 7), { weekStartsOn: 1 })) {
+      if (isThisWeek(subDays(referenceDate, 7), { weekStartsOn: 1 })) {
         return 'Next week'
       }
-      return format(anchorDate, "'W'l yyyy")
+      return format(referenceDate, "'W'l yyyy")
     default:
-      if (isToday(anchorDate)) {
+      if (isToday(referenceDate)) {
         return 'Today'
       }
-      if (isToday(subDays(anchorDate, 1))) {
+      if (isToday(subDays(referenceDate, 1))) {
         return 'Tomorrow'
       }
       // TODO: if this year, skip year in format
-      return format(anchorDate, 'PPP')
+      return format(referenceDate, 'PPP')
   }
 }
 
