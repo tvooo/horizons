@@ -11,6 +11,7 @@ import { observer } from 'mobx-react-lite'
 import { useNavigate } from 'react-router-dom'
 import { signOut, useSession } from '../../lib/auth-client'
 import { useRootStore } from '../../models/RootStore'
+import type { ListType } from '../../types'
 import { ListItem } from '../ListItem'
 import { SidebarNavItem } from './SidebarNavItem'
 
@@ -26,6 +27,18 @@ const STATIC_PAGES: StaticPage[] = [
   { name: 'Upcoming', icon: CalendarDaysIcon, href: '/upcoming' },
   { name: 'On Ice', icon: IceCreamConeIcon, href: '/on-ice' },
 ]
+
+// Areas first, projects second, regular lists last
+function sortByListTypeAndName(
+  a: { type: ListType; name: string },
+  b: { type: ListType; name: string },
+) {
+  const typeOrder: { [key in ListType]: number } = { area: 0, project: 1, list: 2 }
+  if (typeOrder[a.type] !== typeOrder[b.type]) {
+    return typeOrder[a.type] - typeOrder[b.type]
+  }
+  return a.name.localeCompare(b.name)
+}
 
 interface SidebarProps {
   onAddListClick: () => void
@@ -58,6 +71,7 @@ export const Sidebar = observer(({ onAddListClick }: SidebarProps) => {
         <div className="space-y-1">
           {standaloneLists
             .filter((list) => !list.archived)
+            .sort(sortByListTypeAndName)
             .map((list) => (
               <ListItem key={list.id} list={list} />
             ))}
@@ -67,6 +81,7 @@ export const Sidebar = observer(({ onAddListClick }: SidebarProps) => {
               {store
                 .getChildLists(area.id)
                 .filter((childList) => !childList.archived)
+                .sort(sortByListTypeAndName)
                 .map((childList) => (
                   <ListItem key={childList.id} list={childList} isNested />
                 ))}

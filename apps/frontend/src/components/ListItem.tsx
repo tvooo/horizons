@@ -65,11 +65,11 @@ export const ListItem = observer(({ list, isNested = false }: ListItemProps) => 
             <IconComponent size={16} className="shrink-0 text-gray-500" />
           ) : null}
           <span className="flex-1 truncate">{list.name}</span>
-          {list.numberOfOpenTasks > 0 && (
+          {/* {list.numberOfOpenTasks > 0 && (
             <span className="ml-2 shrink-0 rounded-full bg-gray-200 px-2 py-0.5 font-medium text-gray-600 text-xs">
               {list.numberOfOpenTasks}
             </span>
-          )}
+          )} */}
         </Link>
       </ContextMenu.Trigger>
       <ContextMenu.Portal>

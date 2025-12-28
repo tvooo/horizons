@@ -61,13 +61,16 @@ export const TaskItem = observer(({ task, showList }: TaskItemProps) => {
         {showList && task.list && (
           <div className="flex items-center gap-1 text-xs">
             <TaskListPopover task={task}>
-              <button type="button" className="-m-1 p-1 hover:bg-gray-100 hover:text-gray-600">
-                <span className="text-gray-400 text-xs">{task.list.name}</span>
+              <button
+                type="button"
+                className="-m-1 p-1 text-gray-400 text-xs hover:bg-gray-100 hover:text-gray-600"
+              >
+                <span>{task.list.name}</span>
               </button>
             </TaskListPopover>
             <button
               type="button"
-              className="p-1 opacity-0 transition-opacity hover:bg-gray-100 hover:text-gray-600 focus:opacity-100 group-hover:opacity-100"
+              className="p-1 text-gray-400 text-xs opacity-0 transition-opacity hover:bg-gray-100 hover:text-gray-600 focus:opacity-100 group-hover:opacity-100"
               onClick={() => navigate(`/list/${task.list?.id}`)}
             >
               <ArrowRightIcon size={12} />
