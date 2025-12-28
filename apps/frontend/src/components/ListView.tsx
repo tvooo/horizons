@@ -3,6 +3,7 @@ import { useParams } from 'react-router-dom'
 import { useRootStore } from '../models/RootStore'
 import { ListPage } from '../pages/ListPage'
 import { scheduledDateLabel } from '../utils/dateUtils'
+import { ProjectIcon } from './ProjectIcon'
 import { TaskItem } from './TaskItem'
 
 export const ListView = observer(() => {
@@ -33,11 +34,22 @@ export const ListView = observer(() => {
     )
   }
 
+  const icon =
+    list.type === 'project' ? (
+      <button type="button" className="" onClick={() => list.setArchived(!list.archived)}>
+        <ProjectIcon size={28} className="shrink-0" percentage={list.completionPercentage ?? 0} />
+      </button>
+    ) : undefined
+
   return (
-    <ListPage title={list.name} onCreateTask={(title) => store.createTask(title, list.id)}>
+    <ListPage
+      title={list.name}
+      onCreateTask={(title) => store.createTask(title, list.id)}
+      icon={icon}
+    >
       {list.type === 'project' && (
         <div className="mt-4">
-          {list.completionPercentage !== undefined && (
+          {/* {list.completionPercentage !== undefined && (
             <div className="flex items-center gap-3">
               <div className="h-2 flex-1 rounded-full bg-gray-200">
                 <div
@@ -47,7 +59,7 @@ export const ListView = observer(() => {
               </div>
               <span className="text-gray-600 text-sm">{list.completionPercentage}%</span>
             </div>
-          )}
+          )} */}
           {list.scheduledDate && (
             <p className="mt-2 text-gray-600 text-sm">{scheduledDateLabel(list.scheduledDate)}</p>
           )}

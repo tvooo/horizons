@@ -21,6 +21,7 @@ export interface BackendList {
   name: string
   type: 'area' | 'project' | 'list'
   parentListId: number | null
+  archived: boolean
   scheduledPeriodType: PeriodType | null
   scheduledAnchorDate: string | null
   createdAt: string
@@ -50,6 +51,7 @@ export interface UpdateListRequest {
   name?: string
   type?: 'area' | 'project' | 'list'
   parentListId?: number | null
+  archived?: boolean
   scheduledDate?: BackendScheduledDate | null
 }
 

@@ -40,9 +40,10 @@ const TaskCheckbox = ({ checked, onChange, className, ...props }: TaskCheckboxPr
 
 interface TaskItemProps {
   task: TaskModel
+  showList?: boolean
 }
 
-export const TaskItem = observer(({ task }: TaskItemProps) => {
+export const TaskItem = observer(({ task, showList }: TaskItemProps) => {
   const handleSchedule = async (periodType: 'day' | 'week' | 'month', daysOffset: number) => {
     const anchorDate = new Date()
     anchorDate.setDate(anchorDate.getDate() + daysOffset)
@@ -60,19 +61,19 @@ export const TaskItem = observer(({ task }: TaskItemProps) => {
   }
 
   return (
-    <div className="group flex items-center gap-3 rounded-lg p-2 hover:bg-gray-50">
-      {/* <input
-        type="checkbox"
-        checked={task.completed}
-        onChange={() => task.toggleCompleted()}
-        className="mt-0.5 rounded border-gray-300 text-blue-600 focus:ring-blue-500"
-      /> */}
+    <div className="group flex items-center gap-2 rounded-lg p-2 hover:bg-gray-50">
       <TaskCheckbox checked={task.completed} onChange={() => task.toggleCompleted()} />
 
       <div className="flex-1 text-sm">
         <span className={`${task.completed ? 'text-gray-400 line-through' : 'text-gray-900'}`}>
           {task.title}
         </span>
+        {showList && task.list && (
+          <div>
+            <span className="text-gray-400 text-xs">{task.list.name}</span>
+            {/* <button type='button'><ArrowRightIcon size={12} className="ml-1" /></button> */}
+          </div>
+        )}
         {/* {task.description && <p className="mt-1 text-gray-500 text-sm">{task.description}</p>} */}
       </div>
 

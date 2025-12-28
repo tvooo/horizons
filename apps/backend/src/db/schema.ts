@@ -62,6 +62,7 @@ export const lists = sqliteTable('lists', {
     .references(() => users.id, { onDelete: 'cascade' }),
   // biome-ignore lint/suspicious/noExplicitAny: Cannot reference itself, apparently
   parentListId: integer('parent_list_id').references((): any => lists.id, { onDelete: 'set null' }),
+  archived: integer('archived', { mode: 'boolean' }).notNull().default(false),
   scheduledPeriodType: text('scheduled_period_type', {
     enum: ['day', 'week', 'month', 'quarter', 'year'],
   }),

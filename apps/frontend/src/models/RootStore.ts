@@ -91,6 +91,7 @@ export class RootStore {
       type?: 'area' | 'project' | 'list'
       parentListId?: number | null
       scheduledDate?: BackendScheduledDate | null
+      archived?: boolean
     },
   ) {
     await api.updateList(Number.parseInt(listId, 10), updates)

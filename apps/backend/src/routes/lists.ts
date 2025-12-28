@@ -27,6 +27,7 @@ const updateListSchema = z.object({
   name: z.string().min(1).optional(),
   type: z.enum(['area', 'project', 'list']).optional(),
   parentListId: z.number().nullable().optional(),
+  archived: z.boolean().optional(),
   scheduledDate: scheduledDateSchema.nullable().optional(),
 })
 

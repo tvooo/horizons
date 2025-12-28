@@ -16,7 +16,7 @@ export const Now = observer(() => {
         <ListItem key={list.id} list={list} />
       ))}
       {nowTasks.map((task) => (
-        <TaskItem key={task.id} task={task} />
+        <TaskItem key={task.id} task={task} showList />
       ))}
     </ListPage>
   )
