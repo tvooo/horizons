@@ -9,7 +9,7 @@ export interface ScheduledDate {
 }
 
 // List type discriminator
-export type ListType = 'regular' | 'project' | 'area'
+export type ListType = 'list' | 'project' | 'area'
 
 // Base list interface with common properties
 interface BaseList {

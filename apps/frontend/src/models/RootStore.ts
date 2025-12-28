@@ -128,9 +128,10 @@ export class RootStore {
   get nowTasks() {
     return this.tasks.filter(
       (task) =>
+        !task.completed &&
         task.scheduledDate &&
         (isCurrentPeriod(task.scheduledDate) ||
-          (isPast(task.scheduledDate.anchorDate) && !task.completed)),
+          (isPast(task.scheduledDate.anchorDate) && !task.completed)), // FIXME: redunandant completed check, not sure if I always want to hide completed or not
     )
   }
 
