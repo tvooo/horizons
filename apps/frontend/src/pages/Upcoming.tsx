@@ -34,11 +34,24 @@ const NEXT_5_DAYS = Array.from({ length: 5 }, (_, i) => {
 
 const PERIOD_TO_TYPE: Record<string, { periodType: PeriodType; anchorDate: Date }> = {
   'This Week': { periodType: 'week', anchorDate: startOfWeek(TODAY, { weekStartsOn: 1 }) },
+  'Next Week': {
+    periodType: 'week',
+    anchorDate: startOfWeek(addDays(TODAY, 7), { weekStartsOn: 1 }),
+  },
   'This Month': { periodType: 'month', anchorDate: startOfMonth(TODAY) },
+  'Next Month': { periodType: 'month', anchorDate: startOfMonth(addDays(TODAY, 30)) },
   'This Quarter': { periodType: 'quarter', anchorDate: startOfQuarter(TODAY) },
+  'Next Quarter': { periodType: 'quarter', anchorDate: startOfQuarter(addDays(TODAY, 90)) },
 }
 
-const TIME_PERIODS = ['This Week', 'This Month', 'This Quarter']
+const TIME_PERIODS = [
+  'This Week',
+  'This Month',
+  'This Quarter',
+  'Next Week',
+  'Next Month',
+  'Next Quarter',
+]
 
 export function Upcoming() {
   const { tasks, lists } = useRootStore()
