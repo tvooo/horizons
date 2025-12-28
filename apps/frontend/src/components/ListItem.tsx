@@ -47,10 +47,10 @@ export const ListItem = observer(({ list, isNested = false }: ListItemProps) => 
           to={`/list/${list.id}`}
           className={twMerge(
             clsx(
-              'flex cursor-pointer items-center gap-2 rounded px-2 py-1.5 text-gray-700 text-sm hover:bg-gray-100',
+              'flex cursor-pointer items-center gap-2 rounded px-2 py-1.5 text-gray-700 text-sm hover:bg-neutral-light',
               {
                 'ml-6': isNested,
-                'bg-neutral-light text-gray-900': isActive,
+                'bg-neutral-light font-medium text-gray-900': isActive,
               },
             ),
           )}

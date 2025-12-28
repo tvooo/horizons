@@ -47,6 +47,7 @@ export class TaskModel {
       updateTitle: action,
       updateDescription: action,
       updateScheduledDate: action,
+      moveToList: action,
       list: computed,
     })
   }
@@ -110,6 +111,22 @@ export class TaskModel {
     } catch (err) {
       // Rollback on error
       this.scheduledDate = oldScheduledDate
+      throw err
+    }
+  }
+
+  async moveToList(listId: string | null) {
+    const oldListId = this.listId
+    this.listId = listId
+    this.updatedAt = new Date()
+
+    try {
+      await this.rootStore.updateTask(this.id, {
+        listId: listId ? Number.parseInt(listId, 10) : undefined,
+      })
+    } catch (err) {
+      // Rollback on error
+      this.listId = oldListId
       throw err
     }
   }

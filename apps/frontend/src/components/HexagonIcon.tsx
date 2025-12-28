@@ -7,7 +7,7 @@ interface HexagonIconProps {
 export function HexagonIcon({
   size = 24,
   className = '',
-  filledVertices = [5, 0],
+  filledVertices = [3, 4],
 }: HexagonIconProps) {
   const viewBoxSize = 24
   const center = viewBoxSize / 2
@@ -28,7 +28,8 @@ export function HexagonIcon({
   const hexagonPath = `M ${vertices.map((v) => `${v.x},${v.y}`).join(' L ')} Z`
 
   // Create dividing lines from center to each vertex
-  const dividerLines: string[] = [vertices[3]].map((v) => `M ${center},${center} L ${v.x},${v.y}`)
+  const dividerLines: string[] = []
+  // const dividerLines: string[] = [vertices[3]].map((v) => `M ${center},${center} L ${v.x},${v.y}`)
 
   // Upper-left piece (vertices[5] to center to vertices[0])
   // This is the piece between 270° and 330° (top-left to top vertex)

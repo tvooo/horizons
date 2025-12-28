@@ -1,4 +1,3 @@
-import clsx from 'clsx'
 import {
   CalendarDaysIcon,
   IceCreamConeIcon,
@@ -10,7 +9,6 @@ import {
 } from 'lucide-react'
 import { observer } from 'mobx-react-lite'
 import { useNavigate } from 'react-router-dom'
-import { twMerge } from 'tailwind-merge'
 import { signOut, useSession } from '../../lib/auth-client'
 import { useRootStore } from '../../models/RootStore'
 import { ListItem } from '../ListItem'

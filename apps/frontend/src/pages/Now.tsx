@@ -8,7 +8,7 @@ import { ListPage } from './ListPage'
 export const Now = observer(() => {
   const store = useRootStore()
   const nowTasks = store.nowTasks.slice().sort(sortByPeriodTypeAndDate)
-  const nowLists = store.nowLists.slice().sort(sortByPeriodTypeAndDate)
+  const nowLists = store.nowLists.filter((list) => !list.archived).sort(sortByPeriodTypeAndDate)
 
   return (
     <ListPage title="Now" onCreateTask={(title) => store.createTask(title)}>

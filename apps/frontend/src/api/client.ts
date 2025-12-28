@@ -66,7 +66,7 @@ export interface CreateTaskRequest {
 export interface UpdateTaskRequest {
   title?: string
   description?: string
-  listId?: number
+  listId?: number | null
   completed?: boolean
   scheduledDate?: BackendScheduledDate
 }
