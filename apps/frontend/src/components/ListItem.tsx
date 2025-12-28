@@ -50,7 +50,7 @@ export const ListItem = observer(({ list, isNested = false }: ListItemProps) => 
               'flex cursor-pointer items-center gap-2 rounded px-2 py-1.5 text-gray-700 text-sm hover:bg-gray-100',
               {
                 'ml-6': isNested,
-                'bg-blue-50 text-blue-900': isActive,
+                'bg-neutral-light text-gray-900': isActive,
               },
             ),
           )}

@@ -1,18 +1,33 @@
 import clsx from 'clsx'
 import {
   CalendarDaysIcon,
-  CalendarIcon,
   IceCreamConeIcon,
   InboxIcon,
   LogOut,
+  type LucideIcon,
   Plus,
+  SunIcon,
 } from 'lucide-react'
 import { observer } from 'mobx-react-lite'
-import { NavLink, useNavigate } from 'react-router-dom'
+import { useNavigate } from 'react-router-dom'
 import { twMerge } from 'tailwind-merge'
 import { signOut, useSession } from '../../lib/auth-client'
 import { useRootStore } from '../../models/RootStore'
 import { ListItem } from '../ListItem'
+import { SidebarNavItem } from './SidebarNavItem'
+
+interface StaticPage {
+  name: string
+  icon: LucideIcon
+  href: string
+}
+
+const STATIC_PAGES: StaticPage[] = [
+  { name: 'Inbox', icon: InboxIcon, href: '/inbox' },
+  { name: 'Now', icon: SunIcon, href: '/now' },
+  { name: 'Upcoming', icon: CalendarDaysIcon, href: '/upcoming' },
+  { name: 'On Ice', icon: IceCreamConeIcon, href: '/on-ice' },
+]
 
 interface SidebarProps {
   onAddListClick: () => void
@@ -31,73 +46,11 @@ export const Sidebar = observer(({ onAddListClick }: SidebarProps) => {
   }
 
   return (
-    <div className="flex w-64 flex-col border-gray-300 border-r bg-white p-4">
+    <div className="flex w-72 shrink-0 flex-col border-gray-300 bg-neutral-lighter p-4">
       <div className="flex-1 overflow-y-auto">
-        <NavLink
-          to="/inbox"
-          className={({ isActive }) =>
-            twMerge(
-              clsx(
-                'flex cursor-pointer items-center gap-2 rounded px-2 py-1.5 text-gray-700 text-sm hover:bg-gray-100',
-                {
-                  'bg-blue-50 text-blue-900': isActive,
-                },
-              ),
-            )
-          }
-        >
-          <InboxIcon size={16} className="shrink-0 text-gray-500" />
-          <span className="flex-1">Inbox</span>
-        </NavLink>
-        <NavLink
-          to="/now"
-          className={({ isActive }) =>
-            twMerge(
-              clsx(
-                'flex cursor-pointer items-center gap-2 rounded px-2 py-1.5 text-gray-700 text-sm hover:bg-gray-100',
-                {
-                  'bg-blue-50 text-blue-900': isActive,
-                },
-              ),
-            )
-          }
-        >
-          <CalendarIcon size={16} className="shrink-0 text-gray-500" />
-          <span className="flex-1">Now</span>
-        </NavLink>
-        <NavLink
-          to="/upcoming"
-          className={({ isActive }) =>
-            twMerge(
-              clsx(
-                'flex cursor-pointer items-center gap-2 rounded px-2 py-1.5 text-gray-700 text-sm hover:bg-gray-100',
-                {
-                  'bg-blue-50 text-blue-900': isActive,
-                },
-              ),
-            )
-          }
-        >
-          <CalendarDaysIcon size={16} className="shrink-0 text-gray-500" />
-          <span className="flex-1">Upcoming</span>
-        </NavLink>
-
-        <NavLink
-          to="/on-ice"
-          className={({ isActive }) =>
-            twMerge(
-              clsx(
-                'flex cursor-pointer items-center gap-2 rounded px-2 py-1.5 text-gray-700 text-sm hover:bg-gray-100',
-                {
-                  'bg-blue-50 text-blue-900': isActive,
-                },
-              ),
-            )
-          }
-        >
-          <IceCreamConeIcon size={16} className="shrink-0 text-gray-500" />
-          <span className="flex-1">On Ice</span>
-        </NavLink>
+        {STATIC_PAGES.map((page) => (
+          <SidebarNavItem key={page.href} href={page.href} icon={page.icon} name={page.name} />
+        ))}
 
         <h3 className="mt-6 mb-3 font-semibold text-gray-500 text-xs uppercase tracking-wider">
           Lists

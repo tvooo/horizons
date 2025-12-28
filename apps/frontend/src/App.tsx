@@ -43,7 +43,7 @@ const AppContent = observer(() => {
             <ProtectedRoute>
               <div className="flex h-screen w-screen flex-col overflow-hidden">
                 {/* Top Navigation Bar */}
-                <div className="h-16 border-gray-300 border-b bg-white" />
+                {/* <div className="h-16 border-gray-300 border-b bg-white" /> */}
 
                 <div className="flex flex-1 overflow-hidden">
                   <Sidebar onAddListClick={() => setIsAddListModalOpen(true)} />
