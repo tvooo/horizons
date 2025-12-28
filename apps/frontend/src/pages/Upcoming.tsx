@@ -159,7 +159,7 @@ export function Upcoming() {
   }
 
   return (
-    <div className="flex flex-1 flex-col overflow-hidden bg-gray-300">
+    <div className="flex flex-1 flex-col overflow-hidden bg-neutral-light">
       {/* Days of the week - 5 columns */}
       <div className="grid flex-1 grid-cols-5 gap-px">
         {NEXT_5_DAYS.map((day) => {
@@ -169,7 +169,11 @@ export function Upcoming() {
             <div
               key={day.dateString}
               className={`flex flex-col p-4 ${
-                isToday(day.date) ? 'bg-blue-50' : isWeekend(day.name) ? 'bg-gray-50' : 'bg-white'
+                isToday(day.date)
+                  ? 'bg-neutral-lightest'
+                  : isWeekend(day.name)
+                    ? 'bg-gray-50'
+                    : 'bg-white'
               }`}
             >
               <h2
