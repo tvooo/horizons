@@ -12,7 +12,7 @@ export interface TaskCheckboxProps extends React.InputHTMLAttributes<HTMLInputEl
   // asChild?: boolean;
 }
 
-const TaskCheckbox = ({ checked, onChange, className, ...props }: TaskCheckboxProps) => {
+export const TaskCheckbox = ({ checked, onChange, className, ...props }: TaskCheckboxProps) => {
   return (
     <label
       className={twMerge(

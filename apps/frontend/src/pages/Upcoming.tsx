@@ -9,14 +9,15 @@ import {
   startOfWeek,
 } from 'date-fns'
 import { List as ListIcon } from 'lucide-react'
-import { useState } from 'react'
+import { observer } from 'mobx-react-lite'
 import { HexagonIcon } from '../components/HexagonIcon'
 import { ProjectIcon } from '../components/ProjectIcon'
-// import { lists, tasks } from '../mockData'
+import { TaskCheckbox } from '../components/TaskItem'
 import type { ListModel } from '../models/ListModel'
 import { useRootStore } from '../models/RootStore'
 import type { TaskModel } from '../models/TaskModel'
 import type { PeriodType } from '../types'
+import { isCurrentPeriod } from '../utils/dateUtils'
 
 // Use actual current date
 const TODAY = new Date()
@@ -53,25 +54,11 @@ const TIME_PERIODS = [
   'Next Quarter',
 ]
 
-export function Upcoming() {
+export const Upcoming = observer(function Upcoming() {
   const { tasks, lists } = useRootStore()
-  const [taskStates, setTaskStates] = useState<Record<string, boolean>>(() => {
-    const initial: Record<string, boolean> = {}
-    tasks.forEach((task) => {
-      initial[task.id] = task.completed
-    })
-    return initial
-  })
 
   const isWeekend = (dayName: string) => dayName === 'Saturday' || dayName === 'Sunday'
   const isToday = (date: Date) => isSameDay(date, TODAY)
-
-  const toggleTask = (taskId: string) => {
-    setTaskStates((prev) => ({
-      ...prev,
-      [taskId]: !prev[taskId],
-    }))
-  }
 
   // Rollover logic: if scheduled for the past, show it today
   const getTasksForDay = (targetDate: Date): TaskModel[] => {
@@ -80,7 +67,7 @@ export function Upcoming() {
     const isTargetToday = isSameDay(targetDate, TODAY)
 
     return tasks.filter((task) => {
-      if (!task.scheduledDate) return false
+      if (!task.scheduledDate || task.completed) return false
       if (task.scheduledDate.periodType !== 'day') return false
 
       const taskDate = startOfDay(task.scheduledDate.anchorDate)
@@ -102,13 +89,13 @@ export function Upcoming() {
     if (!periodConfig) return []
 
     return tasks.filter((task) => {
-      if (!task.scheduledDate) return false
+      if (!task.scheduledDate || task.completed) return false
       if (task.scheduledDate.periodType !== periodConfig.periodType) return false
 
       const taskPeriodStart = task.scheduledDate.anchorDate
 
       // Rollover: if scheduled for past period, show in current period
-      if (isBefore(taskPeriodStart, periodConfig.anchorDate)) {
+      if (isCurrentPeriod(periodConfig) && isBefore(taskPeriodStart, periodConfig.anchorDate)) {
         return true
       }
 
@@ -214,20 +201,18 @@ export function Upcoming() {
 
                 {/* Tasks */}
                 {dayTasks.map((task) => (
-                  <label
+                  <div
                     key={task.id}
-                    className={`flex cursor-pointer items-start gap-2 text-sm ${
+                    className={`flex cursor-pointer items-center gap-2 text-sm ${
                       isWeekend(day.name) ? 'text-gray-500' : 'text-gray-700'
                     }`}
                   >
-                    <input
-                      type="checkbox"
-                      checked={taskStates[task.id]}
-                      onChange={() => toggleTask(task.id)}
-                      className="mt-0.5 rounded border-gray-300 text-blue-600 focus:ring-blue-500"
+                    <TaskCheckbox
+                      checked={task.completed}
+                      onChange={() => task.toggleCompleted()}
                     />
                     <span className="flex-1">{task.title}</span>
-                  </label>
+                  </div>
                 ))}
               </div>
             </div>
@@ -269,18 +254,16 @@ export function Upcoming() {
 
                 {/* Tasks */}
                 {periodTasks.map((task) => (
-                  <label
+                  <div
                     key={task.id}
-                    className="flex cursor-pointer items-start gap-2 text-gray-700 text-sm"
+                    className="flex cursor-pointer items-center gap-2 text-gray-700 text-sm"
                   >
-                    <input
-                      type="checkbox"
-                      checked={taskStates[task.id]}
-                      onChange={() => toggleTask(task.id)}
-                      className="mt-0.5 rounded border-gray-300 text-blue-600 focus:ring-blue-500"
+                    <TaskCheckbox
+                      checked={task.completed}
+                      onChange={() => task.toggleCompleted()}
                     />
                     <span className="flex-1">{task.title}</span>
-                  </label>
+                  </div>
                 ))}
               </div>
             </div>
@@ -289,4 +272,4 @@ export function Upcoming() {
       </div>
     </div>
   )
-}
+})
