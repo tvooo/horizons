@@ -110,14 +110,14 @@ export const Upcoming = observer(function Upcoming() {
     const isTargetToday = isSameDay(targetDate, TODAY)
 
     return lists.filter((list) => {
-      if (!list.scheduledDate) return false
+      if (!list.scheduledDate || list.archived) return false
       if (list.scheduledDate.periodType !== 'day') return false
 
       const listDate = startOfDay(list.scheduledDate.anchorDate)
 
       // If target is today, show today's lists AND past lists (rollover)
       if (isTargetToday) {
-        return isSameDay(listDate, todayStart) || isBefore(listDate, todayStart)
+        return isSameDay(listDate, todayStart) || (isBefore(listDate, todayStart) && !list.archived)
       }
 
       // For future days, only show lists scheduled for that specific day
@@ -130,13 +130,13 @@ export const Upcoming = observer(function Upcoming() {
     if (!periodConfig) return []
 
     return lists.filter((list) => {
-      if (!list.scheduledDate) return false
+      if (!list.scheduledDate || list.archived) return false
       if (list.scheduledDate.periodType !== periodConfig.periodType) return false
 
       const listPeriodStart = list.scheduledDate.anchorDate
 
       // Rollover: if scheduled for past period, show in current period
-      if (isBefore(listPeriodStart, periodConfig.anchorDate)) {
+      if (isCurrentPeriod(periodConfig) && isBefore(listPeriodStart, periodConfig.anchorDate)) {
         return true
       }
 
