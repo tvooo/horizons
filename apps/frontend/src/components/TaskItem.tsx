@@ -1,5 +1,6 @@
 import { ArrowRightIcon, CheckIcon } from 'lucide-react'
 import { observer } from 'mobx-react-lite'
+import { useEffect, useRef, useState } from 'react'
 import { useNavigate } from 'react-router-dom'
 import { twMerge } from 'tailwind-merge'
 import type { TaskModel } from '../models/TaskModel'
@@ -8,9 +9,7 @@ import { RoundedSquareIcon } from './RoundedSquareIcon'
 import { TaskListPopover } from './TaskListPopover'
 import { TaskSchedulePopover } from './TaskSchedulePopover'
 
-export interface TaskCheckboxProps extends React.InputHTMLAttributes<HTMLInputElement> {
-  // asChild?: boolean;
-}
+export interface TaskCheckboxProps extends React.InputHTMLAttributes<HTMLInputElement> {}
 
 export const TaskCheckbox = ({ checked, onChange, className, ...props }: TaskCheckboxProps) => {
   return (
@@ -50,14 +49,68 @@ interface TaskItemProps {
 
 export const TaskItem = observer(({ task, showList }: TaskItemProps) => {
   const navigate = useNavigate()
+  const [isEditing, setIsEditing] = useState(false)
+  const [editValue, setEditValue] = useState(task.title)
+  const inputRef = useRef<HTMLInputElement>(null)
+
+  useEffect(() => {
+    if (isEditing && inputRef.current) {
+      inputRef.current.focus()
+      inputRef.current.select()
+    }
+  }, [isEditing])
+
+  const handleSave = async () => {
+    const trimmedValue = editValue.trim()
+    if (trimmedValue && trimmedValue !== task.title) {
+      await task.updateTitle(trimmedValue)
+    }
+    setIsEditing(false)
+  }
+
+  const handleCancel = () => {
+    setEditValue(task.title)
+    setIsEditing(false)
+  }
+
+  const handleKeyDown = (e: React.KeyboardEvent<HTMLInputElement>) => {
+    if (e.key === 'Enter') {
+      e.preventDefault()
+      handleSave()
+    } else if (e.key === 'Escape') {
+      e.preventDefault()
+      handleCancel()
+    }
+  }
+
   return (
     <div className="group flex items-center gap-2 rounded-lg p-2 hover:bg-gray-50">
       <TaskCheckbox checked={task.completed} onChange={() => task.toggleCompleted()} />
 
       <div className="flex-1 text-sm">
-        <span className={`${task.completed ? 'text-gray-400 line-through' : 'text-gray-900'}`}>
-          {task.title}
-        </span>
+        {isEditing ? (
+          <input
+            ref={inputRef}
+            type="text"
+            value={editValue}
+            onChange={(e) => setEditValue(e.target.value)}
+            onBlur={handleCancel}
+            onKeyDown={handleKeyDown}
+            className={`w-full bg-transparent outline-none ${task.completed ? 'text-gray-400 line-through' : 'text-gray-900'}`}
+          />
+        ) : (
+          // biome-ignore lint/a11y/noStaticElementInteractions: Need to think about how to improve this
+          // biome-ignore lint/a11y/useKeyWithClickEvents: See above
+          <span
+            className={`cursor-text ${task.completed ? 'text-gray-400 line-through' : 'text-gray-900'}`}
+            onClick={() => {
+              setEditValue(task.title)
+              setIsEditing(true)
+            }}
+          >
+            {task.title}
+          </span>
+        )}
         {showList && task.list && (
           <div className="flex items-center gap-1 text-xs">
             <TaskListPopover task={task}>
@@ -77,7 +130,6 @@ export const TaskItem = observer(({ task, showList }: TaskItemProps) => {
             </button>
           </div>
         )}
-        {/* {task.description && <p className="mt-1 text-gray-500 text-sm">{task.description}</p>} */}
       </div>
 
       <TaskSchedulePopover task={task} />
