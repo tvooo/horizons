@@ -10,14 +10,12 @@ import {
 } from 'date-fns'
 import { List as ListIcon } from 'lucide-react'
 import { observer } from 'mobx-react-lite'
+import type { ListModel, PeriodType, TaskModel } from 'shared'
+import { isCurrentPeriod } from 'shared'
 import { HexagonIcon } from '../components/HexagonIcon'
 import { ProjectIcon } from '../components/ProjectIcon'
 import { TaskCheckbox } from '../components/TaskItem'
-import type { ListModel } from '../models/ListModel'
-import { useRootStore } from '../models/RootStore'
-import type { TaskModel } from '../models/TaskModel'
-import type { PeriodType } from '../types'
-import { isCurrentPeriod } from '../utils/dateUtils'
+import { useRootStore } from '../models/RootStoreContext'
 
 // Use actual current date
 const TODAY = new Date()

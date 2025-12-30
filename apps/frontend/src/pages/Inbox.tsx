@@ -1,6 +1,6 @@
 import { observer } from 'mobx-react-lite'
 import { TaskItem } from '../components/TaskItem'
-import { useRootStore } from '../models/RootStore'
+import { useRootStore } from '../models/RootStoreContext'
 import { ListPage } from './ListPage'
 
 export const Inbox = observer(() => {
