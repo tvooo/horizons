@@ -50,25 +50,51 @@ export const TaskListPopover = observer(({ task, children }: TaskListPopoverProp
               .map((list) => {
                 const IconComponent = list.type === 'area' ? HexagonIcon : null
                 return (
-                  <button
-                    key={list.id}
-                    type="button"
-                    onClick={() => handleMoveToList(list.id)}
-                    className="flex w-full items-center gap-2 rounded px-2 py-1.5 text-left text-gray-700 text-sm hover:bg-gray-100"
-                  >
-                    {IconComponent &&
-                      (list.type === 'project' ? (
-                        <ProjectIcon
-                          size={14}
-                          className="shrink-0 text-gray-500"
-                          percentage={list.completionPercentage ?? 0}
-                        />
-                      ) : (
-                        <IconComponent size={14} className="shrink-0 text-gray-500" />
-                      ))}
-                    <span className="flex-1">{list.name}</span>
-                    {task.listId === list.id && <CheckIcon size={14} className="text-gray-400" />}
-                  </button>
+                  <div key={list.id}>
+                    <button
+                      type="button"
+                      onClick={() => handleMoveToList(list.id)}
+                      className="flex w-full items-center gap-2 rounded px-2 py-1.5 text-left text-gray-700 text-sm hover:bg-gray-100"
+                    >
+                      {IconComponent &&
+                        (list.type === 'project' ? (
+                          <ProjectIcon
+                            size={14}
+                            className="shrink-0 text-gray-500"
+                            percentage={list.completionPercentage ?? 0}
+                          />
+                        ) : (
+                          <IconComponent size={14} className="shrink-0 text-gray-500" />
+                        ))}
+                      <span className="flex-1">{list.name}</span>
+                      {task.listId === list.id && <CheckIcon size={14} className="text-gray-400" />}
+                    </button>
+                    {/* Projects nested under standalone lists */}
+                    {list.type === 'list' &&
+                      store
+                        .getChildLists(list.id)
+                        .filter((childList) => !childList.archived)
+                        .map((childList) => (
+                          <button
+                            key={childList.id}
+                            type="button"
+                            onClick={() => handleMoveToList(childList.id)}
+                            className="ml-6 flex w-full items-center gap-2 rounded px-2 py-1.5 text-left text-gray-700 text-sm hover:bg-gray-100"
+                          >
+                            {childList.type === 'project' && (
+                              <ProjectIcon
+                                size={14}
+                                className="shrink-0 text-gray-500"
+                                percentage={childList.completionPercentage ?? 0}
+                              />
+                            )}
+                            <span className="flex-1">{childList.name}</span>
+                            {task.listId === childList.id && (
+                              <CheckIcon size={14} className="text-gray-400" />
+                            )}
+                          </button>
+                        ))}
+                  </div>
                 )
               })}
 
@@ -84,31 +110,57 @@ export const TaskListPopover = observer(({ task, children }: TaskListPopoverProp
                   <span className="flex-1">{area.name}</span>
                   {task.listId === area.id && <CheckIcon size={14} className="text-gray-400" />}
                 </button>
-                {/* Child lists */}
+                {/* Child lists and their nested projects */}
                 {store
                   .getChildLists(area.id)
                   .filter((childList) => !childList.archived)
                   .map((childList) => {
                     const IconComponent = childList.type === 'project' ? ProjectIcon : null
                     return (
-                      <button
-                        key={childList.id}
-                        type="button"
-                        onClick={() => handleMoveToList(childList.id)}
-                        className="ml-6 flex w-full items-center gap-2 rounded px-2 py-1.5 text-left text-gray-700 text-sm hover:bg-gray-100"
-                      >
-                        {IconComponent && (
-                          <IconComponent
-                            size={14}
-                            className="shrink-0 text-gray-500"
-                            percentage={childList.completionPercentage ?? 0}
-                          />
-                        )}
-                        <span className="flex-1">{childList.name}</span>
-                        {task.listId === childList.id && (
-                          <CheckIcon size={14} className="text-gray-400" />
-                        )}
-                      </button>
+                      <div key={childList.id}>
+                        <button
+                          type="button"
+                          onClick={() => handleMoveToList(childList.id)}
+                          className="ml-6 flex w-full items-center gap-2 rounded px-2 py-1.5 text-left text-gray-700 text-sm hover:bg-gray-100"
+                        >
+                          {IconComponent && (
+                            <IconComponent
+                              size={14}
+                              className="shrink-0 text-gray-500"
+                              percentage={childList.completionPercentage ?? 0}
+                            />
+                          )}
+                          <span className="flex-1">{childList.name}</span>
+                          {task.listId === childList.id && (
+                            <CheckIcon size={14} className="text-gray-400" />
+                          )}
+                        </button>
+                        {/* Projects nested under lists (third level) */}
+                        {childList.type === 'list' &&
+                          store
+                            .getChildLists(childList.id)
+                            .filter((grandchildList) => !grandchildList.archived)
+                            .map((grandchildList) => (
+                              <button
+                                key={grandchildList.id}
+                                type="button"
+                                onClick={() => handleMoveToList(grandchildList.id)}
+                                className="ml-12 flex w-full items-center gap-2 rounded px-2 py-1.5 text-left text-gray-700 text-sm hover:bg-gray-100"
+                              >
+                                {grandchildList.type === 'project' && (
+                                  <ProjectIcon
+                                    size={14}
+                                    className="shrink-0 text-gray-500"
+                                    percentage={grandchildList.completionPercentage ?? 0}
+                                  />
+                                )}
+                                <span className="flex-1">{grandchildList.name}</span>
+                                {task.listId === grandchildList.id && (
+                                  <CheckIcon size={14} className="text-gray-400" />
+                                )}
+                              </button>
+                            ))}
+                      </div>
                     )
                   })}
               </div>
