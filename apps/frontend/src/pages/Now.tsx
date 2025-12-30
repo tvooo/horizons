@@ -1,8 +1,8 @@
 import { observer } from 'mobx-react-lite'
+import { sortByPeriodTypeAndDate } from 'shared'
 import { ListItem } from '../components/ListItem'
 import { TaskItem } from '../components/TaskItem'
-import { useRootStore } from '../models/RootStore'
-import { sortByPeriodTypeAndDate } from '../utils/dateUtils'
+import { useRootStore } from '../models/RootStoreContext'
 import { ListPage } from './ListPage'
 
 export const Now = observer(() => {

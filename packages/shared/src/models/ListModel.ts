@@ -1,5 +1,5 @@
 import { action, computed, makeObservable, observable, runInAction } from 'mobx'
-import type { BackendList, PeriodType } from '../api/client'
+import type { BackendList, PeriodType } from '../api/types'
 import type { RootStore } from './RootStore'
 
 export class ListModel {

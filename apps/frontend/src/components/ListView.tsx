@@ -1,8 +1,8 @@
 import { observer } from 'mobx-react-lite'
 import { useParams } from 'react-router-dom'
-import { useRootStore } from '../models/RootStore'
+import { scheduledDateLabel } from 'shared'
+import { useRootStore } from '../models/RootStoreContext'
 import { ListPage } from '../pages/ListPage'
-import { scheduledDateLabel } from '../utils/dateUtils'
 import { ProjectIcon } from './ProjectIcon'
 import { TaskItem } from './TaskItem'
 

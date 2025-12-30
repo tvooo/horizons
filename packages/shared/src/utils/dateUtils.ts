@@ -8,7 +8,7 @@ import {
   isToday,
   subDays,
 } from 'date-fns'
-import type { PeriodType } from '../types'
+import type { PeriodType } from '../api/types'
 
 export function scheduledDateLabel(scheduledDate: {
   periodType: PeriodType

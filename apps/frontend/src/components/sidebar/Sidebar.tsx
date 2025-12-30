@@ -9,9 +9,9 @@ import {
 } from 'lucide-react'
 import { observer } from 'mobx-react-lite'
 import { useNavigate } from 'react-router-dom'
+import type { ListType } from 'shared'
 import { signOut, useSession } from '../../lib/auth-client'
-import { useRootStore } from '../../models/RootStore'
-import type { ListType } from '../../types'
+import { useRootStore } from '../../models/RootStoreContext'
 import { ListItem } from '../ListItem'
 import { SidebarNavItem } from './SidebarNavItem'
 

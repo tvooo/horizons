@@ -1,7 +1,7 @@
 import * as Dialog from '@radix-ui/react-dialog'
 import { X } from 'lucide-react'
 import { useState } from 'react'
-import { useRootStore } from '../models/RootStore'
+import { useRootStore } from '../models/RootStoreContext'
 
 interface AddListModalProps {
   isOpen: boolean

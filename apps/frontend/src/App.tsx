@@ -1,11 +1,13 @@
 import { observer } from 'mobx-react-lite'
 import { useEffect, useMemo, useState } from 'react'
 import { BrowserRouter, Navigate, Route, Routes } from 'react-router-dom'
+import { RootStore } from 'shared'
+import { api } from './api/client'
 import { AddListModal } from './components/AddListModal'
 import { ListView } from './components/ListView'
 import { ProtectedRoute } from './components/ProtectedRoute'
 import { Sidebar } from './components/sidebar/Sidebar'
-import { RootStore, RootStoreProvider, useRootStore } from './models/RootStore'
+import { RootStoreProvider, useRootStore } from './models/RootStoreContext'
 import { Inbox } from './pages/Inbox'
 import { Now } from './pages/Now'
 import { OnIce } from './pages/OnIce'
@@ -73,7 +75,7 @@ const AppContent = observer(() => {
 })
 
 function App() {
-  const rootStore = useMemo(() => new RootStore(), [])
+  const rootStore = useMemo(() => new RootStore(api), [])
 
   return (
     <RootStoreProvider value={rootStore}>

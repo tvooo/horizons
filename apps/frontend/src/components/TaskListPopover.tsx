@@ -1,8 +1,8 @@
 import * as Popover from '@radix-ui/react-popover'
 import { CheckIcon } from 'lucide-react'
 import { observer } from 'mobx-react-lite'
-import { useRootStore } from '../models/RootStore'
-import type { TaskModel } from '../models/TaskModel'
+import type { TaskModel } from 'shared'
+import { useRootStore } from '../models/RootStoreContext'
 import { HexagonIcon } from './HexagonIcon'
 import { ProjectIcon } from './ProjectIcon'
 

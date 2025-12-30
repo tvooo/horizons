@@ -1,5 +1,5 @@
 import { action, computed, makeObservable, observable } from 'mobx'
-import type { BackendTask, PeriodType } from '../api/client'
+import type { BackendTask, PeriodType } from '../api/types'
 import type { RootStore } from './RootStore'
 
 export interface ScheduledDate {

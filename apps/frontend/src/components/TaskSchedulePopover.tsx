@@ -1,9 +1,8 @@
 import * as Popover from '@radix-ui/react-popover'
 import { CalendarDays } from 'lucide-react'
 import { observer } from 'mobx-react-lite'
+import { scheduledDateLabel, type TaskModel } from 'shared'
 import { twMerge } from 'tailwind-merge'
-import type { TaskModel } from '../models/TaskModel'
-import { scheduledDateLabel } from '../utils/dateUtils'
 import { handleSchedule, scheduleOptions } from '../utils/scheduleOptions'
 
 interface TaskSchedulePopoverProps {

@@ -1,8 +1,8 @@
 import { isPast } from 'date-fns'
 import { action, computed, makeObservable, observable, runInAction } from 'mobx'
-import { createContext, useContext } from 'react'
-import { api, type BackendScheduledDate } from '../api/client'
+import type { APIClient } from '../api/client'
 import { toBackendTaskId } from '../api/converter'
+import type { BackendScheduledDate } from '../api/types'
 import { isCurrentPeriod } from '../utils/dateUtils'
 import { ListModel } from './ListModel'
 import { TaskModel } from './TaskModel'
@@ -12,7 +12,11 @@ export class RootStore {
   tasks: TaskModel[] = []
   loading = true
 
-  constructor() {
+  private api: APIClient
+
+  constructor(api: APIClient) {
+    this.api = api
+
     makeObservable(this, {
       lists: observable,
       tasks: observable,
@@ -34,7 +38,10 @@ export class RootStore {
 
   async loadData() {
     try {
-      const [backendLists, backendTasks] = await Promise.all([api.getLists(), api.getTasks()])
+      const [backendLists, backendTasks] = await Promise.all([
+        this.api.getLists(),
+        this.api.getTasks(),
+      ])
 
       runInAction(() => {
         this.lists = backendLists.map((data) => new ListModel(data, this))
@@ -50,7 +57,7 @@ export class RootStore {
   }
 
   async createTask(title: string, listId?: string) {
-    const backendTask = await api.createTask({
+    const backendTask = await this.api.createTask({
       title,
       listId: listId ? Number.parseInt(listId, 10) : undefined,
     })
@@ -63,7 +70,7 @@ export class RootStore {
   }
 
   async createList(name: string, type: 'area' | 'project' | 'list' = 'list') {
-    const backendList = await api.createList({ name, type })
+    const backendList = await this.api.createList({ name, type })
 
     const newList = new ListModel(backendList, this)
     runInAction(() => {
@@ -82,7 +89,7 @@ export class RootStore {
       listId?: number | null
     },
   ) {
-    await api.updateTask(toBackendTaskId(taskId), updates)
+    await this.api.updateTask(toBackendTaskId(taskId), updates)
   }
 
   async updateList(
@@ -95,7 +102,7 @@ export class RootStore {
       archived?: boolean
     },
   ) {
-    await api.updateList(Number.parseInt(listId, 10), updates)
+    await this.api.updateList(Number.parseInt(listId, 10), updates)
   }
 
   async updateListParent(listId: string, parentListId: string | null) {
@@ -110,7 +117,7 @@ export class RootStore {
     })
 
     try {
-      await api.updateList(Number.parseInt(listId, 10), {
+      await this.api.updateList(Number.parseInt(listId, 10), {
         parentListId: parentListId ? Number.parseInt(parentListId, 10) : null,
       })
     } catch (err) {
@@ -170,16 +177,4 @@ export class RootStore {
   getStandaloneLists() {
     return this.lists.filter((list) => !list.isArea && !list.parentListId)
   }
-}
-
-const RootStoreContext = createContext<RootStore | null>(null)
-
-export const RootStoreProvider = RootStoreContext.Provider
-
-export function useRootStore() {
-  const context = useContext(RootStoreContext)
-  if (!context) {
-    throw new Error('useRootStore must be used within RootStoreProvider')
-  }
-  return context
 }

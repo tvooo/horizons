@@ -10,6 +10,10 @@
     "forceConsistentCasingInFileNames": true,
     "resolveJsonModule": true,
     "isolatedModules": true,
-    "types": ["bun-types"]
+    "types": ["bun-types"],
+    "paths": {
+      "shared": ["./packages/shared/src/index.ts"],
+      "shared/*": ["./packages/shared/src/*"]
+    }
   }
 }

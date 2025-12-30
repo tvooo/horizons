@@ -9,6 +9,8 @@
     "dev": "bun run --filter '*' dev",
     "dev:backend": "bun run --filter backend dev",
     "dev:frontend": "bun run --filter frontend dev",
+    "dev:mobile": "bun run --filter mobile start",
+    "ios": "bun run --filter mobile ios",
     "lint": "biome check .",
     "format": "biome format --write .",
     "type-check": "bun run --filter '*' type-check",
