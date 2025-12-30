@@ -14,9 +14,10 @@ import { ProjectIcon } from './ProjectIcon'
 interface ListItemProps {
   list: ListModel
   isNested?: boolean
+  nestingLevel?: number
 }
 
-export const ListItem = observer(({ list, isNested = false }: ListItemProps) => {
+export const ListItem = observer(({ list, isNested = false, nestingLevel = 0 }: ListItemProps) => {
   const store = useRootStore()
   const match = useMatch(`/list/${list.id}`)
   const isActive = !!match
@@ -28,6 +29,11 @@ export const ListItem = observer(({ list, isNested = false }: ListItemProps) => 
     list.type === 'area' ? HexagonIcon : list.type === 'project' ? null : DotIcon
 
   const areas = store.areas
+  const regularLists = store.lists.filter((l) => l.type === 'list')
+
+  // Calculate margin based on nesting level (0 = no nesting, 1 = ml-6, 2 = ml-12)
+  const nestingClass =
+    nestingLevel === 2 ? 'ml-12' : nestingLevel === 1 ? 'ml-6' : isNested ? 'ml-6' : ''
 
   useEffect(() => {
     if (isEditing && inputRef.current) {
@@ -72,7 +78,7 @@ export const ListItem = observer(({ list, isNested = false }: ListItemProps) => 
               clsx(
                 'flex cursor-pointer items-center gap-2 rounded px-2 py-1.5 text-gray-700 text-sm hover:bg-neutral-light',
                 {
-                  'ml-6': isNested,
+                  [nestingClass]: nestingClass,
                   'bg-neutral-light font-medium text-gray-900': isActive,
                 },
               ),
@@ -104,7 +110,7 @@ export const ListItem = observer(({ list, isNested = false }: ListItemProps) => 
               clsx(
                 'flex cursor-pointer items-center gap-2 rounded px-2 py-1.5 text-gray-700 text-sm hover:bg-neutral-light',
                 {
-                  'ml-6': isNested,
+                  [nestingClass]: nestingClass,
                   'bg-neutral-light font-medium text-gray-900': isActive,
                 },
               ),
@@ -176,7 +182,7 @@ export const ListItem = observer(({ list, isNested = false }: ListItemProps) => 
                 Set Parent List
               </ContextMenu.SubTrigger>
               <ContextMenu.Portal>
-                <ContextMenu.SubContent className="min-w-[180px] rounded-lg border border-gray-200 bg-white p-1 shadow-lg">
+                <ContextMenu.SubContent className="max-h-96 min-w-[180px] overflow-y-auto rounded-lg border border-gray-200 bg-white p-1 shadow-lg">
                   <ContextMenu.Item
                     className="cursor-pointer rounded px-3 py-2 text-gray-700 text-sm outline-none hover:bg-gray-100 focus:bg-gray-100"
                     onSelect={() => {
@@ -185,21 +191,47 @@ export const ListItem = observer(({ list, isNested = false }: ListItemProps) => 
                   >
                     None
                   </ContextMenu.Item>
-                  {areas.length === 0 ? (
+
+                  {/* Areas as parent candidates */}
+                  {areas.length === 0 && list.type === 'list' ? (
                     <div className="px-3 py-2 text-gray-500 text-sm">No areas available</div>
                   ) : (
-                    areas.map((area) => (
-                      <ContextMenu.Item
-                        key={area.id}
-                        className="cursor-pointer rounded px-3 py-2 text-gray-700 text-sm outline-none hover:bg-gray-100 focus:bg-gray-100"
-                        onSelect={() => {
-                          store.updateListParent(list.id, area.id)
-                        }}
-                      >
-                        {area.name}
-                      </ContextMenu.Item>
-                    ))
+                    areas
+                      .filter((area) => area.id !== list.id)
+                      .map((area) => (
+                        <ContextMenu.Item
+                          key={area.id}
+                          className="cursor-pointer rounded px-3 py-2 text-gray-700 text-sm outline-none hover:bg-gray-100 focus:bg-gray-100"
+                          onSelect={() => {
+                            store.updateListParent(list.id, area.id)
+                          }}
+                        >
+                          <div className="flex items-center gap-2">
+                            <HexagonIcon size={14} className="shrink-0 text-gray-500" />
+                            <span>{area.name}</span>
+                          </div>
+                        </ContextMenu.Item>
+                      ))
                   )}
+
+                  {/* Regular lists as parent candidates (only for projects) */}
+                  {list.type === 'project' &&
+                    regularLists
+                      .filter((l) => l.id !== list.id && !l.archived)
+                      .map((regularList) => (
+                        <ContextMenu.Item
+                          key={regularList.id}
+                          className="cursor-pointer rounded px-3 py-2 text-gray-700 text-sm outline-none hover:bg-gray-100 focus:bg-gray-100"
+                          onSelect={() => {
+                            store.updateListParent(list.id, regularList.id)
+                          }}
+                        >
+                          <div className="flex items-center gap-2">
+                            <DotIcon size={14} className="shrink-0 text-gray-500" />
+                            <span>{regularList.name}</span>
+                          </div>
+                        </ContextMenu.Item>
+                      ))}
                 </ContextMenu.SubContent>
               </ContextMenu.Portal>
             </ContextMenu.Sub>

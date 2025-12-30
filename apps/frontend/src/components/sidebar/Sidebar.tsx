@@ -73,7 +73,16 @@ export const Sidebar = observer(({ onAddListClick }: SidebarProps) => {
             .filter((list) => !list.archived)
             .sort(sortByListTypeAndName)
             .map((list) => (
-              <ListItem key={list.id} list={list} />
+              <div key={list.id}>
+                <ListItem list={list} />
+                {/* Children of standalone lists (e.g., projects nested in lists) */}
+                {list.type === 'list' &&
+                  store
+                    .getChildLists(list.id)
+                    .filter((childList) => !childList.archived)
+                    .sort(sortByListTypeAndName)
+                    .map((childList) => <ListItem key={childList.id} list={childList} isNested />)}
+              </div>
             ))}
           {areas.map((area) => (
             <div key={area.id}>
@@ -83,7 +92,22 @@ export const Sidebar = observer(({ onAddListClick }: SidebarProps) => {
                 .filter((childList) => !childList.archived)
                 .sort(sortByListTypeAndName)
                 .map((childList) => (
-                  <ListItem key={childList.id} list={childList} isNested />
+                  <div key={childList.id}>
+                    <ListItem list={childList} isNested />
+                    {/* Third level: projects nested in lists (inside areas) */}
+                    {childList.type === 'list' &&
+                      store
+                        .getChildLists(childList.id)
+                        .filter((grandchildList) => !grandchildList.archived)
+                        .sort(sortByListTypeAndName)
+                        .map((grandchildList) => (
+                          <ListItem
+                            key={grandchildList.id}
+                            list={grandchildList}
+                            nestingLevel={2}
+                          />
+                        ))}
+                  </div>
                 ))}
             </div>
           ))}
