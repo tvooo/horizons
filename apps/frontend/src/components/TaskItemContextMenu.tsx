@@ -78,28 +78,55 @@ export const TaskItemContextMenu = observer(({ task, children }: TaskItemContext
                   .map((list) => {
                     const IconComponent = list.type === 'area' ? HexagonIcon : null
                     return (
-                      <ContextMenu.Item
-                        key={list.id}
-                        className="cursor-pointer rounded px-3 py-2 text-gray-700 text-sm outline-none hover:bg-gray-100 focus:bg-gray-100"
-                        onSelect={() => handleMoveToList(list.id)}
-                      >
-                        <div className="flex items-center gap-2">
-                          {IconComponent &&
-                            (list.type === 'project' ? (
-                              <ProjectIcon
-                                size={14}
-                                className="shrink-0 text-gray-500"
-                                percentage={list.completionPercentage ?? 0}
-                              />
-                            ) : (
-                              <IconComponent size={14} className="shrink-0 text-gray-500" />
+                      <div key={list.id}>
+                        <ContextMenu.Item
+                          className="cursor-pointer rounded px-3 py-2 text-gray-700 text-sm outline-none hover:bg-gray-100 focus:bg-gray-100"
+                          onSelect={() => handleMoveToList(list.id)}
+                        >
+                          <div className="flex items-center gap-2">
+                            {IconComponent &&
+                              (list.type === 'project' ? (
+                                <ProjectIcon
+                                  size={14}
+                                  className="shrink-0 text-gray-500"
+                                  percentage={list.completionPercentage ?? 0}
+                                />
+                              ) : (
+                                <IconComponent size={14} className="shrink-0 text-gray-500" />
+                              ))}
+                            <span className="flex-1">{list.name}</span>
+                            {task.listId === list.id && (
+                              <CheckIcon size={14} className="text-gray-400" />
+                            )}
+                          </div>
+                        </ContextMenu.Item>
+                        {/* Projects nested under standalone lists */}
+                        {list.type === 'list' &&
+                          store
+                            .getChildLists(list.id)
+                            .filter((childList) => !childList.archived)
+                            .map((childList) => (
+                              <ContextMenu.Item
+                                key={childList.id}
+                                className="cursor-pointer rounded px-3 py-2 pl-9 text-gray-700 text-sm outline-none hover:bg-gray-100 focus:bg-gray-100"
+                                onSelect={() => handleMoveToList(childList.id)}
+                              >
+                                <div className="flex items-center gap-2">
+                                  {childList.type === 'project' && (
+                                    <ProjectIcon
+                                      size={14}
+                                      className="shrink-0 text-gray-500"
+                                      percentage={childList.completionPercentage ?? 0}
+                                    />
+                                  )}
+                                  <span className="flex-1">{childList.name}</span>
+                                  {task.listId === childList.id && (
+                                    <CheckIcon size={14} className="text-gray-400" />
+                                  )}
+                                </div>
+                              </ContextMenu.Item>
                             ))}
-                          <span className="flex-1">{list.name}</span>
-                          {task.listId === list.id && (
-                            <CheckIcon size={14} className="text-gray-400" />
-                          )}
-                        </div>
-                      </ContextMenu.Item>
+                      </div>
                     )
                   })}
 
@@ -118,32 +145,59 @@ export const TaskItemContextMenu = observer(({ task, children }: TaskItemContext
                         )}
                       </div>
                     </ContextMenu.Item>
-                    {/* Child lists */}
+                    {/* Child lists and their nested projects */}
                     {store
                       .getChildLists(area.id)
                       .filter((childList) => !childList.archived)
                       .map((childList) => {
                         const IconComponent = childList.type === 'project' ? ProjectIcon : null
                         return (
-                          <ContextMenu.Item
-                            key={childList.id}
-                            className="cursor-pointer rounded px-3 py-2 pl-9 text-gray-700 text-sm outline-none hover:bg-gray-100 focus:bg-gray-100"
-                            onSelect={() => handleMoveToList(childList.id)}
-                          >
-                            <div className="flex items-center gap-2">
-                              {IconComponent && (
-                                <IconComponent
-                                  size={14}
-                                  className="shrink-0 text-gray-500"
-                                  percentage={childList.completionPercentage ?? 0}
-                                />
-                              )}
-                              <span className="flex-1">{childList.name}</span>
-                              {task.listId === childList.id && (
-                                <CheckIcon size={14} className="text-gray-400" />
-                              )}
-                            </div>
-                          </ContextMenu.Item>
+                          <div key={childList.id}>
+                            <ContextMenu.Item
+                              className="cursor-pointer rounded px-3 py-2 pl-9 text-gray-700 text-sm outline-none hover:bg-gray-100 focus:bg-gray-100"
+                              onSelect={() => handleMoveToList(childList.id)}
+                            >
+                              <div className="flex items-center gap-2">
+                                {IconComponent && (
+                                  <IconComponent
+                                    size={14}
+                                    className="shrink-0 text-gray-500"
+                                    percentage={childList.completionPercentage ?? 0}
+                                  />
+                                )}
+                                <span className="flex-1">{childList.name}</span>
+                                {task.listId === childList.id && (
+                                  <CheckIcon size={14} className="text-gray-400" />
+                                )}
+                              </div>
+                            </ContextMenu.Item>
+                            {/* Projects nested under lists (third level) */}
+                            {childList.type === 'list' &&
+                              store
+                                .getChildLists(childList.id)
+                                .filter((grandchildList) => !grandchildList.archived)
+                                .map((grandchildList) => (
+                                  <ContextMenu.Item
+                                    key={grandchildList.id}
+                                    className="cursor-pointer rounded px-3 py-2 pl-[60px] text-gray-700 text-sm outline-none hover:bg-gray-100 focus:bg-gray-100"
+                                    onSelect={() => handleMoveToList(grandchildList.id)}
+                                  >
+                                    <div className="flex items-center gap-2">
+                                      {grandchildList.type === 'project' && (
+                                        <ProjectIcon
+                                          size={14}
+                                          className="shrink-0 text-gray-500"
+                                          percentage={grandchildList.completionPercentage ?? 0}
+                                        />
+                                      )}
+                                      <span className="flex-1">{grandchildList.name}</span>
+                                      {task.listId === grandchildList.id && (
+                                        <CheckIcon size={14} className="text-gray-400" />
+                                      )}
+                                    </div>
+                                  </ContextMenu.Item>
+                                ))}
+                          </div>
                         )
                       })}
                   </div>
