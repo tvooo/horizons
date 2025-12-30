@@ -7,6 +7,7 @@ import { Link, useMatch } from 'react-router-dom'
 import { twMerge } from 'tailwind-merge'
 import type { ListModel } from '../models/ListModel'
 import { useRootStore } from '../models/RootStore'
+import { handleSchedule, scheduleOptions } from '../utils/scheduleOptions'
 import { HexagonIcon } from './HexagonIcon'
 import { ProjectIcon } from './ProjectIcon'
 
@@ -60,22 +61,6 @@ export const ListItem = observer(({ list, isNested = false }: ListItemProps) => 
       e.preventDefault()
       handleCancel()
     }
-  }
-
-  const handleSchedule = async (periodType: 'day' | 'week' | 'month', daysOffset: number) => {
-    const anchorDate = new Date()
-    anchorDate.setDate(anchorDate.getDate() + daysOffset)
-
-    // For week/month scheduling, set to start of period
-    if (periodType === 'week') {
-      const dayOfWeek = anchorDate.getDay()
-      const diff = dayOfWeek === 0 ? -6 : 1 - dayOfWeek // Monday is start of week
-      anchorDate.setDate(anchorDate.getDate() + diff)
-    } else if (periodType === 'month') {
-      anchorDate.setDate(1)
-    }
-
-    await list.updateScheduledDate(periodType, anchorDate)
   }
 
   return (
@@ -161,51 +146,26 @@ export const ListItem = observer(({ list, isNested = false }: ListItemProps) => 
             </ContextMenu.SubTrigger>
             <ContextMenu.Portal>
               <ContextMenu.SubContent className="min-w-45 rounded-lg border border-gray-200 bg-white p-1 shadow-lg">
-                <ContextMenu.Item
-                  className="cursor-pointer rounded px-3 py-2 text-gray-700 text-sm outline-none hover:bg-gray-100 focus:bg-gray-100"
-                  onSelect={() => handleSchedule('day', 0)}
-                >
-                  Today
-                </ContextMenu.Item>
-                <ContextMenu.Item
-                  className="cursor-pointer rounded px-3 py-2 text-gray-700 text-sm outline-none hover:bg-gray-100 focus:bg-gray-100"
-                  onSelect={() => handleSchedule('day', 1)}
-                >
-                  Tomorrow
-                </ContextMenu.Item>
-                <ContextMenu.Separator className="my-1 h-px bg-gray-200" />
-                <ContextMenu.Item
-                  className="cursor-pointer rounded px-3 py-2 text-gray-700 text-sm outline-none hover:bg-gray-100 focus:bg-gray-100"
-                  onSelect={() => handleSchedule('week', 0)}
-                >
-                  This Week
-                </ContextMenu.Item>
-                <ContextMenu.Item
-                  className="cursor-pointer rounded px-3 py-2 text-gray-700 text-sm outline-none hover:bg-gray-100 focus:bg-gray-100"
-                  onSelect={() => handleSchedule('week', 7)}
-                >
-                  Next Week
-                </ContextMenu.Item>
-                <ContextMenu.Separator className="my-1 h-px bg-gray-200" />
-                <ContextMenu.Item
-                  className="cursor-pointer rounded px-3 py-2 text-gray-700 text-sm outline-none hover:bg-gray-100 focus:bg-gray-100"
-                  onSelect={() => handleSchedule('month', 0)}
-                >
-                  This Month
-                </ContextMenu.Item>
-                <ContextMenu.Item
-                  className="cursor-pointer rounded px-3 py-2 text-gray-700 text-sm outline-none hover:bg-gray-100 focus:bg-gray-100"
-                  onSelect={() => {
-                    const nextMonth = new Date()
-                    nextMonth.setMonth(nextMonth.getMonth() + 1)
-                    const daysToNextMonth = Math.ceil(
-                      (nextMonth.getTime() - Date.now()) / (1000 * 60 * 60 * 24),
-                    )
-                    handleSchedule('month', daysToNextMonth)
-                  }}
-                >
-                  Next Month
-                </ContextMenu.Item>
+                {scheduleOptions.map((option) => (
+                  <div key={option.label}>
+                    {option.separator && (
+                      <ContextMenu.Separator className="my-1 h-px bg-gray-200" />
+                    )}
+                    <ContextMenu.Item
+                      className="cursor-pointer rounded px-3 py-2 text-gray-700 text-sm outline-none hover:bg-gray-100 focus:bg-gray-100"
+                      onSelect={() =>
+                        handleSchedule(
+                          (periodType, anchorDate) =>
+                            list.updateScheduledDate(periodType, anchorDate),
+                          option.periodType,
+                          option.getDaysOffset(),
+                        )
+                      }
+                    >
+                      {option.label}
+                    </ContextMenu.Item>
+                  </div>
+                ))}
               </ContextMenu.SubContent>
             </ContextMenu.Portal>
           </ContextMenu.Sub>

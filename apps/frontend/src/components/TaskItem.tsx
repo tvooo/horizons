@@ -6,6 +6,7 @@ import { twMerge } from 'tailwind-merge'
 import type { TaskModel } from '../models/TaskModel'
 import { RoundedSquareFilledIcon } from './RoundedSquareFilledIcon'
 import { RoundedSquareIcon } from './RoundedSquareIcon'
+import { TaskItemContextMenu } from './TaskItemContextMenu'
 import { TaskListPopover } from './TaskListPopover'
 import { TaskSchedulePopover } from './TaskSchedulePopover'
 
@@ -84,55 +85,57 @@ export const TaskItem = observer(({ task, showList }: TaskItemProps) => {
   }
 
   return (
-    <div className="group flex items-center gap-2 rounded-lg p-2 hover:bg-gray-50">
-      <TaskCheckbox checked={task.completed} onChange={() => task.toggleCompleted()} />
+    <TaskItemContextMenu task={task}>
+      <div className="group flex items-center gap-2 rounded-lg p-2 hover:bg-gray-50">
+        <TaskCheckbox checked={task.completed} onChange={() => task.toggleCompleted()} />
 
-      <div className="flex-1 text-sm">
-        {isEditing ? (
-          <input
-            ref={inputRef}
-            type="text"
-            value={editValue}
-            onChange={(e) => setEditValue(e.target.value)}
-            onBlur={handleCancel}
-            onKeyDown={handleKeyDown}
-            className={`w-full bg-transparent outline-none ${task.completed ? 'text-gray-400 line-through' : 'text-gray-900'}`}
-          />
-        ) : (
-          // biome-ignore lint/a11y/noStaticElementInteractions: Need to think about how to improve this
-          // biome-ignore lint/a11y/useKeyWithClickEvents: See above
-          <span
-            className={`cursor-text ${task.completed ? 'text-gray-400 line-through' : 'text-gray-900'}`}
-            onClick={() => {
-              setEditValue(task.title)
-              setIsEditing(true)
-            }}
-          >
-            {task.title}
-          </span>
-        )}
-        {showList && task.list && (
-          <div className="flex items-center gap-1 text-xs">
-            <TaskListPopover task={task}>
+        <div className="flex-1 text-sm">
+          {isEditing ? (
+            <input
+              ref={inputRef}
+              type="text"
+              value={editValue}
+              onChange={(e) => setEditValue(e.target.value)}
+              onBlur={handleCancel}
+              onKeyDown={handleKeyDown}
+              className={`w-full bg-transparent outline-none ${task.completed ? 'text-gray-400 line-through' : 'text-gray-900'}`}
+            />
+          ) : (
+            // biome-ignore lint/a11y/noStaticElementInteractions: Need to think about how to improve this
+            // biome-ignore lint/a11y/useKeyWithClickEvents: See above
+            <span
+              className={`cursor-text ${task.completed ? 'text-gray-400 line-through' : 'text-gray-900'}`}
+              onClick={() => {
+                setEditValue(task.title)
+                setIsEditing(true)
+              }}
+            >
+              {task.title}
+            </span>
+          )}
+          {showList && task.list && (
+            <div className="flex items-center gap-1 text-xs">
+              <TaskListPopover task={task}>
+                <button
+                  type="button"
+                  className="-m-1 p-1 text-gray-400 text-xs hover:bg-gray-100 hover:text-gray-600"
+                >
+                  <span>{task.list.name}</span>
+                </button>
+              </TaskListPopover>
               <button
                 type="button"
-                className="-m-1 p-1 text-gray-400 text-xs hover:bg-gray-100 hover:text-gray-600"
+                className="p-1 text-gray-400 text-xs opacity-0 transition-opacity hover:bg-gray-100 hover:text-gray-600 focus:opacity-100 group-hover:opacity-100"
+                onClick={() => navigate(`/list/${task.list?.id}`)}
               >
-                <span>{task.list.name}</span>
+                <ArrowRightIcon size={12} />
               </button>
-            </TaskListPopover>
-            <button
-              type="button"
-              className="p-1 text-gray-400 text-xs opacity-0 transition-opacity hover:bg-gray-100 hover:text-gray-600 focus:opacity-100 group-hover:opacity-100"
-              onClick={() => navigate(`/list/${task.list?.id}`)}
-            >
-              <ArrowRightIcon size={12} />
-            </button>
-          </div>
-        )}
-      </div>
+            </div>
+          )}
+        </div>
 
-      <TaskSchedulePopover task={task} />
-    </div>
+        <TaskSchedulePopover task={task} />
+      </div>
+    </TaskItemContextMenu>
   )
 })
