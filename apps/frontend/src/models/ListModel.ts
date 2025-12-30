@@ -38,6 +38,7 @@ export class ListModel {
       archived: observable,
       scheduledDate: observable,
       updatedAt: observable,
+      updateName: action,
       updateScheduledDate: action,
       setArchived: action,
       numberOfOpenTasks: computed,
@@ -76,6 +77,21 @@ export class ListModel {
     }
     const open = this.numberOfOpenTasks
     return Math.round(((total - open) / total) * 100)
+  }
+
+  async updateName(newName: string) {
+    const oldName = this.name
+    this.name = newName
+    this.updatedAt = new Date()
+
+    try {
+      await this.rootStore.updateList(this.id, { name: newName })
+    } catch (err) {
+      runInAction(() => {
+        this.name = oldName
+      })
+      throw err
+    }
   }
 
   async updateScheduledDate(periodType: PeriodType, anchorDate: Date) {
