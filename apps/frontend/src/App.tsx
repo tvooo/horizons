@@ -1,3 +1,4 @@
+import { Menu } from 'lucide-react'
 import { observer } from 'mobx-react-lite'
 import { useEffect, useMemo, useState } from 'react'
 import { BrowserRouter, Navigate, Route, Routes, useLocation } from 'react-router-dom'
@@ -14,7 +15,6 @@ import { OnIce } from './pages/OnIce'
 import SignIn from './pages/SignIn'
 import SignUp from './pages/SignUp'
 import { Upcoming } from './pages/Upcoming'
-import { Menu } from 'lucide-react'
 
 const AppContent = observer(() => {
   const store = useRootStore()
