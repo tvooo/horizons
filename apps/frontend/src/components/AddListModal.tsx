@@ -40,7 +40,7 @@ export function AddListModal({ isOpen, onClose }: AddListModalProps) {
     <Dialog.Root open={isOpen} onOpenChange={onClose}>
       <Dialog.Portal>
         <Dialog.Overlay className="fixed inset-0 bg-black/50" />
-        <Dialog.Content className="-translate-x-1/2 -translate-y-1/2 fixed top-1/2 left-1/2 max-h-[85vh] w-[90vw] max-w-md rounded-lg bg-white p-6 shadow-lg focus:outline-none">
+        <Dialog.Content className="fixed top-1/2 left-1/2 max-h-[85vh] w-[90vw] max-w-md -translate-x-1/2 -translate-y-1/2 rounded-lg bg-white p-6 shadow-lg focus:outline-none">
           <Dialog.Title className="mb-4 font-semibold text-gray-900 text-lg">
             Add New List
           </Dialog.Title>
