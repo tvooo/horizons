@@ -1,6 +1,6 @@
 import { observer } from 'mobx-react-lite'
 import { useEffect, useMemo, useState } from 'react'
-import { BrowserRouter, Navigate, Route, Routes } from 'react-router-dom'
+import { BrowserRouter, Navigate, Route, Routes, useLocation } from 'react-router-dom'
 import { RootStore } from 'shared'
 import { api } from './api/client'
 import { AddListModal } from './components/AddListModal'
@@ -14,10 +14,18 @@ import { OnIce } from './pages/OnIce'
 import SignIn from './pages/SignIn'
 import SignUp from './pages/SignUp'
 import { Upcoming } from './pages/Upcoming'
+import { Menu } from 'lucide-react'
 
 const AppContent = observer(() => {
   const store = useRootStore()
   const [isAddListModalOpen, setIsAddListModalOpen] = useState(false)
+  const [isMobileSidebarOpen, setIsMobileSidebarOpen] = useState(false)
+  const location = useLocation()
+
+  // Close mobile sidebar on navigation
+  useEffect(() => {
+    setIsMobileSidebarOpen(false)
+  }, [location.pathname])
 
   useEffect(() => {
     store.loadData()
@@ -48,17 +56,33 @@ const AppContent = observer(() => {
                 {/* <div className="h-16 border-gray-300 border-b bg-white" /> */}
 
                 <div className="flex flex-1 overflow-hidden">
-                  <Sidebar onAddListClick={() => setIsAddListModalOpen(true)} />
+                  <Sidebar
+                    onAddListClick={() => setIsAddListModalOpen(true)}
+                    isMobileOpen={isMobileSidebarOpen}
+                    onMobileClose={() => setIsMobileSidebarOpen(false)}
+                  />
 
                   {/* Main Content Area */}
-                  <Routes>
-                    <Route path="/" element={<Navigate to="/upcoming" replace />} />
-                    <Route path="/inbox" element={<Inbox />} />
-                    <Route path="/now" element={<Now />} />
-                    <Route path="/upcoming" element={<Upcoming />} />
-                    <Route path="/on-ice" element={<OnIce />} />
-                    <Route path="/list/:listId" element={<ListView />} />
-                  </Routes>
+                  <div className="relative flex flex-1 flex-col overflow-hidden">
+                    {/* Hamburger Menu Button - Only visible on mobile */}
+                    <button
+                      type="button"
+                      onClick={() => setIsMobileSidebarOpen(true)}
+                      className="absolute top-4 left-4 z-10 rounded-lg bg-white p-2 text-gray-700 shadow-md hover:bg-gray-100 md:hidden"
+                      aria-label="Open menu"
+                    >
+                      <Menu size={24} />
+                    </button>
+
+                    <Routes>
+                      <Route path="/" element={<Navigate to="/upcoming" replace />} />
+                      <Route path="/inbox" element={<Inbox />} />
+                      <Route path="/now" element={<Now />} />
+                      <Route path="/upcoming" element={<Upcoming />} />
+                      <Route path="/on-ice" element={<OnIce />} />
+                      <Route path="/list/:listId" element={<ListView />} />
+                    </Routes>
+                  </div>
                 </div>
               </div>
 
