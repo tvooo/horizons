@@ -1,3 +1,4 @@
+import { expo } from '@better-auth/expo'
 import { createId } from '@paralleldrive/cuid2'
 import { betterAuth } from 'better-auth'
 import { drizzleAdapter } from 'better-auth/adapters/drizzle'
@@ -47,6 +48,12 @@ export const auth = betterAuth({
       maxAge: 5 * 60, // 5 minutes
     },
   },
+  trustedOrigins: [
+    'http://localhost:3000',
+    'exp://*', // For Expo development
+    'horizons://*', // For production app
+  ],
+  plugins: [expo()],
   // Add more providers here (Google, GitHub, etc.) as needed
   // socialProviders: {
   //   google: {
