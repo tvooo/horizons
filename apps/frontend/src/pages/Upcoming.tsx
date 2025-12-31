@@ -175,7 +175,7 @@ export const Upcoming = observer(function Upcoming() {
               <h2
                 className={`mb-4 font-semibold text-sm ${
                   isToday(day.date)
-                    ? 'text-blue-900'
+                    ? 'text-gray-900'
                     : isWeekend(day.name)
                       ? 'text-gray-500'
                       : 'text-gray-900'
@@ -192,7 +192,7 @@ export const Upcoming = observer(function Upcoming() {
                   return (
                     <div
                       key={list.id}
-                      className="flex items-center gap-2 rounded bg-blue-100 p-2 font-medium text-blue-900 text-sm"
+                      className="flex items-center gap-2 rounded bg-project/15 p-2 font-medium text-project text-sm"
                     >
                       {list.type === 'project' ? (
                         <ProjectIcon
@@ -245,7 +245,7 @@ export const Upcoming = observer(function Upcoming() {
                   return (
                     <div
                       key={list.id}
-                      className="flex items-center gap-2 rounded bg-blue-100 p-2 font-medium text-blue-900 text-sm"
+                      className="flex items-center gap-2 rounded bg-project/15 p-2 font-medium text-project text-sm"
                     >
                       {list.type === 'project' ? (
                         <ProjectIcon
