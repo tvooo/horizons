@@ -6,6 +6,7 @@ import {
   type LucideIcon,
   Plus,
   SunIcon,
+  X,
 } from 'lucide-react'
 import { observer } from 'mobx-react-lite'
 import { useNavigate } from 'react-router-dom'
@@ -42,9 +43,11 @@ function sortByListTypeAndName(
 
 interface SidebarProps {
   onAddListClick: () => void
+  isMobileOpen: boolean
+  onMobileClose: () => void
 }
 
-export const Sidebar = observer(({ onAddListClick }: SidebarProps) => {
+export const Sidebar = observer(({ onAddListClick, isMobileOpen, onMobileClose }: SidebarProps) => {
   const store = useRootStore()
   const areas = store.areas
   const standaloneLists = store.getStandaloneLists()
@@ -57,8 +60,34 @@ export const Sidebar = observer(({ onAddListClick }: SidebarProps) => {
   }
 
   return (
-    <div className="flex w-72 shrink-0 flex-col border-gray-300 bg-neutral-lighter p-4">
-      <div className="flex-1 overflow-y-auto">
+    <>
+      {/* Mobile backdrop overlay */}
+      {isMobileOpen && (
+        <div
+          className="fixed inset-0 z-40 bg-black/50 md:hidden"
+          onClick={onMobileClose}
+          aria-hidden="true"
+        />
+      )}
+
+      {/* Sidebar */}
+      <div className={`
+        fixed inset-y-0 left-0 z-50 flex w-full flex-col border-gray-300 bg-neutral-lighter p-4
+        transition-transform duration-300 ease-in-out
+        md:static md:w-72 md:shrink-0 md:translate-x-0
+        ${isMobileOpen ? 'translate-x-0' : '-translate-x-full'}
+      `}>
+        {/* Close button - Only visible on mobile */}
+        <button
+          type="button"
+          onClick={onMobileClose}
+          className="mb-4 self-end rounded-lg p-2 text-gray-500 hover:bg-gray-100 hover:text-gray-700 md:hidden"
+          aria-label="Close menu"
+        >
+          <X size={24} />
+        </button>
+
+        <div className="flex-1 overflow-y-auto">
         {STATIC_PAGES.map((page) => (
           <SidebarNavItem key={page.href} href={page.href} icon={page.icon} name={page.name} />
         ))}
@@ -138,6 +167,7 @@ export const Sidebar = observer(({ onAddListClick }: SidebarProps) => {
           <span className="flex-1 text-left">Logout</span>
         </button>
       </div>
-    </div>
+      </div>
+    </>
   )
 })
