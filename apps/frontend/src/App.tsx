@@ -23,6 +23,7 @@ const AppContent = observer(() => {
   const location = useLocation()
 
   // Close mobile sidebar on navigation
+  // biome-ignore lint/correctness/useExhaustiveDependencies: setIsMobileSidebarOpen is stable from useState
   useEffect(() => {
     setIsMobileSidebarOpen(false)
   }, [location.pathname])
