@@ -41,61 +41,59 @@ const AppContent = observer(() => {
   }
 
   return (
-    <BrowserRouter>
-      <Routes>
-        {/* Public routes */}
-        <Route path="/signin" element={<SignIn />} />
-        <Route path="/signup" element={<SignUp />} />
+    <Routes>
+      {/* Public routes */}
+      <Route path="/signin" element={<SignIn />} />
+      <Route path="/signup" element={<SignUp />} />
 
-        {/* Protected routes */}
-        <Route
-          path="/*"
-          element={
-            <ProtectedRoute>
-              <div className="flex h-screen w-screen flex-col overflow-hidden">
-                {/* Top Navigation Bar */}
-                {/* <div className="h-16 border-gray-300 border-b bg-white" /> */}
+      {/* Protected routes */}
+      <Route
+        path="/*"
+        element={
+          <ProtectedRoute>
+            <div className="flex h-screen w-screen flex-col overflow-hidden">
+              {/* Top Navigation Bar */}
+              {/* <div className="h-16 border-gray-300 border-b bg-white" /> */}
 
-                <div className="flex flex-1 overflow-hidden">
-                  <Sidebar
-                    onAddListClick={() => setIsAddListModalOpen(true)}
-                    isMobileOpen={isMobileSidebarOpen}
-                    onMobileClose={() => setIsMobileSidebarOpen(false)}
-                  />
+              <div className="flex flex-1 overflow-hidden">
+                <Sidebar
+                  onAddListClick={() => setIsAddListModalOpen(true)}
+                  isMobileOpen={isMobileSidebarOpen}
+                  onMobileClose={() => setIsMobileSidebarOpen(false)}
+                />
 
-                  {/* Main Content Area */}
-                  <div className="relative flex flex-1 flex-col overflow-hidden">
-                    {/* Hamburger Menu Button - Only visible on mobile */}
-                    <button
-                      type="button"
-                      onClick={() => setIsMobileSidebarOpen(true)}
-                      className="absolute top-4 left-4 z-10 rounded-lg bg-white p-2 text-gray-700 shadow-md hover:bg-gray-100 md:hidden"
-                      aria-label="Open menu"
-                    >
-                      <Menu size={24} />
-                    </button>
+                {/* Main Content Area */}
+                <div className="relative flex flex-1 flex-col overflow-hidden">
+                  {/* Hamburger Menu Button - Only visible on mobile */}
+                  <button
+                    type="button"
+                    onClick={() => setIsMobileSidebarOpen(true)}
+                    className="absolute top-4 left-4 z-10 rounded-lg bg-white p-2 text-gray-700 shadow-md hover:bg-gray-100 md:hidden"
+                    aria-label="Open menu"
+                  >
+                    <Menu size={24} />
+                  </button>
 
-                    <Routes>
-                      <Route path="/" element={<Navigate to="/upcoming" replace />} />
-                      <Route path="/inbox" element={<Inbox />} />
-                      <Route path="/now" element={<Now />} />
-                      <Route path="/upcoming" element={<Upcoming />} />
-                      <Route path="/on-ice" element={<OnIce />} />
-                      <Route path="/list/:listId" element={<ListView />} />
-                    </Routes>
-                  </div>
+                  <Routes>
+                    <Route path="/" element={<Navigate to="/upcoming" replace />} />
+                    <Route path="/inbox" element={<Inbox />} />
+                    <Route path="/now" element={<Now />} />
+                    <Route path="/upcoming" element={<Upcoming />} />
+                    <Route path="/on-ice" element={<OnIce />} />
+                    <Route path="/list/:listId" element={<ListView />} />
+                  </Routes>
                 </div>
               </div>
+            </div>
 
-              <AddListModal
-                isOpen={isAddListModalOpen}
-                onClose={() => setIsAddListModalOpen(false)}
-              />
-            </ProtectedRoute>
-          }
-        />
-      </Routes>
-    </BrowserRouter>
+            <AddListModal
+              isOpen={isAddListModalOpen}
+              onClose={() => setIsAddListModalOpen(false)}
+            />
+          </ProtectedRoute>
+        }
+      />
+    </Routes>
   )
 })
 
@@ -104,7 +102,9 @@ function App() {
 
   return (
     <RootStoreProvider value={rootStore}>
-      <AppContent />
+      <BrowserRouter>
+        <AppContent />
+      </BrowserRouter>
     </RootStoreProvider>
   )
 }
