@@ -1,3 +1,4 @@
+import { draggable } from '@atlaskit/pragmatic-drag-and-drop/element/adapter'
 import { ArrowRightIcon, CheckIcon } from 'lucide-react'
 import { observer } from 'mobx-react-lite'
 import { useEffect, useRef, useState } from 'react'
@@ -52,7 +53,9 @@ export const TaskItem = observer(({ task, showList }: TaskItemProps) => {
   const navigate = useNavigate()
   const [isEditing, setIsEditing] = useState(false)
   const [editValue, setEditValue] = useState(task.title)
+  const [isDragging, setIsDragging] = useState(false)
   const inputRef = useRef<HTMLInputElement>(null)
+  const taskRef = useRef<HTMLDivElement>(null)
 
   useEffect(() => {
     if (isEditing && inputRef.current) {
@@ -60,6 +63,21 @@ export const TaskItem = observer(({ task, showList }: TaskItemProps) => {
       inputRef.current.select()
     }
   }, [isEditing])
+
+  useEffect(() => {
+    const element = taskRef.current
+    if (!element) return
+
+    return draggable({
+      element,
+      getInitialData: () => ({
+        type: 'task',
+        taskId: task.id,
+      }),
+      onDragStart: () => setIsDragging(true),
+      onDrop: () => setIsDragging(false),
+    })
+  }, [task.id])
 
   const handleSave = async () => {
     const trimmedValue = editValue.trim()
@@ -86,7 +104,13 @@ export const TaskItem = observer(({ task, showList }: TaskItemProps) => {
 
   return (
     <TaskItemContextMenu task={task}>
-      <div className="group flex items-center gap-2 rounded-lg p-2 hover:bg-gray-50">
+      <div
+        ref={taskRef}
+        className={twMerge(
+          'group flex items-center gap-2 rounded-lg p-2 hover:bg-gray-50',
+          isDragging && 'cursor-grabbing opacity-50',
+        )}
+      >
         <TaskCheckbox checked={task.completed} onChange={() => task.toggleCompleted()} />
 
         <div className="flex-1 text-sm">
