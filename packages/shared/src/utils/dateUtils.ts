@@ -17,10 +17,19 @@ export function scheduledDateLabel(scheduledDate: {
   const referenceDate = isPast(scheduledDate.anchorDate) ? new Date() : scheduledDate.anchorDate
 
   switch (scheduledDate.periodType) {
-    case 'year':
-      return 'Some year'
-    case 'quarter':
-      return 'Some quarter'
+    case 'year': {
+      if (isThisYear(referenceDate)) {
+        return 'This year'
+      }
+      return referenceDate.getFullYear().toString()
+    }
+    case 'quarter': {
+      if (isThisQuarter(referenceDate)) {
+        return 'This quarter'
+      }
+      const quarter = Math.floor(referenceDate.getMonth() / 3) + 1
+      return `Q${quarter} ${referenceDate.getFullYear()}`
+    }
     case 'month':
       if (isThisMonth(referenceDate)) {
         return 'This month'
