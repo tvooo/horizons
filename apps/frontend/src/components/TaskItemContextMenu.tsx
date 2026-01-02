@@ -6,6 +6,7 @@ import { useRootStore } from '../models/RootStoreContext'
 import { handleSchedule, scheduleOptions } from '../utils/scheduleOptions'
 import { HexagonIcon } from './HexagonIcon'
 import { ProjectIcon } from './ProjectIcon'
+import { ScheduleCalendar } from './ScheduleCalendar'
 
 interface TaskItemContextMenuProps {
   task: TaskModel
@@ -32,26 +33,58 @@ export const TaskItemContextMenu = observer(({ task, children }: TaskItemContext
             </ContextMenu.SubTrigger>
             <ContextMenu.Portal>
               <ContextMenu.SubContent className="min-w-45 rounded-lg border border-gray-200 bg-white p-1 shadow-lg">
-                {scheduleOptions.map((option) => (
-                  <div key={option.label}>
-                    {option.separator && (
-                      <ContextMenu.Separator className="my-1 h-px bg-gray-200" />
-                    )}
-                    <ContextMenu.Item
-                      className="cursor-pointer rounded px-3 py-2 text-gray-700 text-sm outline-none hover:bg-gray-100 focus:bg-gray-100"
-                      onSelect={() =>
-                        handleSchedule(
-                          (periodType, anchorDate) =>
-                            task.updateScheduledDate(periodType, anchorDate),
-                          option.periodType,
-                          option.getDaysOffset(),
-                        )
-                      }
-                    >
-                      {option.label}
-                    </ContextMenu.Item>
-                  </div>
-                ))}
+                {/* Day options */}
+                {scheduleOptions
+                  .filter((opt) => opt.periodType === 'day')
+                  .map((option) => (
+                    <div key={option.label}>
+                      <ContextMenu.Item
+                        className="cursor-pointer rounded px-3 py-2 text-gray-700 text-sm outline-none hover:bg-gray-100 focus:bg-gray-100"
+                        onSelect={() =>
+                          handleSchedule(
+                            (periodType, anchorDate) =>
+                              task.updateScheduledDate(periodType, anchorDate),
+                            option.periodType,
+                            option.getDaysOffset(),
+                          )
+                        }
+                      >
+                        {option.label}
+                      </ContextMenu.Item>
+                    </div>
+                  ))}
+
+                {/* Calendar view */}
+                <ContextMenu.Separator className="my-1 h-px bg-gray-200" />
+                <ScheduleCalendar
+                  onSelectDate={(date) => {
+                    task.updateScheduledDate('day', date)
+                  }}
+                />
+
+                {/* Week, month, quarter, year options */}
+                {scheduleOptions
+                  .filter((opt) => opt.periodType !== 'day')
+                  .map((option) => (
+                    <div key={option.label}>
+                      {option.separator && (
+                        <ContextMenu.Separator className="my-1 h-px bg-gray-200" />
+                      )}
+                      <ContextMenu.Item
+                        className="cursor-pointer rounded px-3 py-2 text-gray-700 text-sm outline-none hover:bg-gray-100 focus:bg-gray-100"
+                        onSelect={() =>
+                          handleSchedule(
+                            (periodType, anchorDate) =>
+                              task.updateScheduledDate(periodType, anchorDate),
+                            option.periodType,
+                            option.getDaysOffset(),
+                          )
+                        }
+                      >
+                        {option.label}
+                      </ContextMenu.Item>
+                    </div>
+                  ))}
               </ContextMenu.SubContent>
             </ContextMenu.Portal>
           </ContextMenu.Sub>

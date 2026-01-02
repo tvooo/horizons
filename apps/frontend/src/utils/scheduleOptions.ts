@@ -10,6 +10,7 @@ import {
   startOfWeek,
   startOfYear,
 } from 'date-fns'
+import { calendarConfig } from '../config/calendar'
 
 export interface ScheduleOption {
   label: string
@@ -40,7 +41,9 @@ export const scheduleOptions: ScheduleOption[] = [
     periodType: 'week',
     getDaysOffset: () => {
       const now = new Date()
-      const nextWeekStart = startOfWeek(addWeeks(now, 1), { weekStartsOn: 1 })
+      const nextWeekStart = startOfWeek(addWeeks(now, 1), {
+        weekStartsOn: calendarConfig.weekStartsOn,
+      })
       return differenceInDays(nextWeekStart, now)
     },
   },
@@ -111,7 +114,7 @@ export const handleSchedule = async (
 
   // For week/month/quarter/year scheduling, set to start of period
   if (periodType === 'week') {
-    anchorDate = startOfWeek(anchorDate, { weekStartsOn: 1 })
+    anchorDate = startOfWeek(anchorDate, { weekStartsOn: calendarConfig.weekStartsOn })
   } else if (periodType === 'month') {
     anchorDate = startOfMonth(anchorDate)
   } else if (periodType === 'quarter') {

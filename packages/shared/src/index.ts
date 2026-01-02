@@ -13,11 +13,12 @@ export interface ApiResponse<T> {
 export { APIClient } from './api/client'
 export * from './api/converter'
 export * from './api/types'
-export { ListModel } from './models/ListModel'
+// Config
+export { calendarConfig } from './config/calendar'
 // Models
+export { ListModel } from './models/ListModel'
 export { RootStore } from './models/RootStore'
 export type { ScheduledDate } from './models/TaskModel'
 export { TaskModel } from './models/TaskModel'
-
 // Utils
 export { isCurrentPeriod, scheduledDateLabel, sortByPeriodTypeAndDate } from './utils/dateUtils'
