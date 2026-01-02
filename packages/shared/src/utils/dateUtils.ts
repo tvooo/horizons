@@ -9,6 +9,7 @@ import {
   subDays,
 } from 'date-fns'
 import type { PeriodType } from '../api/types'
+import { calendarConfig } from '../config/calendar'
 
 export function scheduledDateLabel(scheduledDate: {
   periodType: PeriodType
@@ -36,10 +37,10 @@ export function scheduledDateLabel(scheduledDate: {
       }
       return referenceDate.toLocaleString('default', { month: 'long', year: 'numeric' })
     case 'week':
-      if (isThisWeek(referenceDate, { weekStartsOn: 1 })) {
+      if (isThisWeek(referenceDate, { weekStartsOn: calendarConfig.weekStartsOn })) {
         return 'This week'
       }
-      if (isThisWeek(subDays(referenceDate, 7), { weekStartsOn: 1 })) {
+      if (isThisWeek(subDays(referenceDate, 7), { weekStartsOn: calendarConfig.weekStartsOn })) {
         return 'Next week'
       }
       return format(referenceDate, "'W'l yyyy")
@@ -69,7 +70,7 @@ export function isCurrentPeriod(scheduledDate: {
     case 'month':
       return isThisMonth(anchorDate)
     case 'week':
-      return isThisWeek(anchorDate, { weekStartsOn: 1 })
+      return isThisWeek(anchorDate, { weekStartsOn: calendarConfig.weekStartsOn })
     default:
       return isToday(anchorDate)
   }
