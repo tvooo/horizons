@@ -163,7 +163,7 @@ export const ListItem = observer(({ list, isNested = false, nestingLevel = 0 }: 
           )}
         </ContextMenu.Trigger>
         <ContextMenu.Portal>
-          <ContextMenu.Content className="min-w-50 rounded-lg border border-gray-200 bg-white p-1 shadow-lg">
+          <ContextMenu.Content className="z-[60] min-w-50 rounded-lg border border-gray-200 bg-white p-1 shadow-lg">
             <ContextMenu.Item
               className="cursor-pointer rounded px-3 py-2 text-gray-700 text-sm outline-none hover:bg-gray-100 focus:bg-gray-100"
               onSelect={() => {
@@ -174,12 +174,23 @@ export const ListItem = observer(({ list, isNested = false, nestingLevel = 0 }: 
               Rename
             </ContextMenu.Item>
 
+            {list.isArea && (
+              <ContextMenu.Item
+                className="cursor-pointer rounded px-3 py-2 text-gray-700 text-sm outline-none hover:bg-gray-100 focus:bg-gray-100"
+                onSelect={() => {
+                  store.setFocusedArea(list.id)
+                }}
+              >
+                Focus
+              </ContextMenu.Item>
+            )}
+
             <ContextMenu.Sub>
               <ContextMenu.SubTrigger className="cursor-pointer rounded px-3 py-2 text-gray-700 text-sm outline-none hover:bg-gray-100 focus:bg-gray-100 data-[state=open]:bg-gray-100">
                 Schedule
               </ContextMenu.SubTrigger>
               <ContextMenu.Portal>
-                <ContextMenu.SubContent className="min-w-45 rounded-lg border border-gray-200 bg-white p-1 shadow-lg">
+                <ContextMenu.SubContent className="z-[60] min-w-45 rounded-lg border border-gray-200 bg-white p-1 shadow-lg">
                   {scheduleOptions.map((option) => (
                     <div key={option.label}>
                       {option.separator && (
@@ -210,7 +221,7 @@ export const ListItem = observer(({ list, isNested = false, nestingLevel = 0 }: 
                   Set Parent List
                 </ContextMenu.SubTrigger>
                 <ContextMenu.Portal>
-                  <ContextMenu.SubContent className="max-h-96 min-w-[180px] overflow-y-auto rounded-lg border border-gray-200 bg-white p-1 shadow-lg">
+                  <ContextMenu.SubContent className="z-[60] max-h-96 min-w-[180px] overflow-y-auto rounded-lg border border-gray-200 bg-white p-1 shadow-lg">
                     <ContextMenu.Item
                       className="cursor-pointer rounded px-3 py-2 text-gray-700 text-sm outline-none hover:bg-gray-100 focus:bg-gray-100"
                       onSelect={() => {

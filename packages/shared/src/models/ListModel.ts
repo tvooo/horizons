@@ -43,6 +43,7 @@ export class ListModel {
       setArchived: action,
       numberOfOpenTasks: computed,
       numberOfTasks: computed,
+      areaId: computed,
     })
   }
 
@@ -77,6 +78,22 @@ export class ListModel {
     }
     const open = this.numberOfOpenTasks
     return Math.round(((total - open) / total) * 100)
+  }
+
+  get areaId(): string | null {
+    // If this is an area, return its own id
+    if (this.isArea) {
+      return this.id
+    }
+
+    // If this has a parent, return the parent's areaId (recursive)
+    if (this.parentListId) {
+      const parent = this.rootStore.getListById(this.parentListId)
+      return parent?.areaId ?? null
+    }
+
+    // Otherwise, no area
+    return null
   }
 
   async updateName(newName: string) {

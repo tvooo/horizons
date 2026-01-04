@@ -11,6 +11,7 @@ export class RootStore {
   lists: ListModel[] = []
   tasks: TaskModel[] = []
   loading = true
+  focusedAreaId: string | null = null
 
   private api: APIClient
 
@@ -21,18 +22,21 @@ export class RootStore {
       lists: observable,
       tasks: observable,
       loading: observable,
+      focusedAreaId: observable,
       loadData: action,
       createTask: action,
       createList: action,
       updateTask: action,
       updateList: action,
       updateListParent: action,
+      setFocusedArea: action,
       inboxTasks: computed,
       nowTasks: computed,
       nowLists: computed,
       areas: computed,
       projects: computed,
       regularLists: computed,
+      focusedArea: computed,
     })
   }
 
@@ -128,8 +132,18 @@ export class RootStore {
     }
   }
 
+  private isTaskInFocus(task: TaskModel): boolean {
+    if (!this.focusedAreaId) return true
+    return task.areaId === this.focusedAreaId
+  }
+
+  private isListInFocus(list: ListModel): boolean {
+    if (!this.focusedAreaId) return true
+    return list.areaId === this.focusedAreaId
+  }
+
   get inboxTasks() {
-    return this.tasks.filter((task) => !task.listId && !task.completed)
+    return this.tasks.filter((task) => !task.listId && !task.completed && this.isTaskInFocus(task))
   }
 
   get nowTasks() {
@@ -138,7 +152,8 @@ export class RootStore {
         !task.completed &&
         task.scheduledDate &&
         (isCurrentPeriod(task.scheduledDate) ||
-          (isPast(task.scheduledDate.anchorDate) && !task.completed)), // FIXME: redunandant completed check, not sure if I always want to hide completed or not
+          (isPast(task.scheduledDate.anchorDate) && !task.completed)) && // FIXME: redunandant completed check, not sure if I always want to hide completed or not
+        this.isTaskInFocus(task),
     )
   }
 
@@ -146,20 +161,21 @@ export class RootStore {
     return this.lists.filter(
       (list) =>
         list.scheduledDate &&
-        (isCurrentPeriod(list.scheduledDate) || isPast(list.scheduledDate.anchorDate)),
+        (isCurrentPeriod(list.scheduledDate) || isPast(list.scheduledDate.anchorDate)) &&
+        this.isListInFocus(list),
     )
   }
 
   get areas() {
-    return this.lists.filter((list) => list.isArea)
+    return this.lists.filter((list) => list.isArea && this.isListInFocus(list))
   }
 
   get projects() {
-    return this.lists.filter((list) => list.isProject)
+    return this.lists.filter((list) => list.isProject && this.isListInFocus(list))
   }
 
   get regularLists() {
-    return this.lists.filter((list) => list.isList)
+    return this.lists.filter((list) => list.isList && this.isListInFocus(list))
   }
 
   getTasksByListId(listId: string) {
@@ -175,6 +191,17 @@ export class RootStore {
   }
 
   getStandaloneLists() {
-    return this.lists.filter((list) => !list.isArea && !list.parentListId)
+    return this.lists.filter(
+      (list) => !list.isArea && !list.parentListId && this.isListInFocus(list),
+    )
+  }
+
+  get focusedArea() {
+    if (!this.focusedAreaId) return null
+    return this.getListById(this.focusedAreaId)
+  }
+
+  setFocusedArea(areaId: string | null) {
+    this.focusedAreaId = areaId
   }
 }

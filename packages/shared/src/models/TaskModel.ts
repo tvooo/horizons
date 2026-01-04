@@ -49,12 +49,17 @@ export class TaskModel {
       updateScheduledDate: action,
       moveToList: action,
       list: computed,
+      areaId: computed,
     })
   }
 
   get list() {
     if (!this.listId) return null
     return this.rootStore.lists.find((list) => list.id === this.listId) || null
+  }
+
+  get areaId(): string | null {
+    return this.list?.areaId ?? null
   }
 
   async toggleCompleted() {

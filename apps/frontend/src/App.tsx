@@ -5,6 +5,7 @@ import { BrowserRouter, Navigate, Route, Routes, useLocation } from 'react-route
 import { RootStore } from 'shared'
 import { api } from './api/client'
 import { AddListModal } from './components/AddListModal'
+import { FocusModeUI } from './components/FocusModeUI'
 import { ListView } from './components/ListView'
 import { ProtectedRoute } from './components/ProtectedRoute'
 import { Sidebar } from './components/sidebar/Sidebar'
@@ -90,6 +91,8 @@ const AppContent = observer(() => {
               isOpen={isAddListModalOpen}
               onClose={() => setIsAddListModalOpen(false)}
             />
+
+            <FocusModeUI />
           </ProtectedRoute>
         }
       />
