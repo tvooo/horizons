@@ -53,7 +53,18 @@ const TIME_PERIODS = [
 ]
 
 export const Upcoming = observer(function Upcoming() {
-  const { tasks, lists } = useRootStore()
+  const store = useRootStore()
+
+  // Filter tasks and lists based on focus mode
+  const tasks = store.tasks.filter((task) => {
+    if (!store.focusedAreaId) return true
+    return task.areaId === store.focusedAreaId
+  })
+
+  const lists = store.lists.filter((list) => {
+    if (!store.focusedAreaId) return true
+    return list.areaId === store.focusedAreaId
+  })
 
   const isWeekend = (dayName: string) => dayName === 'Saturday' || dayName === 'Sunday'
   const isToday = (date: Date) => isSameDay(date, TODAY)
