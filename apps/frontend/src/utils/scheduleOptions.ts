@@ -2,9 +2,9 @@ import {
   addDays,
   addMonths,
   addQuarters,
-  addWeeks,
   addYears,
   differenceInDays,
+  startOfDay,
   startOfMonth,
   startOfQuarter,
   startOfWeek,
@@ -39,15 +39,7 @@ export const scheduleOptions: ScheduleOption[] = [
   {
     label: 'Next Week',
     periodType: 'week',
-    getDaysOffset: () => {
-      const now = new Date()
-      const nextWeekStart = startOfWeek(addWeeks(now, 1), {
-        weekStartsOn: calendarConfig.weekStartsOn,
-      })
-      console.log('Next week start:', nextWeekStart)
-      console.log('Diff in days:', differenceInDays(nextWeekStart, now))
-      return differenceInDays(nextWeekStart, now)
-    },
+    getDaysOffset: () => 7,
   },
   {
     label: 'This Month',
@@ -59,18 +51,18 @@ export const scheduleOptions: ScheduleOption[] = [
     label: 'Next Month',
     periodType: 'month',
     getDaysOffset: () => {
-      const now = new Date()
-      const nextMonthStart = startOfMonth(addMonths(now, 1))
-      return differenceInDays(nextMonthStart, now)
+      const today = startOfDay(new Date())
+      const nextMonthStart = startOfMonth(addMonths(today, 1))
+      return differenceInDays(nextMonthStart, today)
     },
   },
   {
     label: 'This Quarter',
     periodType: 'quarter',
     getDaysOffset: () => {
-      const now = new Date()
-      const quarterStart = startOfQuarter(now)
-      return differenceInDays(quarterStart, now)
+      const today = startOfDay(new Date())
+      const quarterStart = startOfQuarter(today)
+      return differenceInDays(quarterStart, today)
     },
     separator: true,
   },
@@ -78,18 +70,18 @@ export const scheduleOptions: ScheduleOption[] = [
     label: 'Next Quarter',
     periodType: 'quarter',
     getDaysOffset: () => {
-      const now = new Date()
-      const nextQuarterStart = startOfQuarter(addQuarters(now, 1))
-      return differenceInDays(nextQuarterStart, now)
+      const today = startOfDay(new Date())
+      const nextQuarterStart = startOfQuarter(addQuarters(today, 1))
+      return differenceInDays(nextQuarterStart, today)
     },
   },
   {
     label: 'This Year',
     periodType: 'year',
     getDaysOffset: () => {
-      const now = new Date()
-      const yearStart = startOfYear(now)
-      return differenceInDays(yearStart, now)
+      const today = startOfDay(new Date())
+      const yearStart = startOfYear(today)
+      return differenceInDays(yearStart, today)
     },
     separator: true,
   },
@@ -97,9 +89,9 @@ export const scheduleOptions: ScheduleOption[] = [
     label: 'Next Year',
     periodType: 'year',
     getDaysOffset: () => {
-      const now = new Date()
-      const nextYearStart = startOfYear(addYears(now, 1))
-      return differenceInDays(nextYearStart, now)
+      const today = startOfDay(new Date())
+      const nextYearStart = startOfYear(addYears(today, 1))
+      return differenceInDays(nextYearStart, today)
     },
   },
 ]
@@ -113,12 +105,10 @@ export const handleSchedule = async (
   daysOffset: number,
 ) => {
   let anchorDate = addDays(new Date(), daysOffset)
-  console.log('Initial anchor date:', anchorDate)
 
   // For week/month/quarter/year scheduling, set to start of period
   if (periodType === 'week') {
     anchorDate = startOfWeek(anchorDate, { weekStartsOn: calendarConfig.weekStartsOn })
-    console.log('Anchor date for week:', anchorDate)
   } else if (periodType === 'month') {
     anchorDate = startOfMonth(anchorDate)
   } else if (periodType === 'quarter') {
