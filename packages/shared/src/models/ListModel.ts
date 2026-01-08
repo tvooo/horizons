@@ -9,6 +9,7 @@ export class ListModel {
   parentListId: string | null
   archived: boolean
   scheduledDate: { periodType: PeriodType; anchorDate: Date } | null
+  notes: string | null
   createdAt: Date
   updatedAt: Date
 
@@ -27,6 +28,7 @@ export class ListModel {
             anchorDate: new Date(data.scheduledAnchorDate),
           }
         : null
+    this.notes = data.notes
     this.createdAt = new Date(data.createdAt)
     this.updatedAt = new Date(data.updatedAt)
     this.rootStore = rootStore
@@ -37,10 +39,12 @@ export class ListModel {
       parentListId: observable,
       archived: observable,
       scheduledDate: observable,
+      notes: observable,
       updatedAt: observable,
       updateName: action,
       updateScheduledDate: action,
       setArchived: action,
+      updateNotes: action,
       numberOfOpenTasks: computed,
       numberOfTasks: computed,
       areaId: computed,
@@ -138,6 +142,21 @@ export class ListModel {
     } catch (err) {
       runInAction(() => {
         this.archived = oldArchived
+      })
+      throw err
+    }
+  }
+
+  async updateNotes(newNotes: string | null) {
+    const oldNotes = this.notes
+    this.notes = newNotes
+    this.updatedAt = new Date()
+
+    try {
+      await this.rootStore.updateList(this.id, { notes: newNotes || undefined })
+    } catch (err) {
+      runInAction(() => {
+        this.notes = oldNotes
       })
       throw err
     }

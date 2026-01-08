@@ -67,6 +67,7 @@ export const lists = sqliteTable('lists', {
     enum: ['day', 'week', 'month', 'quarter', 'year'],
   }),
   scheduledAnchorDate: integer('scheduled_anchor_date', { mode: 'timestamp' }),
+  notes: text('notes'),
   createdAt: integer('created_at', { mode: 'timestamp' }).notNull().default(sql`(unixepoch())`),
   updatedAt: integer('updated_at', { mode: 'timestamp' }).notNull().default(sql`(unixepoch())`),
 })
@@ -74,7 +75,7 @@ export const lists = sqliteTable('lists', {
 export const tasks = sqliteTable('tasks', {
   id: integer('id').primaryKey({ autoIncrement: true }),
   title: text('title').notNull(),
-  description: text('description'),
+  notes: text('notes'),
   userId: text('user_id')
     .notNull()
     .references(() => users.id, { onDelete: 'cascade' }),

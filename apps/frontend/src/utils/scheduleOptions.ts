@@ -44,6 +44,8 @@ export const scheduleOptions: ScheduleOption[] = [
       const nextWeekStart = startOfWeek(addWeeks(now, 1), {
         weekStartsOn: calendarConfig.weekStartsOn,
       })
+      console.log('Next week start:', nextWeekStart)
+      console.log('Diff in days:', differenceInDays(nextWeekStart, now))
       return differenceInDays(nextWeekStart, now)
     },
   },
@@ -111,10 +113,12 @@ export const handleSchedule = async (
   daysOffset: number,
 ) => {
   let anchorDate = addDays(new Date(), daysOffset)
+  console.log('Initial anchor date:', anchorDate)
 
   // For week/month/quarter/year scheduling, set to start of period
   if (periodType === 'week') {
     anchorDate = startOfWeek(anchorDate, { weekStartsOn: calendarConfig.weekStartsOn })
+    console.log('Anchor date for week:', anchorDate)
   } else if (periodType === 'month') {
     anchorDate = startOfMonth(anchorDate)
   } else if (periodType === 'quarter') {
