@@ -9,47 +9,52 @@ export type ListPageProps = {
   onCreateTask?: (title: string) => Promise<unknown>
   icon?: React.ReactNode
   list?: ListModel
+  afterInput?: React.ReactNode
 }
 
-export const ListPage = observer(({ children, title, icon, onCreateTask, list }: ListPageProps) => {
-  const [notes, setNotes] = useState(list?.notes || '')
+export const ListPage = observer(
+  ({ children, title, icon, onCreateTask, list, afterInput }: ListPageProps) => {
+    const [notes, setNotes] = useState(list?.notes || '')
 
-  const handleNotesBlur = async () => {
-    if (list && notes !== (list.notes || '')) {
-      await list.updateNotes(notes || null)
+    const handleNotesBlur = async () => {
+      if (list && notes !== (list.notes || '')) {
+        await list.updateNotes(notes || null)
+      }
     }
-  }
 
-  const handleNotesChange = (e: React.ChangeEvent<HTMLTextAreaElement>) => {
-    setNotes(e.target.value)
-  }
+    const handleNotesChange = (e: React.ChangeEvent<HTMLTextAreaElement>) => {
+      setNotes(e.target.value)
+    }
 
-  return (
-    <div className="h-full w-full overflow-y-auto p-8">
-      <div className="mx-auto w-full max-w-3xl">
-        <div className="mb-8 flex items-center gap-4">
-          {icon && <div className="text-project">{icon}</div>}
-          <h1 className="font-bold font-heading text-3xl">{title}</h1>
-        </div>
-
-        {list && (
-          <div className="mb-6">
-            <textarea
-              value={notes}
-              onChange={handleNotesChange}
-              onBlur={handleNotesBlur}
-              placeholder="Add notes..."
-              className="min-h-[80px] w-full resize-y rounded-md border border-transparent bg-background p-3 text-sm transition-colors hover:border-gray-300 focus:border-gray-400 focus:outline-none focus:ring-2 focus:ring-blue-500"
-            />
+    return (
+      <div className="h-full w-full overflow-y-auto p-8">
+        <div className="mx-auto w-full max-w-3xl">
+          <div className="mb-8 flex items-center gap-4">
+            {icon && <div className="text-project">{icon}</div>}
+            <h1 className="font-bold font-heading text-3xl">{title}</h1>
           </div>
-        )}
 
-        <div className="space-y-2">
-          {children}
+          {list && (
+            <div className="mb-6">
+              <textarea
+                value={notes}
+                onChange={handleNotesChange}
+                onBlur={handleNotesBlur}
+                placeholder="Add notes..."
+                className="min-h-[80px] w-full resize-y rounded-md border border-transparent bg-background p-3 text-sm transition-colors hover:border-gray-300 focus:border-gray-400 focus:outline-none focus:ring-2 focus:ring-blue-500"
+              />
+            </div>
+          )}
 
-          {onCreateTask && <NewTaskInput onCreateTask={onCreateTask} />}
+          <div className="space-y-2">
+            {children}
+
+            {onCreateTask && <NewTaskInput onCreateTask={onCreateTask} />}
+
+            {afterInput && <div className="mt-8">{afterInput}</div>}
+          </div>
         </div>
       </div>
-    </div>
-  )
-})
+    )
+  },
+)
