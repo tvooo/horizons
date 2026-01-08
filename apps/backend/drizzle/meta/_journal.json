@@ -57,6 +57,13 @@
       "when": 1766912465638,
       "tag": "0007_steep_sabra",
       "breakpoints": true
+    },
+    {
+      "idx": 8,
+      "version": "6",
+      "when": 1767858821385,
+      "tag": "0008_flippant_doomsday",
+      "breakpoints": true
     }
   ]
 }
