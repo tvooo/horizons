@@ -21,6 +21,7 @@ const createListSchema = z.object({
   type: z.enum(['area', 'project', 'list']).optional(),
   parentListId: z.number().optional(),
   scheduledDate: scheduledDateSchema.optional(),
+  notes: z.string().optional(),
 })
 
 const updateListSchema = z.object({
@@ -29,6 +30,7 @@ const updateListSchema = z.object({
   parentListId: z.number().nullable().optional(),
   archived: z.boolean().optional(),
   scheduledDate: scheduledDateSchema.nullable().optional(),
+  notes: z.string().optional(),
 })
 
 // GET /api/lists - Get all lists
@@ -73,6 +75,7 @@ app.post('/', zValidator('json', createListSchema), async (c) => {
       parentListId: data.parentListId,
       scheduledPeriodType: data.scheduledDate?.periodType,
       scheduledAnchorDate: data.scheduledDate ? new Date(data.scheduledDate.anchorDate) : undefined,
+      notes: data.notes,
     })
     .returning()
 

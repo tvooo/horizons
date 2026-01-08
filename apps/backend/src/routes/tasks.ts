@@ -18,7 +18,7 @@ const scheduledDateSchema = z.object({
 
 const createTaskSchema = z.object({
   title: z.string().min(1),
-  description: z.string().optional(),
+  notes: z.string().optional(),
   listId: z.number().optional(),
   completed: z.boolean().optional(),
   scheduledDate: scheduledDateSchema.optional(),
@@ -26,7 +26,7 @@ const createTaskSchema = z.object({
 
 const updateTaskSchema = z.object({
   title: z.string().min(1).optional(),
-  description: z.string().optional(),
+  notes: z.string().optional(),
   listId: z.number().optional(),
   completed: z.boolean().optional(),
   scheduledDate: scheduledDateSchema.optional(),
@@ -69,7 +69,7 @@ app.post('/', zValidator('json', createTaskSchema), async (c) => {
     .insert(tasks)
     .values({
       title: data.title,
-      description: data.description,
+      notes: data.notes,
       userId: user.id,
       listId: data.listId,
       completed: data.completed ?? false,
@@ -93,7 +93,7 @@ app.patch('/:id', zValidator('json', updateTaskSchema), async (c) => {
 
   const updateData: Record<string, unknown> = {
     title: data.title,
-    description: data.description,
+    notes: data.notes,
     listId: data.listId,
     completed: data.completed,
     updatedAt: new Date(),

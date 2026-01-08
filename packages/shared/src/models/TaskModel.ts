@@ -10,7 +10,7 @@ export interface ScheduledDate {
 export class TaskModel {
   id: string
   title: string
-  description: string | null
+  notes: string | null
   listId: string | null
   completed: boolean
   scheduledDate: ScheduledDate | null
@@ -22,7 +22,7 @@ export class TaskModel {
   constructor(data: BackendTask, rootStore: RootStore) {
     this.id = String(data.id)
     this.title = data.title
-    this.description = data.description
+    this.notes = data.notes
     this.listId = data.listId ? String(data.listId) : null
     this.completed = data.completed
     this.scheduledDate =
@@ -38,14 +38,14 @@ export class TaskModel {
 
     makeObservable(this, {
       title: observable,
-      description: observable,
+      notes: observable,
       listId: observable,
       completed: observable,
       scheduledDate: observable,
       updatedAt: observable,
       toggleCompleted: action,
       updateTitle: action,
-      updateDescription: action,
+      updateNotes: action,
       updateScheduledDate: action,
       moveToList: action,
       list: computed,
@@ -90,16 +90,16 @@ export class TaskModel {
     }
   }
 
-  async updateDescription(newDescription: string | null) {
-    const oldDescription = this.description
-    this.description = newDescription
+  async updateNotes(newNotes: string | null) {
+    const oldNotes = this.notes
+    this.notes = newNotes
     this.updatedAt = new Date()
 
     try {
-      await this.rootStore.updateTask(this.id, { description: newDescription || undefined })
+      await this.rootStore.updateTask(this.id, { notes: newNotes || undefined })
     } catch (err) {
       // Rollback on error
-      this.description = oldDescription
+      this.notes = oldNotes
       throw err
     }
   }

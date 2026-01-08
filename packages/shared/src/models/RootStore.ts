@@ -88,7 +88,7 @@ export class RootStore {
     updates: {
       completed?: boolean
       title?: string
-      description?: string
+      notes?: string
       scheduledDate?: BackendScheduledDate
       listId?: number | null
     },
@@ -104,6 +104,7 @@ export class RootStore {
       parentListId?: number | null
       scheduledDate?: BackendScheduledDate | null
       archived?: boolean
+      notes?: string
     },
   ) {
     await this.api.updateList(Number.parseInt(listId, 10), updates)

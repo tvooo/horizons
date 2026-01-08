@@ -46,6 +46,7 @@ export const ListView = observer(() => {
       title={list.name}
       onCreateTask={(title) => store.createTask(title, list.id)}
       icon={icon}
+      list={list}
     >
       {list.type === 'project' && (
         <div className="mt-4">
