@@ -3,6 +3,7 @@ import { useParams } from 'react-router-dom'
 import { scheduledDateLabel } from 'shared'
 import { useRootStore } from '../models/RootStoreContext'
 import { ListPage } from '../pages/ListPage'
+import { CollapsibleSection } from './CollapsibleSection'
 import { ProjectIcon } from './ProjectIcon'
 import { TaskItem } from './TaskItem'
 
@@ -22,6 +23,8 @@ export const ListView = observer(() => {
 
   const list = store.getListById(listId)
   const listTasks = store.getTasksByListId(listId)
+  const incompleteTasks = listTasks.filter((task) => !task.completed)
+  const completedTasks = listTasks.filter((task) => task.completed)
 
   if (!list) {
     return (
@@ -47,6 +50,20 @@ export const ListView = observer(() => {
       onCreateTask={(title) => store.createTask(title, list.id)}
       icon={icon}
       list={list}
+      afterInput={
+        completedTasks.length > 0 ? (
+          <CollapsibleSection
+            title="Completed"
+            count={completedTasks.length}
+            defaultCollapsed={true}
+            storageKey={`list-${listId}-completed-collapsed`}
+          >
+            {completedTasks.map((task) => (
+              <TaskItem key={task.id} task={task} />
+            ))}
+          </CollapsibleSection>
+        ) : undefined
+      }
     >
       {list.type === 'project' && (
         <div className="mt-4">
@@ -67,7 +84,7 @@ export const ListView = observer(() => {
         </div>
       )}
 
-      {listTasks.map((task) => (
+      {incompleteTasks.map((task) => (
         <TaskItem key={task.id} task={task} />
       ))}
     </ListPage>
