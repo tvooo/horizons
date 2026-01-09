@@ -16,6 +16,7 @@ export interface BackendList {
   archived: boolean
   scheduledPeriodType: PeriodType | null
   scheduledAnchorDate: string | null
+  onIce: boolean
   notes: string | null
   createdAt: string
   updatedAt: string
@@ -29,6 +30,7 @@ export interface BackendTask {
   completed: boolean
   scheduledPeriodType: PeriodType | null
   scheduledAnchorDate: string | null
+  onIce: boolean
   createdAt: string
   updatedAt: string
 }
@@ -38,6 +40,7 @@ export interface CreateListRequest {
   type?: 'area' | 'project' | 'list'
   parentListId?: number
   scheduledDate?: BackendScheduledDate
+  onIce?: boolean
   notes?: string
 }
 
@@ -47,6 +50,7 @@ export interface UpdateListRequest {
   parentListId?: number | null
   archived?: boolean
   scheduledDate?: BackendScheduledDate | null
+  onIce?: boolean
   notes?: string
 }
 
@@ -56,6 +60,7 @@ export interface CreateTaskRequest {
   listId?: number
   completed?: boolean
   scheduledDate?: BackendScheduledDate
+  onIce?: boolean
 }
 
 export interface UpdateTaskRequest {
@@ -64,4 +69,5 @@ export interface UpdateTaskRequest {
   listId?: number | null
   completed?: boolean
   scheduledDate?: BackendScheduledDate
+  onIce?: boolean
 }

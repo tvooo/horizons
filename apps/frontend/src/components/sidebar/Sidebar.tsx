@@ -97,7 +97,7 @@ export const Sidebar = observer(({ onAddListClick, isMobileOpen, onMobileClose }
           {/* All lists */}
           <div className="space-y-1">
             {standaloneLists
-              .filter((list) => !list.archived)
+              .filter((list) => !list.archived && !list.onIce)
               .sort(sortByListTypeAndName)
               .map((list) => (
                 <div key={list.id}>
@@ -106,7 +106,7 @@ export const Sidebar = observer(({ onAddListClick, isMobileOpen, onMobileClose }
                   {list.type === 'list' &&
                     store
                       .getChildLists(list.id)
-                      .filter((childList) => !childList.archived)
+                      .filter((childList) => !childList.archived && !childList.onIce)
                       .sort(sortByListTypeAndName)
                       .map((childList) => (
                         <ListItem key={childList.id} list={childList} isNested />
@@ -118,7 +118,7 @@ export const Sidebar = observer(({ onAddListClick, isMobileOpen, onMobileClose }
                 <ListItem list={area} />
                 {store
                   .getChildLists(area.id)
-                  .filter((childList) => !childList.archived)
+                  .filter((childList) => !childList.archived && !childList.onIce)
                   .sort(sortByListTypeAndName)
                   .map((childList) => (
                     <div key={childList.id}>
@@ -127,7 +127,9 @@ export const Sidebar = observer(({ onAddListClick, isMobileOpen, onMobileClose }
                       {childList.type === 'list' &&
                         store
                           .getChildLists(childList.id)
-                          .filter((grandchildList) => !grandchildList.archived)
+                          .filter(
+                            (grandchildList) => !grandchildList.archived && !grandchildList.onIce,
+                          )
                           .sort(sortByListTypeAndName)
                           .map((grandchildList) => (
                             <ListItem

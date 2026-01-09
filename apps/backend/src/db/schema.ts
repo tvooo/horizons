@@ -67,6 +67,7 @@ export const lists = sqliteTable('lists', {
     enum: ['day', 'week', 'month', 'quarter', 'year'],
   }),
   scheduledAnchorDate: integer('scheduled_anchor_date', { mode: 'timestamp' }),
+  onIce: integer('on_ice', { mode: 'boolean' }).notNull().default(false),
   notes: text('notes'),
   createdAt: integer('created_at', { mode: 'timestamp' }).notNull().default(sql`(unixepoch())`),
   updatedAt: integer('updated_at', { mode: 'timestamp' }).notNull().default(sql`(unixepoch())`),
@@ -85,6 +86,7 @@ export const tasks = sqliteTable('tasks', {
     enum: ['day', 'week', 'month', 'quarter', 'year'],
   }),
   scheduledAnchorDate: integer('scheduled_anchor_date', { mode: 'timestamp' }),
+  onIce: integer('on_ice', { mode: 'boolean' }).notNull().default(false),
   createdAt: integer('created_at', { mode: 'timestamp' }).notNull().default(sql`(unixepoch())`),
   updatedAt: integer('updated_at', { mode: 'timestamp' }).notNull().default(sql`(unixepoch())`),
 })

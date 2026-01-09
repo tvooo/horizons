@@ -33,6 +33,8 @@ export class RootStore {
       inboxTasks: computed,
       nowTasks: computed,
       nowLists: computed,
+      onIceTasks: computed,
+      onIceLists: computed,
       areas: computed,
       projects: computed,
       regularLists: computed,
@@ -91,6 +93,7 @@ export class RootStore {
       notes?: string
       scheduledDate?: BackendScheduledDate
       listId?: number | null
+      onIce?: boolean
     },
   ) {
     await this.api.updateTask(toBackendTaskId(taskId), updates)
@@ -104,6 +107,7 @@ export class RootStore {
       parentListId?: number | null
       scheduledDate?: BackendScheduledDate | null
       archived?: boolean
+      onIce?: boolean
       notes?: string
     },
   ) {
@@ -144,7 +148,9 @@ export class RootStore {
   }
 
   get inboxTasks() {
-    return this.tasks.filter((task) => !task.listId && !task.completed && this.isTaskInFocus(task))
+    return this.tasks.filter(
+      (task) => !task.listId && !task.completed && !task.onIce && this.isTaskInFocus(task),
+    )
   }
 
   get nowTasks() {
@@ -165,6 +171,16 @@ export class RootStore {
         (isCurrentPeriod(list.scheduledDate) || isPast(list.scheduledDate.anchorDate)) &&
         this.isListInFocus(list),
     )
+  }
+
+  get onIceTasks() {
+    return this.tasks.filter(
+      (task) => task.onIce && !task.listId && !task.completed && this.isTaskInFocus(task),
+    )
+  }
+
+  get onIceLists() {
+    return this.lists.filter((list) => list.onIce && !list.archived && this.isListInFocus(list))
   }
 
   get areas() {

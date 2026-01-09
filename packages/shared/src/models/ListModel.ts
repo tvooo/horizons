@@ -9,6 +9,7 @@ export class ListModel {
   parentListId: string | null
   archived: boolean
   scheduledDate: { periodType: PeriodType; anchorDate: Date } | null
+  onIce: boolean
   notes: string | null
   createdAt: Date
   updatedAt: Date
@@ -28,6 +29,7 @@ export class ListModel {
             anchorDate: new Date(data.scheduledAnchorDate),
           }
         : null
+    this.onIce = data.onIce
     this.notes = data.notes
     this.createdAt = new Date(data.createdAt)
     this.updatedAt = new Date(data.updatedAt)
@@ -39,11 +41,13 @@ export class ListModel {
       parentListId: observable,
       archived: observable,
       scheduledDate: observable,
+      onIce: observable,
       notes: observable,
       updatedAt: observable,
       updateName: action,
       updateScheduledDate: action,
       setArchived: action,
+      setOnIce: action,
       updateNotes: action,
       numberOfOpenTasks: computed,
       numberOfTasks: computed,
@@ -117,7 +121,9 @@ export class ListModel {
 
   async updateScheduledDate(periodType: PeriodType, anchorDate: Date) {
     const oldScheduledDate = this.scheduledDate
+    const oldOnIce = this.onIce
     this.scheduledDate = { periodType, anchorDate }
+    this.onIce = false // Clear onIce when scheduling
     this.updatedAt = new Date()
 
     try {
@@ -127,6 +133,7 @@ export class ListModel {
     } catch (err) {
       runInAction(() => {
         this.scheduledDate = oldScheduledDate
+        this.onIce = oldOnIce
       })
       throw err
     }
@@ -142,6 +149,26 @@ export class ListModel {
     } catch (err) {
       runInAction(() => {
         this.archived = oldArchived
+      })
+      throw err
+    }
+  }
+
+  async setOnIce(value: boolean) {
+    const oldOnIce = this.onIce
+    const oldScheduledDate = this.scheduledDate
+    this.onIce = value
+    if (value) {
+      this.scheduledDate = null // Clear scheduling when putting on ice
+    }
+    this.updatedAt = new Date()
+
+    try {
+      await this.rootStore.updateList(this.id, { onIce: value })
+    } catch (err) {
+      runInAction(() => {
+        this.onIce = oldOnIce
+        this.scheduledDate = oldScheduledDate
       })
       throw err
     }
