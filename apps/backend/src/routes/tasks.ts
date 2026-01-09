@@ -22,6 +22,7 @@ const createTaskSchema = z.object({
   listId: z.number().optional(),
   completed: z.boolean().optional(),
   scheduledDate: scheduledDateSchema.optional(),
+  onIce: z.boolean().optional(),
 })
 
 const updateTaskSchema = z.object({
@@ -30,6 +31,7 @@ const updateTaskSchema = z.object({
   listId: z.number().optional(),
   completed: z.boolean().optional(),
   scheduledDate: scheduledDateSchema.optional(),
+  onIce: z.boolean().optional(),
 })
 
 // GET /api/tasks - Get all tasks
@@ -75,6 +77,7 @@ app.post('/', zValidator('json', createTaskSchema), async (c) => {
       completed: data.completed ?? false,
       scheduledPeriodType: data.scheduledDate?.periodType,
       scheduledAnchorDate: data.scheduledDate ? new Date(data.scheduledDate.anchorDate) : undefined,
+      onIce: data.onIce ?? false,
     })
     .returning()
 
@@ -99,9 +102,20 @@ app.patch('/:id', zValidator('json', updateTaskSchema), async (c) => {
     updatedAt: new Date(),
   }
 
+  // Mutual exclusion: scheduling clears onIce
   if (data.scheduledDate) {
     updateData.scheduledPeriodType = data.scheduledDate.periodType
     updateData.scheduledAnchorDate = new Date(data.scheduledDate.anchorDate)
+    updateData.onIce = false
+  }
+
+  // Mutual exclusion: onIce clears scheduling
+  if (data.onIce === true) {
+    updateData.scheduledPeriodType = null
+    updateData.scheduledAnchorDate = null
+    updateData.onIce = true
+  } else if (data.onIce === false) {
+    updateData.onIce = false
   }
 
   const result = await db

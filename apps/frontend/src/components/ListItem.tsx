@@ -174,6 +174,17 @@ export const ListItem = observer(({ list, isNested = false, nestingLevel = 0 }: 
               Rename
             </ContextMenu.Item>
 
+            <ContextMenu.Separator className="my-1 h-px bg-gray-200" />
+
+            <ContextMenu.Item
+              className="cursor-pointer rounded px-3 py-2 text-gray-700 text-sm outline-none hover:bg-gray-100 focus:bg-gray-100"
+              onSelect={() => list.setOnIce(!list.onIce)}
+            >
+              {list.onIce ? 'Remove from Ice' : 'Put on Ice'}
+            </ContextMenu.Item>
+
+            <ContextMenu.Separator className="my-1 h-px bg-gray-200" />
+
             {list.isArea && (
               <ContextMenu.Item
                 className="cursor-pointer rounded px-3 py-2 text-gray-700 text-sm outline-none hover:bg-gray-100 focus:bg-gray-100"

@@ -21,6 +21,7 @@ const createListSchema = z.object({
   type: z.enum(['area', 'project', 'list']).optional(),
   parentListId: z.number().optional(),
   scheduledDate: scheduledDateSchema.optional(),
+  onIce: z.boolean().optional(),
   notes: z.string().optional(),
 })
 
@@ -30,6 +31,7 @@ const updateListSchema = z.object({
   parentListId: z.number().nullable().optional(),
   archived: z.boolean().optional(),
   scheduledDate: scheduledDateSchema.nullable().optional(),
+  onIce: z.boolean().optional(),
   notes: z.string().optional(),
 })
 
@@ -75,6 +77,7 @@ app.post('/', zValidator('json', createListSchema), async (c) => {
       parentListId: data.parentListId,
       scheduledPeriodType: data.scheduledDate?.periodType,
       scheduledAnchorDate: data.scheduledDate ? new Date(data.scheduledDate.anchorDate) : undefined,
+      onIce: data.onIce ?? false,
       notes: data.notes,
     })
     .returning()
@@ -106,7 +109,16 @@ app.patch('/:id', zValidator('json', updateListSchema), async (c) => {
     } else if (data.scheduledDate) {
       updateData.scheduledPeriodType = data.scheduledDate.periodType
       updateData.scheduledAnchorDate = new Date(data.scheduledDate.anchorDate)
+      // Mutual exclusion: scheduling clears onIce
+      updateData.onIce = false
     }
+  }
+
+  // Mutual exclusion: onIce clears scheduling
+  if (data.onIce === true) {
+    updateData.scheduledPeriodType = null
+    updateData.scheduledAnchorDate = null
+    updateData.onIce = true
   }
 
   const result = await db

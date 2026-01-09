@@ -89,6 +89,17 @@ export const TaskItemContextMenu = observer(({ task, children }: TaskItemContext
             </ContextMenu.Portal>
           </ContextMenu.Sub>
 
+          <ContextMenu.Separator className="my-1 h-px bg-gray-200" />
+
+          <ContextMenu.Item
+            className="cursor-pointer rounded px-3 py-2 text-gray-700 text-sm outline-none hover:bg-gray-100 focus:bg-gray-100"
+            onSelect={() => task.setOnIce(!task.onIce)}
+          >
+            {task.onIce ? 'Remove from Ice' : 'Put on Ice'}
+          </ContextMenu.Item>
+
+          <ContextMenu.Separator className="my-1 h-px bg-gray-200" />
+
           <ContextMenu.Sub>
             <ContextMenu.SubTrigger className="cursor-pointer rounded px-3 py-2 text-gray-700 text-sm outline-none hover:bg-gray-100 focus:bg-gray-100 data-[state=open]:bg-gray-100">
               Move to List

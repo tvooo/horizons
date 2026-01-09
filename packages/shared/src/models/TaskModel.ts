@@ -14,6 +14,7 @@ export class TaskModel {
   listId: string | null
   completed: boolean
   scheduledDate: ScheduledDate | null
+  onIce: boolean
   createdAt: Date
   updatedAt: Date
 
@@ -32,6 +33,7 @@ export class TaskModel {
             anchorDate: new Date(data.scheduledAnchorDate),
           }
         : null
+    this.onIce = data.onIce
     this.createdAt = new Date(data.createdAt)
     this.updatedAt = new Date(data.updatedAt)
     this.rootStore = rootStore
@@ -42,11 +44,13 @@ export class TaskModel {
       listId: observable,
       completed: observable,
       scheduledDate: observable,
+      onIce: observable,
       updatedAt: observable,
       toggleCompleted: action,
       updateTitle: action,
       updateNotes: action,
       updateScheduledDate: action,
+      setOnIce: action,
       moveToList: action,
       list: computed,
       areaId: computed,
@@ -106,7 +110,9 @@ export class TaskModel {
 
   async updateScheduledDate(periodType: PeriodType, anchorDate: Date) {
     const oldScheduledDate = this.scheduledDate
+    const oldOnIce = this.onIce
     this.scheduledDate = { periodType, anchorDate }
+    this.onIce = false // Clear onIce when scheduling
     this.updatedAt = new Date()
 
     try {
@@ -115,6 +121,26 @@ export class TaskModel {
       })
     } catch (err) {
       // Rollback on error
+      this.scheduledDate = oldScheduledDate
+      this.onIce = oldOnIce
+      throw err
+    }
+  }
+
+  async setOnIce(value: boolean) {
+    const oldOnIce = this.onIce
+    const oldScheduledDate = this.scheduledDate
+    this.onIce = value
+    if (value) {
+      this.scheduledDate = null // Clear scheduling when putting on ice
+    }
+    this.updatedAt = new Date()
+
+    try {
+      await this.rootStore.updateTask(this.id, { onIce: value })
+    } catch (err) {
+      // Rollback on error
+      this.onIce = oldOnIce
       this.scheduledDate = oldScheduledDate
       throw err
     }
