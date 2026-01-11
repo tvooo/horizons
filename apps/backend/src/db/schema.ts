@@ -87,6 +87,7 @@ export const tasks = sqliteTable('tasks', {
   }),
   scheduledAnchorDate: integer('scheduled_anchor_date', { mode: 'timestamp' }),
   onIce: integer('on_ice', { mode: 'boolean' }).notNull().default(false),
+  scheduleOrder: text('schedule_order'),
   createdAt: integer('created_at', { mode: 'timestamp' }).notNull().default(sql`(unixepoch())`),
   updatedAt: integer('updated_at', { mode: 'timestamp' }).notNull().default(sql`(unixepoch())`),
 })

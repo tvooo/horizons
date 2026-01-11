@@ -22,3 +22,8 @@ export type { ScheduledDate } from './models/TaskModel'
 export { TaskModel } from './models/TaskModel'
 // Utils
 export { isCurrentPeriod, scheduledDateLabel, sortByPeriodTypeAndDate } from './utils/dateUtils'
+export {
+  compareFractionalIndices,
+  generateFractionalIndex,
+  isValidFractionalIndex,
+} from './utils/fractionalIndexing'

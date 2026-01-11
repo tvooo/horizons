@@ -32,6 +32,7 @@ const updateTaskSchema = z.object({
   completed: z.boolean().optional(),
   scheduledDate: scheduledDateSchema.optional(),
   onIce: z.boolean().optional(),
+  scheduleOrder: z.string().optional(),
 })
 
 // GET /api/tasks - Get all tasks
@@ -99,6 +100,7 @@ app.patch('/:id', zValidator('json', updateTaskSchema), async (c) => {
     notes: data.notes,
     listId: data.listId,
     completed: data.completed,
+    scheduleOrder: data.scheduleOrder,
     updatedAt: new Date(),
   }
 

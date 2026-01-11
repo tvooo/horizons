@@ -31,6 +31,7 @@ export interface BackendTask {
   scheduledPeriodType: PeriodType | null
   scheduledAnchorDate: string | null
   onIce: boolean
+  scheduleOrder: string | null
   createdAt: string
   updatedAt: string
 }
@@ -70,4 +71,5 @@ export interface UpdateTaskRequest {
   completed?: boolean
   scheduledDate?: BackendScheduledDate
   onIce?: boolean
+  scheduleOrder?: string
 }

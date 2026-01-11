@@ -95,6 +95,7 @@ export class RootStore {
       scheduledDate?: BackendScheduledDate
       listId?: number | null
       onIce?: boolean
+      scheduleOrder?: string
     },
   ) {
     await this.api.updateTask(toBackendTaskId(taskId), updates)
