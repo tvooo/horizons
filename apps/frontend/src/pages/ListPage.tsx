@@ -41,7 +41,7 @@ export const ListPage = observer(
                 onChange={handleNotesChange}
                 onBlur={handleNotesBlur}
                 placeholder="Add notes..."
-                className="min-h-[80px] w-full resize-y rounded-md border border-transparent bg-background p-3 text-sm transition-colors hover:border-gray-300 focus:border-gray-400 focus:outline-none focus:ring-2 focus:ring-blue-500"
+                className="min-h-20 w-full resize-y rounded-md border border-transparent bg-background p-3 text-sm transition-colors hover:border-gray-300 focus:border-gray-400 focus:outline-none focus:ring-2 focus:ring-blue-500"
               />
             </div>
           )}
