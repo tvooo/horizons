@@ -77,8 +77,16 @@ export function isCurrentPeriod(scheduledDate: {
 }
 
 export function sortByPeriodTypeAndDate(
-  am: { scheduledDate: { periodType: PeriodType; anchorDate: Date } | null; completed?: boolean },
-  bm: { scheduledDate: { periodType: PeriodType; anchorDate: Date } | null; completed?: boolean },
+  am: {
+    scheduledDate: { periodType: PeriodType; anchorDate: Date } | null
+    completed?: boolean
+    scheduleOrder?: string | null
+  },
+  bm: {
+    scheduledDate: { periodType: PeriodType; anchorDate: Date } | null
+    completed?: boolean
+    scheduleOrder?: string | null
+  },
 ): number {
   const periodTypeOrder: PeriodType[] = ['day', 'week', 'month', 'quarter', 'year']
   const a = am.scheduledDate
@@ -99,5 +107,15 @@ export function sortByPeriodTypeAndDate(
     return periodTypeComparison
   }
 
+  // Within the same period type, sort by scheduleOrder if both have it
+  if (am.scheduleOrder && bm.scheduleOrder) {
+    return am.scheduleOrder.localeCompare(bm.scheduleOrder)
+  }
+
+  // If only one has scheduleOrder, prioritize it
+  if (am.scheduleOrder && !bm.scheduleOrder) return -1
+  if (!am.scheduleOrder && bm.scheduleOrder) return 1
+
+  // Otherwise, sort by anchor date
   return a.anchorDate.getTime() - b.anchorDate.getTime()
 }

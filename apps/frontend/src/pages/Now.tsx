@@ -70,8 +70,15 @@ export const Now = observer(() => {
             {lists.map((list) => (
               <ListItem key={list.id} list={list} />
             ))}
-            {tasks.map((task) => (
-              <TaskItem key={task.id} task={task} showList />
+            {tasks.map((task, index) => (
+              <TaskItem
+                key={task.id}
+                task={task}
+                showList
+                periodType={periodType}
+                tasksInPeriod={tasks}
+                indexInPeriod={index}
+              />
             ))}
           </CollapsibleSection>
         )
