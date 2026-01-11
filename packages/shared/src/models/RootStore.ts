@@ -62,10 +62,11 @@ export class RootStore {
     }
   }
 
-  async createTask(title: string, listId?: string) {
+  async createTask(title: string, listId?: string, scheduledDate?: BackendScheduledDate) {
     const backendTask = await this.api.createTask({
       title,
       listId: listId ? Number.parseInt(listId, 10) : undefined,
+      scheduledDate,
     })
 
     const newTask = new TaskModel(backendTask, this)

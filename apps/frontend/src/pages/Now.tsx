@@ -44,7 +44,15 @@ export const Now = observer(() => {
   }
 
   return (
-    <ListPage title="Now" onCreateTask={(title) => store.createTask(title)}>
+    <ListPage
+      title="Now"
+      onCreateTask={(title) =>
+        store.createTask(title, undefined, {
+          periodType: 'day',
+          anchorDate: new Date().toISOString(),
+        })
+      }
+    >
       {PERIOD_ORDER.map((periodType) => {
         const { tasks, lists } = groupedByPeriod[periodType]
         const totalCount = tasks.length + lists.length
