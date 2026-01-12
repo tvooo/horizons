@@ -104,6 +104,13 @@ app.patch('/:id', zValidator('json', updateTaskSchema), async (c) => {
     updatedAt: new Date(),
   }
 
+  // Set completedAt when completing, clear it when uncompleting
+  if (data.completed === true) {
+    updateData.completedAt = new Date()
+  } else if (data.completed === false) {
+    updateData.completedAt = null
+  }
+
   // Mutual exclusion: scheduling clears onIce
   if (data.scheduledDate) {
     updateData.scheduledPeriodType = data.scheduledDate.periodType

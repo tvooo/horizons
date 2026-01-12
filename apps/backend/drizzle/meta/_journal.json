@@ -78,6 +78,13 @@
       "when": 1768123172509,
       "tag": "0010_broken_zzzax",
       "breakpoints": true
+    },
+    {
+      "idx": 11,
+      "version": "6",
+      "when": 1768210638558,
+      "tag": "0011_damp_sunfire",
+      "breakpoints": true
     }
   ]
 }

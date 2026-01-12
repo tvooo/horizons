@@ -1,4 +1,5 @@
 import {
+  ArchiveIcon,
   CalendarDaysIcon,
   IceCreamConeIcon,
   InboxIcon,
@@ -27,6 +28,7 @@ const STATIC_PAGES: StaticPage[] = [
   { name: 'Now', icon: SunIcon, href: '/now' },
   { name: 'Upcoming', icon: CalendarDaysIcon, href: '/upcoming' },
   { name: 'On Ice', icon: IceCreamConeIcon, href: '/on-ice' },
+  { name: 'Archive', icon: ArchiveIcon, href: '/archive' },
 ]
 
 // Areas first, projects second, regular lists last

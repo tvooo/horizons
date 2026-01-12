@@ -16,6 +16,7 @@ export class TaskModel {
   scheduledDate: ScheduledDate | null
   onIce: boolean
   scheduleOrder: string | null
+  completedAt: Date | null
   createdAt: Date
   updatedAt: Date
 
@@ -36,6 +37,7 @@ export class TaskModel {
         : null
     this.onIce = data.onIce
     this.scheduleOrder = data.scheduleOrder
+    this.completedAt = data.completedAt ? new Date(data.completedAt) : null
     this.createdAt = new Date(data.createdAt)
     this.updatedAt = new Date(data.updatedAt)
     this.rootStore = rootStore
@@ -48,6 +50,7 @@ export class TaskModel {
       scheduledDate: observable,
       onIce: observable,
       scheduleOrder: observable,
+      completedAt: observable,
       updatedAt: observable,
       toggleCompleted: action,
       updateTitle: action,
