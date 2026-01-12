@@ -1,5 +1,5 @@
 import { observer } from 'mobx-react-lite'
-import { useState } from 'react'
+import { useEffect, useState } from 'react'
 import type { ListModel } from '../../../../packages/shared/src/models/ListModel'
 import { NewTaskInput } from '../components/NewTaskInput'
 
@@ -15,6 +15,11 @@ export type ListPageProps = {
 export const ListPage = observer(
   ({ children, title, icon, onCreateTask, list, afterInput }: ListPageProps) => {
     const [notes, setNotes] = useState(list?.notes || '')
+
+    // Update notes when list changes (e.g., navigating between lists)
+    useEffect(() => {
+      setNotes(list?.notes || '')
+    }, [list?.notes])
 
     const handleNotesBlur = async () => {
       if (list && notes !== (list.notes || '')) {
