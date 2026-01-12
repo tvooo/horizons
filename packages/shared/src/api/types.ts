@@ -18,6 +18,7 @@ export interface BackendList {
   scheduledAnchorDate: string | null
   onIce: boolean
   notes: string | null
+  archivedAt: string | null
   createdAt: string
   updatedAt: string
 }
@@ -32,6 +33,7 @@ export interface BackendTask {
   scheduledAnchorDate: string | null
   onIce: boolean
   scheduleOrder: string | null
+  completedAt: string | null
   createdAt: string
   updatedAt: string
 }

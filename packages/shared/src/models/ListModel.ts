@@ -11,6 +11,7 @@ export class ListModel {
   scheduledDate: { periodType: PeriodType; anchorDate: Date } | null
   onIce: boolean
   notes: string | null
+  archivedAt: Date | null
   createdAt: Date
   updatedAt: Date
 
@@ -31,6 +32,7 @@ export class ListModel {
         : null
     this.onIce = data.onIce
     this.notes = data.notes
+    this.archivedAt = data.archivedAt ? new Date(data.archivedAt) : null
     this.createdAt = new Date(data.createdAt)
     this.updatedAt = new Date(data.updatedAt)
     this.rootStore = rootStore
@@ -43,6 +45,7 @@ export class ListModel {
       scheduledDate: observable,
       onIce: observable,
       notes: observable,
+      archivedAt: observable,
       updatedAt: observable,
       updateName: action,
       updateScheduledDate: action,

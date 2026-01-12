@@ -121,6 +121,13 @@ app.patch('/:id', zValidator('json', updateListSchema), async (c) => {
     updateData.onIce = true
   }
 
+  // Set archivedAt when archiving, clear it when unarchiving
+  if (data.archived === true) {
+    updateData.archivedAt = new Date()
+  } else if (data.archived === false) {
+    updateData.archivedAt = null
+  }
+
   const result = await db
     .update(lists)
     .set(updateData)

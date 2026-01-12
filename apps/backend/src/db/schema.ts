@@ -69,6 +69,7 @@ export const lists = sqliteTable('lists', {
   scheduledAnchorDate: integer('scheduled_anchor_date', { mode: 'timestamp' }),
   onIce: integer('on_ice', { mode: 'boolean' }).notNull().default(false),
   notes: text('notes'),
+  archivedAt: integer('archived_at', { mode: 'timestamp' }),
   createdAt: integer('created_at', { mode: 'timestamp' }).notNull().default(sql`(unixepoch())`),
   updatedAt: integer('updated_at', { mode: 'timestamp' }).notNull().default(sql`(unixepoch())`),
 })
@@ -88,6 +89,7 @@ export const tasks = sqliteTable('tasks', {
   scheduledAnchorDate: integer('scheduled_anchor_date', { mode: 'timestamp' }),
   onIce: integer('on_ice', { mode: 'boolean' }).notNull().default(false),
   scheduleOrder: text('schedule_order'),
+  completedAt: integer('completed_at', { mode: 'timestamp' }),
   createdAt: integer('created_at', { mode: 'timestamp' }).notNull().default(sql`(unixepoch())`),
   updatedAt: integer('updated_at', { mode: 'timestamp' }).notNull().default(sql`(unixepoch())`),
 })

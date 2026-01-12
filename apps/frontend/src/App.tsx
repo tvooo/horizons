@@ -10,6 +10,7 @@ import { ListView } from './components/ListView'
 import { ProtectedRoute } from './components/ProtectedRoute'
 import { Sidebar } from './components/sidebar/Sidebar'
 import { RootStoreProvider, useRootStore } from './models/RootStoreContext'
+import { Archive } from './pages/Archive'
 import { Inbox } from './pages/Inbox'
 import { Now } from './pages/Now'
 import { OnIce } from './pages/OnIce'
@@ -81,6 +82,7 @@ const AppContent = observer(() => {
                     <Route path="/now" element={<Now />} />
                     <Route path="/upcoming" element={<Upcoming />} />
                     <Route path="/on-ice" element={<OnIce />} />
+                    <Route path="/archive" element={<Archive />} />
                     <Route path="/list/:listId" element={<ListView />} />
                   </Routes>
                 </div>
