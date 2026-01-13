@@ -223,4 +223,9 @@ export class RootStore {
   setFocusedArea(areaId: string | null) {
     this.focusedAreaId = areaId
   }
+
+  // Export/Import
+  async exportData() {
+    return this.api.exportData()
+  }
 }

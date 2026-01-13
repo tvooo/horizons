@@ -1,9 +1,11 @@
 import { Download, Upload } from 'lucide-react'
 import { observer } from 'mobx-react-lite'
 import { useState } from 'react'
+import { useRootStore } from '../models/RootStoreContext'
 import { ListPage } from './ListPage'
 
 export const Settings = observer(() => {
+  const store = useRootStore()
   const [isExporting, setIsExporting] = useState(false)
   const [isImporting, setIsImporting] = useState(false)
   const [importError, setImportError] = useState<string | null>(null)
@@ -11,23 +13,9 @@ export const Settings = observer(() => {
   const handleExport = async () => {
     setIsExporting(true)
     try {
-      const response = await fetch('http://localhost:3000/api/export', {
-        credentials: 'include',
-      })
-
-      if (!response.ok) {
-        throw new Error('Export failed')
-      }
-
-      // Get the filename from Content-Disposition header or use a default
-      const contentDisposition = response.headers.get('Content-Disposition')
-      const filenameMatch = contentDisposition?.match(/filename="(.+)"/)
-      const filename = filenameMatch
-        ? filenameMatch[1]
-        : `horizons-export-${new Date().toISOString().split('T')[0]}.json`
+      const { blob, filename } = await store.exportData()
 
       // Download the file
-      const blob = await response.blob()
       const url = window.URL.createObjectURL(blob)
       const a = document.createElement('a')
       a.href = url
