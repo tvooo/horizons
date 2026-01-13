@@ -91,4 +91,22 @@ export class APIClient {
     if (!response.ok) throw new Error('Failed to update task')
     return response.json()
   }
+
+  // Export/Import
+  async exportData(): Promise<{ blob: Blob; filename: string }> {
+    const response = await fetch(`${this.baseUrl}/api/export`, {
+      credentials: 'include',
+    })
+    if (!response.ok) throw new Error('Failed to export data')
+
+    // Get the filename from Content-Disposition header or use a default
+    const contentDisposition = response.headers.get('Content-Disposition')
+    const filenameMatch = contentDisposition?.match(/filename="(.+)"/)
+    const filename = filenameMatch
+      ? filenameMatch[1]
+      : `horizons-export-${new Date().toISOString().split('T')[0]}.json`
+
+    const blob = await response.blob()
+    return { blob, filename }
+  }
 }
