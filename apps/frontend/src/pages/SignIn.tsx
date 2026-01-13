@@ -21,8 +21,8 @@ export default function SignIn() {
       })
       // On success, redirect to home
       navigate('/')
-    } catch (err: any) {
-      setError(err.message || 'Invalid email or password.')
+    } catch (err) {
+      setError(err instanceof Error ? err.message : 'Invalid email or password.')
     } finally {
       setLoading(false)
     }

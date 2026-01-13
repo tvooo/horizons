@@ -23,8 +23,8 @@ export default function SignUp() {
       })
       // On success, redirect to home
       navigate('/')
-    } catch (err: any) {
-      setError(err.message || 'Failed to sign up. Please try again.')
+    } catch (err) {
+      setError(err instanceof Error ? err.message : 'Failed to sign up. Please try again.')
     } finally {
       setLoading(false)
     }

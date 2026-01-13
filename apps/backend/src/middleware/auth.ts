@@ -1,3 +1,4 @@
+import type { Context } from 'hono'
 import { createMiddleware } from 'hono/factory'
 import { auth } from '../lib/auth'
 
@@ -16,6 +17,6 @@ export const requireAuth = createMiddleware(async (c, next) => {
 })
 
 // Helper to get user from context (with type safety)
-export const getUser = (c: any) => {
+export const getUser = (c: Context) => {
   return c.get('user') as { id: string; email: string; name: string }
 }
