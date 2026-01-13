@@ -14,6 +14,7 @@ import { Archive } from './pages/Archive'
 import { Inbox } from './pages/Inbox'
 import { Now } from './pages/Now'
 import { OnIce } from './pages/OnIce'
+import { Settings } from './pages/Settings'
 import SignIn from './pages/SignIn'
 import SignUp from './pages/SignUp'
 import { Upcoming } from './pages/Upcoming'
@@ -83,6 +84,7 @@ const AppContent = observer(() => {
                     <Route path="/upcoming" element={<Upcoming />} />
                     <Route path="/on-ice" element={<OnIce />} />
                     <Route path="/archive" element={<Archive />} />
+                    <Route path="/settings" element={<Settings />} />
                     <Route path="/list/:listId" element={<ListView />} />
                   </Routes>
                 </div>

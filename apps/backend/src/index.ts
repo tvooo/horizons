@@ -3,6 +3,7 @@ import { serveStatic } from 'hono/bun'
 import { cors } from 'hono/cors'
 import { logger } from 'hono/logger'
 import authRoutes from './routes/auth'
+import exportRoutes from './routes/export'
 import listsRoutes from './routes/lists'
 import tasksRoutes from './routes/tasks'
 
@@ -28,6 +29,7 @@ app.get('/api/health', (c) => c.json({ status: 'ok' }))
 app.route('/api/auth', authRoutes)
 app.route('/api/lists', listsRoutes)
 app.route('/api/tasks', tasksRoutes)
+app.route('/api/export', exportRoutes)
 
 // SPA fallback for React Router in production
 if (process.env.NODE_ENV === 'production') {

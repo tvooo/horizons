@@ -24,11 +24,13 @@ export function generateFractionalIndex(before: string | null, after: string | n
 
   // Case 2: Insert at the beginning
   if (!before) {
+    // biome-ignore lint/style/noNonNullAssertion: after is guaranteed to be defined here
     return getIndexBefore(after!)
   }
 
   // Case 3: Insert at the end
   if (!after) {
+    // biome-ignore lint/style/noNonNullAssertion: before is guaranteed to be defined here
     return getIndexAfter(before!)
   }
 

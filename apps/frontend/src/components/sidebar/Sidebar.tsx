@@ -6,6 +6,7 @@ import {
   LogOut,
   type LucideIcon,
   Plus,
+  Settings,
   SunIcon,
   X,
 } from 'lucide-react'
@@ -159,8 +160,16 @@ export const Sidebar = observer(({ onAddListClick, isMobileOpen, onMobileClose }
 
         {/* User section at bottom */}
         <div className="mt-3 border-gray-200 border-t pt-3">
-          <div className="mb-2 px-2 text-gray-500 text-xs">
-            {session?.user.name || session?.user.email}
+          <div className="mb-2 flex items-center justify-between px-2">
+            <div className="text-gray-500 text-xs">{session?.user.name || session?.user.email}</div>
+            <button
+              type="button"
+              onClick={() => navigate('/settings')}
+              className="rounded p-1 text-gray-400 hover:bg-gray-100 hover:text-gray-600"
+              aria-label="Settings"
+            >
+              <Settings size={14} />
+            </button>
           </div>
           <button
             type="button"
