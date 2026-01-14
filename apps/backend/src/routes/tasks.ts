@@ -23,6 +23,7 @@ const createTaskSchema = z.object({
   completed: z.boolean().optional(),
   scheduledDate: scheduledDateSchema.optional(),
   onIce: z.boolean().optional(),
+  scheduleOrder: z.string().optional(),
 })
 
 const updateTaskSchema = z.object({
@@ -79,6 +80,7 @@ app.post('/', zValidator('json', createTaskSchema), async (c) => {
       scheduledPeriodType: data.scheduledDate?.periodType,
       scheduledAnchorDate: data.scheduledDate ? new Date(data.scheduledDate.anchorDate) : undefined,
       onIce: data.onIce ?? false,
+      scheduleOrder: data.scheduleOrder,
     })
     .returning()
 

@@ -118,17 +118,29 @@ export class TaskModel {
   async updateScheduledDate(periodType: PeriodType, anchorDate: Date) {
     const oldScheduledDate = this.scheduledDate
     const oldOnIce = this.onIce
+    const oldScheduleOrder = this.scheduleOrder
+
+    // Only assign a new scheduleOrder if the task doesn't have one or is moving to a different period type
+    const keepExistingOrder =
+      this.scheduleOrder !== null && this.scheduledDate?.periodType === periodType
+    const newScheduleOrder = keepExistingOrder
+      ? this.scheduleOrder
+      : this.rootStore.getNextScheduleOrderForPeriod(periodType)
+
     this.scheduledDate = { periodType, anchorDate }
+    this.scheduleOrder = newScheduleOrder
     this.onIce = false // Clear onIce when scheduling
     this.updatedAt = new Date()
 
     try {
       await this.rootStore.updateTask(this.id, {
         scheduledDate: { periodType, anchorDate: anchorDate.toISOString() },
+        scheduleOrder: newScheduleOrder ?? undefined,
       })
     } catch (err) {
       // Rollback on error
       this.scheduledDate = oldScheduledDate
+      this.scheduleOrder = oldScheduleOrder
       this.onIce = oldOnIce
       throw err
     }

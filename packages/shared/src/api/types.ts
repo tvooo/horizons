@@ -64,6 +64,7 @@ export interface CreateTaskRequest {
   completed?: boolean
   scheduledDate?: BackendScheduledDate
   onIce?: boolean
+  scheduleOrder?: string
 }
 
 export interface UpdateTaskRequest {
