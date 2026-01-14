@@ -1,0 +1,11 @@
+node_modules
+.git
+.env
+*.db
+*.db-shm
+*.db-wal
+apps/backend/horizons.db*
+apps/frontend/dist
+apps/backend/public
+.DS_Store
+*.log
