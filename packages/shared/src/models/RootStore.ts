@@ -2,8 +2,9 @@ import { isPast } from 'date-fns'
 import { action, computed, makeObservable, observable, runInAction } from 'mobx'
 import type { APIClient } from '../api/client'
 import { toBackendTaskId } from '../api/converter'
-import type { BackendScheduledDate } from '../api/types'
+import type { BackendScheduledDate, PeriodType } from '../api/types'
 import { isCurrentPeriod } from '../utils/dateUtils'
+import { generateFractionalIndex } from '../utils/fractionalIndexing'
 import { ListModel } from './ListModel'
 import { TaskModel } from './TaskModel'
 
@@ -63,10 +64,15 @@ export class RootStore {
   }
 
   async createTask(title: string, listId?: string, scheduledDate?: BackendScheduledDate) {
+    const scheduleOrder = scheduledDate
+      ? this.getNextScheduleOrderForPeriod(scheduledDate.periodType)
+      : undefined
+
     const backendTask = await this.api.createTask({
       title,
       listId: listId ? Number.parseInt(listId, 10) : undefined,
       scheduledDate,
+      scheduleOrder,
     })
 
     const newTask = new TaskModel(backendTask, this)
@@ -230,6 +236,20 @@ export class RootStore {
 
   setFocusedArea(areaId: string | null) {
     this.focusedAreaId = areaId
+  }
+
+  /**
+   * Gets the next scheduleOrder for a task being added to a period.
+   * Returns a fractional index that sorts after all existing ordered tasks in that period.
+   */
+  getNextScheduleOrderForPeriod(periodType: PeriodType): string {
+    const tasksWithOrder = this.tasks
+      .filter((t) => t.scheduledDate?.periodType === periodType && t.scheduleOrder && !t.completed)
+      .map((t) => t.scheduleOrder!)
+      .sort()
+
+    const lastOrder = tasksWithOrder[tasksWithOrder.length - 1] || null
+    return generateFractionalIndex(lastOrder, null)
   }
 
   // Export/Import
