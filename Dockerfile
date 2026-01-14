@@ -33,6 +33,7 @@ COPY --from=builder /app/package.json /app/package.json
 
 # Install production dependencies only
 WORKDIR /app
+ENV HUSKY=0
 RUN bun install --production
 
 WORKDIR /app/apps/backend
