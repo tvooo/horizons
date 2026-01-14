@@ -1,3 +1,5 @@
+import { dirname, join } from 'node:path'
+import { fileURLToPath } from 'node:url'
 import { Hono } from 'hono'
 import { serveStatic } from 'hono/bun'
 import { cors } from 'hono/cors'
@@ -6,6 +8,10 @@ import authRoutes from './routes/auth'
 import exportRoutes from './routes/export'
 import listsRoutes from './routes/lists'
 import tasksRoutes from './routes/tasks'
+
+const __filename = fileURLToPath(import.meta.url)
+const __dirname = dirname(__filename)
+const publicDir = join(__dirname, '../public')
 
 const app = new Hono()
 
@@ -20,8 +26,8 @@ app.use(
 
 // Serve static files in production (before API routes)
 if (process.env.NODE_ENV === 'production') {
-  console.log('Serving static files from apps/backend/public')
-  app.use('/*', serveStatic({ root: './apps/backend/public' }))
+  console.log(`Serving static files from ${publicDir}`)
+  app.use('/*', serveStatic({ root: publicDir }))
 }
 
 // API routes
@@ -33,7 +39,7 @@ app.route('/api/export', exportRoutes)
 
 // SPA fallback for React Router in production
 if (process.env.NODE_ENV === 'production') {
-  app.get('/*', serveStatic({ path: './apps/backend/public/index.html' }))
+  app.get('/*', serveStatic({ path: join(publicDir, 'index.html') }))
 }
 
 const port = process.env.PORT || 3000
