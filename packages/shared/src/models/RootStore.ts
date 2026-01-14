@@ -76,8 +76,16 @@ export class RootStore {
     return newTask
   }
 
-  async createList(name: string, type: 'area' | 'project' | 'list' = 'list') {
-    const backendList = await this.api.createList({ name, type })
+  async createList(
+    name: string,
+    type: 'area' | 'project' | 'list' = 'list',
+    parentListId?: string,
+  ) {
+    const backendList = await this.api.createList({
+      name,
+      type,
+      parentListId: parentListId ? Number.parseInt(parentListId, 10) : undefined,
+    })
 
     const newList = new ListModel(backendList, this)
     runInAction(() => {
