@@ -1,3 +1,4 @@
+import { createId } from '@paralleldrive/cuid2'
 import { betterAuth } from 'better-auth'
 import { drizzleAdapter } from 'better-auth/adapters/drizzle'
 import { db } from '../db'
@@ -23,6 +24,27 @@ export const auth = betterAuth({
     cookieCache: {
       enabled: true,
       maxAge: 5 * 60, // 5 minutes
+    },
+  },
+  databaseHooks: {
+    user: {
+      create: {
+        after: async (user) => {
+          // Create a personal workspace for the new user
+          const workspaceId = createId()
+          await db.insert(schema.workspaces).values({
+            id: workspaceId,
+            name: 'Personal',
+            type: 'personal',
+          })
+          await db.insert(schema.workspaceMembers).values({
+            id: createId(),
+            workspaceId,
+            userId: user.id,
+            role: 'owner',
+          })
+        },
+      },
     },
   },
   // Add more providers here (Google, GitHub, etc.) as needed

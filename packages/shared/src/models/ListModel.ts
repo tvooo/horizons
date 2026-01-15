@@ -6,6 +6,7 @@ export class ListModel {
   id: string
   name: string
   type: 'area' | 'project' | 'list'
+  workspaceId: string
   parentListId: string | null
   archived: boolean
   scheduledDate: { periodType: PeriodType; anchorDate: Date } | null
@@ -21,6 +22,7 @@ export class ListModel {
     this.id = String(data.id)
     this.name = data.name
     this.type = data.type === 'list' ? 'list' : data.type
+    this.workspaceId = data.workspaceId
     this.parentListId = data.parentListId ? String(data.parentListId) : null
     this.archived = data.archived
     this.scheduledDate =

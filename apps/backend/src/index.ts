@@ -9,6 +9,7 @@ import exportRoutes from './routes/export'
 import importRoutes from './routes/import'
 import listsRoutes from './routes/lists'
 import tasksRoutes from './routes/tasks'
+import workspacesRoutes from './routes/workspaces'
 
 const __filename = fileURLToPath(import.meta.url)
 const __dirname = dirname(__filename)
@@ -28,6 +29,7 @@ app.use(
 // API routes (must come before static files)
 app.get('/api/health', (c) => c.json({ status: 'ok' }))
 app.route('/api/auth', authRoutes)
+app.route('/api/workspaces', workspacesRoutes)
 app.route('/api/lists', listsRoutes)
 app.route('/api/tasks', tasksRoutes)
 app.route('/api/export', exportRoutes)
