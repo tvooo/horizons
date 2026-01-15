@@ -24,22 +24,22 @@ app.use(
   }),
 )
 
-// Serve static files in production (before API routes)
-if (process.env.NODE_ENV === 'production') {
-  console.log(`Serving static files from ${publicDir}`)
-  app.use('/*', serveStatic({ root: publicDir }))
-}
-
-// API routes
+// API routes (must come before static files)
 app.get('/api/health', (c) => c.json({ status: 'ok' }))
 app.route('/api/auth', authRoutes)
 app.route('/api/lists', listsRoutes)
 app.route('/api/tasks', tasksRoutes)
 app.route('/api/export', exportRoutes)
 
-// SPA fallback for React Router in production
+// Serve static files in production
 if (process.env.NODE_ENV === 'production') {
-  app.get('/*', serveStatic({ path: join(publicDir, 'index.html') }))
+  console.log(`Serving static files from ${publicDir}`)
+  app.get('*', serveStatic({ root: publicDir }))
+
+  // SPA fallback - serve index.html for all non-file routes
+  app.get('*', async (c, _next) => {
+    return c.html(await Bun.file(join(publicDir, 'index.html')).text())
+  })
 }
 
 const port = process.env.PORT || 3000
