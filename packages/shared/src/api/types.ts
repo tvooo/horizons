@@ -9,10 +9,10 @@ export interface BackendScheduledDate {
 
 // Backend types matching the Drizzle schema
 export interface BackendList {
-  id: number
+  id: string
   name: string
   type: 'area' | 'project' | 'list'
-  parentListId: number | null
+  parentListId: string | null
   archived: boolean
   scheduledPeriodType: PeriodType | null
   scheduledAnchorDate: string | null
@@ -24,10 +24,10 @@ export interface BackendList {
 }
 
 export interface BackendTask {
-  id: number
+  id: string
   title: string
   notes: string | null
-  listId: number | null
+  listId: string | null
   completed: boolean
   scheduledPeriodType: PeriodType | null
   scheduledAnchorDate: string | null
@@ -41,7 +41,7 @@ export interface BackendTask {
 export interface CreateListRequest {
   name: string
   type?: 'area' | 'project' | 'list'
-  parentListId?: number
+  parentListId?: string
   scheduledDate?: BackendScheduledDate
   onIce?: boolean
   notes?: string
@@ -50,7 +50,7 @@ export interface CreateListRequest {
 export interface UpdateListRequest {
   name?: string
   type?: 'area' | 'project' | 'list'
-  parentListId?: number | null
+  parentListId?: string | null
   archived?: boolean
   scheduledDate?: BackendScheduledDate | null
   onIce?: boolean
@@ -60,7 +60,7 @@ export interface UpdateListRequest {
 export interface CreateTaskRequest {
   title: string
   notes?: string
-  listId?: number
+  listId?: string
   completed?: boolean
   scheduledDate?: BackendScheduledDate
   onIce?: boolean
@@ -70,7 +70,7 @@ export interface CreateTaskRequest {
 export interface UpdateTaskRequest {
   title?: string
   notes?: string
-  listId?: number | null
+  listId?: string | null
   completed?: boolean
   scheduledDate?: BackendScheduledDate
   onIce?: boolean

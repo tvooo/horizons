@@ -1,4 +1,5 @@
 import { zValidator } from '@hono/zod-validator'
+import { createId } from '@paralleldrive/cuid2'
 import { and, eq } from 'drizzle-orm'
 import { Hono } from 'hono'
 import { z } from 'zod'
@@ -19,7 +20,7 @@ const scheduledDateSchema = z.object({
 const createTaskSchema = z.object({
   title: z.string().min(1),
   notes: z.string().optional(),
-  listId: z.number().optional(),
+  listId: z.string().optional(),
   completed: z.boolean().optional(),
   scheduledDate: scheduledDateSchema.optional(),
   onIce: z.boolean().optional(),
@@ -29,7 +30,7 @@ const createTaskSchema = z.object({
 const updateTaskSchema = z.object({
   title: z.string().min(1).optional(),
   notes: z.string().optional(),
-  listId: z.number().optional(),
+  listId: z.string().nullable().optional(),
   completed: z.boolean().optional(),
   scheduledDate: scheduledDateSchema.optional(),
   onIce: z.boolean().optional(),
@@ -45,12 +46,8 @@ app.get('/', async (c) => {
 
 // GET /api/tasks/:id - Get a specific task
 app.get('/:id', async (c) => {
-  const id = Number.parseInt(c.req.param('id'), 10)
+  const id = c.req.param('id')
   const user = getUser(c)
-
-  if (Number.isNaN(id)) {
-    return c.json({ error: 'Invalid task ID' }, 400)
-  }
 
   const task = await db
     .select()
@@ -72,6 +69,7 @@ app.post('/', zValidator('json', createTaskSchema), async (c) => {
   const result = await db
     .insert(tasks)
     .values({
+      id: createId(),
       title: data.title,
       notes: data.notes,
       userId: user.id,
@@ -89,13 +87,9 @@ app.post('/', zValidator('json', createTaskSchema), async (c) => {
 
 // PATCH /api/tasks/:id - Update a task
 app.patch('/:id', zValidator('json', updateTaskSchema), async (c) => {
-  const id = Number.parseInt(c.req.param('id'), 10)
+  const id = c.req.param('id')
   const data = c.req.valid('json')
   const user = getUser(c)
-
-  if (Number.isNaN(id)) {
-    return c.json({ error: 'Invalid task ID' }, 400)
-  }
 
   const updateData: Record<string, unknown> = {
     title: data.title,

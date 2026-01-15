@@ -6,6 +6,7 @@ import { cors } from 'hono/cors'
 import { logger } from 'hono/logger'
 import authRoutes from './routes/auth'
 import exportRoutes from './routes/export'
+import importRoutes from './routes/import'
 import listsRoutes from './routes/lists'
 import tasksRoutes from './routes/tasks'
 
@@ -30,6 +31,7 @@ app.route('/api/auth', authRoutes)
 app.route('/api/lists', listsRoutes)
 app.route('/api/tasks', tasksRoutes)
 app.route('/api/export', exportRoutes)
+app.route('/api/import', importRoutes)
 
 // Serve static files in production
 if (process.env.NODE_ENV === 'production') {

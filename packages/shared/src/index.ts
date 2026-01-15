@@ -11,7 +11,6 @@ export interface ApiResponse<T> {
 
 // API
 export { APIClient } from './api/client'
-export * from './api/converter'
 export * from './api/types'
 // Config
 export { calendarConfig } from './config/calendar'

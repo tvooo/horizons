@@ -23,7 +23,7 @@ export class APIClient {
     return response.json()
   }
 
-  async getList(id: number): Promise<BackendList> {
+  async getList(id: string): Promise<BackendList> {
     const response = await fetch(`${this.baseUrl}/api/lists/${id}`, {
       credentials: 'include',
     })
@@ -42,7 +42,7 @@ export class APIClient {
     return response.json()
   }
 
-  async updateList(id: number, data: UpdateListRequest): Promise<BackendList> {
+  async updateList(id: string, data: UpdateListRequest): Promise<BackendList> {
     const response = await fetch(`${this.baseUrl}/api/lists/${id}`, {
       method: 'PATCH',
       headers: { 'Content-Type': 'application/json' },
@@ -62,7 +62,7 @@ export class APIClient {
     return response.json()
   }
 
-  async getTask(id: number): Promise<BackendTask> {
+  async getTask(id: string): Promise<BackendTask> {
     const response = await fetch(`${this.baseUrl}/api/tasks/${id}`, {
       credentials: 'include',
     })
@@ -81,7 +81,7 @@ export class APIClient {
     return response.json()
   }
 
-  async updateTask(id: number, data: UpdateTaskRequest): Promise<BackendTask> {
+  async updateTask(id: string, data: UpdateTaskRequest): Promise<BackendTask> {
     const response = await fetch(`${this.baseUrl}/api/tasks/${id}`, {
       method: 'PATCH',
       headers: { 'Content-Type': 'application/json' },
@@ -108,5 +108,21 @@ export class APIClient {
 
     const blob = await response.blob()
     return { blob, filename }
+  }
+
+  async importData(
+    data: unknown,
+  ): Promise<{ success: boolean; imported: { lists: number; tasks: number }; conflicts: boolean }> {
+    const response = await fetch(`${this.baseUrl}/api/import`, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      credentials: 'include',
+      body: JSON.stringify(data),
+    })
+    if (!response.ok) {
+      const error = await response.json()
+      throw new Error(error.error || 'Failed to import data')
+    }
+    return response.json()
   }
 }

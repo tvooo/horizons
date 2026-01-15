@@ -1,4 +1,5 @@
 import { zValidator } from '@hono/zod-validator'
+import { createId } from '@paralleldrive/cuid2'
 import { and, eq } from 'drizzle-orm'
 import { Hono } from 'hono'
 import { z } from 'zod'
@@ -19,7 +20,7 @@ const scheduledDateSchema = z.object({
 const createListSchema = z.object({
   name: z.string().min(1),
   type: z.enum(['area', 'project', 'list']).optional(),
-  parentListId: z.number().optional(),
+  parentListId: z.string().optional(),
   scheduledDate: scheduledDateSchema.optional(),
   onIce: z.boolean().optional(),
   notes: z.string().optional(),
@@ -28,7 +29,7 @@ const createListSchema = z.object({
 const updateListSchema = z.object({
   name: z.string().min(1).optional(),
   type: z.enum(['area', 'project', 'list']).optional(),
-  parentListId: z.number().nullable().optional(),
+  parentListId: z.string().nullable().optional(),
   archived: z.boolean().optional(),
   scheduledDate: scheduledDateSchema.nullable().optional(),
   onIce: z.boolean().optional(),
@@ -44,12 +45,8 @@ app.get('/', async (c) => {
 
 // GET /api/lists/:id - Get a specific list
 app.get('/:id', async (c) => {
-  const id = Number.parseInt(c.req.param('id'), 10)
+  const id = c.req.param('id')
   const user = getUser(c)
-
-  if (Number.isNaN(id)) {
-    return c.json({ error: 'Invalid list ID' }, 400)
-  }
 
   const list = await db
     .select()
@@ -71,6 +68,7 @@ app.post('/', zValidator('json', createListSchema), async (c) => {
   const result = await db
     .insert(lists)
     .values({
+      id: createId(),
       name: data.name,
       type: data.type ?? 'list',
       userId: user.id,
@@ -87,13 +85,9 @@ app.post('/', zValidator('json', createListSchema), async (c) => {
 
 // PATCH /api/lists/:id - Update a list
 app.patch('/:id', zValidator('json', updateListSchema), async (c) => {
-  const id = Number.parseInt(c.req.param('id'), 10)
+  const id = c.req.param('id')
   const data = c.req.valid('json')
   const user = getUser(c)
-
-  if (Number.isNaN(id)) {
-    return c.json({ error: 'Invalid list ID' }, 400)
-  }
 
   const updateData: Record<string, unknown> = {
     ...data,
