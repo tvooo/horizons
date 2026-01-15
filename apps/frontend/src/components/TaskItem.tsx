@@ -56,10 +56,23 @@ interface TaskItemProps {
   periodType?: PeriodType
   tasksInPeriod?: TaskModel[]
   indexInPeriod?: number
+  // List-based reordering props
+  reorderListId?: string
+  tasksInList?: TaskModel[]
+  indexInList?: number
 }
 
 export const TaskItem = observer(
-  ({ task, showList, periodType, tasksInPeriod, indexInPeriod }: TaskItemProps) => {
+  ({
+    task,
+    showList,
+    periodType,
+    tasksInPeriod,
+    indexInPeriod,
+    reorderListId,
+    tasksInList,
+    indexInList,
+  }: TaskItemProps) => {
     const navigate = useNavigate()
     const [isEditing, setIsEditing] = useState(false)
     const [editValue, setEditValue] = useState(task.title)
@@ -79,6 +92,10 @@ export const TaskItem = observer(
       const element = taskRef.current
       if (!element) return
 
+      // Check which reordering mode we're in
+      const hasPeriodReordering = periodType && tasksInPeriod && indexInPeriod !== undefined
+      const hasListReordering = reorderListId && tasksInList && indexInList !== undefined
+
       const cleanupDraggable = draggable({
         element,
         getInitialData: () => ({
@@ -86,21 +103,27 @@ export const TaskItem = observer(
           taskId: task.id,
           periodType,
           scheduleOrder: task.scheduleOrder,
+          reorderListId,
+          listOrder: task.listOrder,
         }),
         onDragStart: () => setIsDragging(true),
         onDrop: () => setIsDragging(false),
       })
 
-      // Only set up drop target if we have the reordering context (periodType and tasksInPeriod)
-      if (!periodType || !tasksInPeriod || indexInPeriod === undefined) {
+      // Only set up drop target if we have reordering context
+      if (!hasPeriodReordering && !hasListReordering) {
         return cleanupDraggable
       }
 
       const cleanupDropTarget = dropTargetForElements({
         element,
         canDrop: ({ source }) => {
-          // Only allow reordering within the same period
-          return source.data.type === 'task' && source.data.periodType === periodType
+          if (source.data.type !== 'task') return false
+          // Allow reordering within the same period
+          if (hasPeriodReordering && source.data.periodType === periodType) return true
+          // Allow reordering within the same list
+          if (hasListReordering && source.data.reorderListId === reorderListId) return true
+          return false
         },
         getData: ({ input }) => {
           return attachClosestEdge(
@@ -135,31 +158,61 @@ export const TaskItem = observer(
           const edge = extractClosestEdge(self.data)
           if (!edge) return
 
-          // Calculate new fractional index
-          let newScheduleOrder: string
-          const currentIndex = indexInPeriod
+          // Handle period-based reordering
+          if (
+            hasPeriodReordering &&
+            source.data.periodType === periodType &&
+            tasksInPeriod &&
+            indexInPeriod !== undefined
+          ) {
+            let newScheduleOrder: string
+            const currentIndex = indexInPeriod
 
-          if (edge === 'top') {
-            // Insert before current task
-            const beforeTask = currentIndex > 0 ? tasksInPeriod[currentIndex - 1] : null
-            newScheduleOrder = generateFractionalIndex(
-              beforeTask?.scheduleOrder || null,
-              task.scheduleOrder,
-            )
-          } else {
-            // Insert after current task (edge === 'bottom')
-            const afterTask =
-              currentIndex < tasksInPeriod.length - 1 ? tasksInPeriod[currentIndex + 1] : null
-            newScheduleOrder = generateFractionalIndex(
-              task.scheduleOrder,
-              afterTask?.scheduleOrder || null,
-            )
+            if (edge === 'top') {
+              const beforeTask = currentIndex > 0 ? tasksInPeriod[currentIndex - 1] : null
+              newScheduleOrder = generateFractionalIndex(
+                beforeTask?.scheduleOrder || null,
+                task.scheduleOrder,
+              )
+            } else {
+              const afterTask =
+                currentIndex < tasksInPeriod.length - 1 ? tasksInPeriod[currentIndex + 1] : null
+              newScheduleOrder = generateFractionalIndex(
+                task.scheduleOrder,
+                afterTask?.scheduleOrder || null,
+              )
+            }
+
+            const draggedTask = tasksInPeriod.find((t) => t.id === draggedTaskId)
+            if (draggedTask) {
+              await draggedTask.updateScheduleOrder(newScheduleOrder)
+            }
+            return
           }
 
-          // Find the dragged task and update its scheduleOrder
-          const draggedTask = tasksInPeriod.find((t) => t.id === draggedTaskId)
-          if (draggedTask) {
-            await draggedTask.updateScheduleOrder(newScheduleOrder)
+          // Handle list-based reordering
+          if (
+            hasListReordering &&
+            source.data.reorderListId === reorderListId &&
+            tasksInList &&
+            indexInList !== undefined
+          ) {
+            let newListOrder: string
+            const currentIndex = indexInList
+
+            if (edge === 'top') {
+              const beforeTask = currentIndex > 0 ? tasksInList[currentIndex - 1] : null
+              newListOrder = generateFractionalIndex(beforeTask?.listOrder || null, task.listOrder)
+            } else {
+              const afterTask =
+                currentIndex < tasksInList.length - 1 ? tasksInList[currentIndex + 1] : null
+              newListOrder = generateFractionalIndex(task.listOrder, afterTask?.listOrder || null)
+            }
+
+            const draggedTask = tasksInList.find((t) => t.id === draggedTaskId)
+            if (draggedTask) {
+              await draggedTask.updateListOrder(newListOrder)
+            }
           }
         },
       })
@@ -168,7 +221,17 @@ export const TaskItem = observer(
         cleanupDraggable()
         cleanupDropTarget()
       }
-    }, [task.id, task.scheduleOrder, periodType, tasksInPeriod, indexInPeriod])
+    }, [
+      task.id,
+      task.scheduleOrder,
+      task.listOrder,
+      periodType,
+      tasksInPeriod,
+      indexInPeriod,
+      reorderListId,
+      tasksInList,
+      indexInList,
+    ])
 
     const handleSave = async () => {
       const trimmedValue = editValue.trim()

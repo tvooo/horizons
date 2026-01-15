@@ -66,12 +66,14 @@ export class RootStore {
     const scheduleOrder = scheduledDate
       ? this.getNextScheduleOrderForPeriod(scheduledDate.periodType)
       : undefined
+    const listOrder = listId ? this.getNextListOrderForList(listId) : undefined
 
     const backendTask = await this.api.createTask({
       title,
       listId,
       scheduledDate,
       scheduleOrder,
+      listOrder,
     })
 
     const newTask = new TaskModel(backendTask, this)
@@ -109,6 +111,7 @@ export class RootStore {
       listId?: string | null
       onIce?: boolean
       scheduleOrder?: string
+      listOrder?: string
     },
   ) {
     await this.api.updateTask(taskId, updates)
@@ -244,7 +247,21 @@ export class RootStore {
   getNextScheduleOrderForPeriod(periodType: PeriodType): string {
     const tasksWithOrder = this.tasks
       .filter((t) => t.scheduledDate?.periodType === periodType && t.scheduleOrder && !t.completed)
-      .map((t) => t.scheduleOrder!)
+      .map((t) => t.scheduleOrder as string)
+      .sort()
+
+    const lastOrder = tasksWithOrder[tasksWithOrder.length - 1] || null
+    return generateFractionalIndex(lastOrder, null)
+  }
+
+  /**
+   * Gets the next listOrder for a task being added to a list.
+   * Returns a fractional index that sorts after all existing ordered tasks in that list.
+   */
+  getNextListOrderForList(listId: string): string {
+    const tasksWithOrder = this.tasks
+      .filter((t) => t.listId === listId && t.listOrder && !t.completed)
+      .map((t) => t.listOrder as string)
       .sort()
 
     const lastOrder = tasksWithOrder[tasksWithOrder.length - 1] || null

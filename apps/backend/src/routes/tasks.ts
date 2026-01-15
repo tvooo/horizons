@@ -25,6 +25,7 @@ const createTaskSchema = z.object({
   scheduledDate: scheduledDateSchema.optional(),
   onIce: z.boolean().optional(),
   scheduleOrder: z.string().optional(),
+  listOrder: z.string().optional(),
 })
 
 const updateTaskSchema = z.object({
@@ -35,6 +36,7 @@ const updateTaskSchema = z.object({
   scheduledDate: scheduledDateSchema.optional(),
   onIce: z.boolean().optional(),
   scheduleOrder: z.string().optional(),
+  listOrder: z.string().optional(),
 })
 
 // GET /api/tasks - Get all tasks
@@ -79,6 +81,7 @@ app.post('/', zValidator('json', createTaskSchema), async (c) => {
       scheduledAnchorDate: data.scheduledDate ? new Date(data.scheduledDate.anchorDate) : undefined,
       onIce: data.onIce ?? false,
       scheduleOrder: data.scheduleOrder,
+      listOrder: data.listOrder,
     })
     .returning()
 
@@ -97,6 +100,7 @@ app.patch('/:id', zValidator('json', updateTaskSchema), async (c) => {
     listId: data.listId,
     completed: data.completed,
     scheduleOrder: data.scheduleOrder,
+    listOrder: data.listOrder,
     updatedAt: new Date(),
   }
 

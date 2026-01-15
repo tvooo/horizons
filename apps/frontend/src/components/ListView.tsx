@@ -23,7 +23,19 @@ export const ListView = observer(() => {
 
   const list = store.getListById(listId)
   const listTasks = store.getTasksByListId(listId)
-  const incompleteTasks = listTasks.filter((task) => !task.completed)
+  const incompleteTasks = listTasks
+    .filter((task) => !task.completed)
+    .sort((a, b) => {
+      // Sort by listOrder if both have it
+      if (a.listOrder && b.listOrder) {
+        return a.listOrder.localeCompare(b.listOrder)
+      }
+      // Tasks with listOrder come first
+      if (a.listOrder) return -1
+      if (b.listOrder) return 1
+      // Fallback to creation date
+      return a.createdAt.getTime() - b.createdAt.getTime()
+    })
   const completedTasks = listTasks.filter((task) => task.completed)
 
   if (!list) {
@@ -84,8 +96,14 @@ export const ListView = observer(() => {
         </div>
       )}
 
-      {incompleteTasks.map((task) => (
-        <TaskItem key={task.id} task={task} />
+      {incompleteTasks.map((task, index) => (
+        <TaskItem
+          key={task.id}
+          task={task}
+          reorderListId={listId}
+          tasksInList={incompleteTasks}
+          indexInList={index}
+        />
       ))}
     </ListPage>
   )

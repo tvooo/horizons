@@ -33,6 +33,7 @@ export interface BackendTask {
   scheduledAnchorDate: string | null
   onIce: boolean
   scheduleOrder: string | null
+  listOrder: string | null
   completedAt: string | null
   createdAt: string
   updatedAt: string
@@ -65,6 +66,7 @@ export interface CreateTaskRequest {
   scheduledDate?: BackendScheduledDate
   onIce?: boolean
   scheduleOrder?: string
+  listOrder?: string
 }
 
 export interface UpdateTaskRequest {
@@ -75,4 +77,5 @@ export interface UpdateTaskRequest {
   scheduledDate?: BackendScheduledDate
   onIce?: boolean
   scheduleOrder?: string
+  listOrder?: string
 }
