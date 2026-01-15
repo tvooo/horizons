@@ -1,0 +1,1 @@
+ALTER TABLE `tasks` ADD `list_order` text;

@@ -16,6 +16,7 @@ export class TaskModel {
   scheduledDate: ScheduledDate | null
   onIce: boolean
   scheduleOrder: string | null
+  listOrder: string | null
   completedAt: Date | null
   createdAt: Date
   updatedAt: Date
@@ -37,6 +38,7 @@ export class TaskModel {
         : null
     this.onIce = data.onIce
     this.scheduleOrder = data.scheduleOrder
+    this.listOrder = data.listOrder
     this.completedAt = data.completedAt ? new Date(data.completedAt) : null
     this.createdAt = new Date(data.createdAt)
     this.updatedAt = new Date(data.updatedAt)
@@ -50,6 +52,7 @@ export class TaskModel {
       scheduledDate: observable,
       onIce: observable,
       scheduleOrder: observable,
+      listOrder: observable,
       completedAt: observable,
       updatedAt: observable,
       toggleCompleted: action,
@@ -59,6 +62,7 @@ export class TaskModel {
       setOnIce: action,
       moveToList: action,
       updateScheduleOrder: action,
+      updateListOrder: action,
       list: computed,
       areaId: computed,
     })
@@ -191,6 +195,20 @@ export class TaskModel {
     } catch (err) {
       // Rollback on error
       this.scheduleOrder = oldScheduleOrder
+      throw err
+    }
+  }
+
+  async updateListOrder(newListOrder: string) {
+    const oldListOrder = this.listOrder
+    this.listOrder = newListOrder
+    this.updatedAt = new Date()
+
+    try {
+      await this.rootStore.updateTask(this.id, { listOrder: newListOrder })
+    } catch (err) {
+      // Rollback on error
+      this.listOrder = oldListOrder
       throw err
     }
   }
