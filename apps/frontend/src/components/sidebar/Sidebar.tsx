@@ -17,6 +17,7 @@ import { signOut, useSession } from '../../lib/auth-client'
 import { useRootStore } from '../../models/RootStoreContext'
 import { ListItem } from '../ListItem'
 import { SidebarNavItem } from './SidebarNavItem'
+import { WorkspaceSelector } from './WorkspaceSelector'
 
 interface StaticPage {
   name: string
@@ -89,6 +90,8 @@ export const Sidebar = observer(({ onAddListClick, isMobileOpen, onMobileClose }
         </button>
 
         <div className="flex-1 overflow-y-auto">
+          <WorkspaceSelector />
+
           {STATIC_PAGES.map((page) => (
             <SidebarNavItem key={page.href} href={page.href} icon={page.icon} name={page.name} />
           ))}
