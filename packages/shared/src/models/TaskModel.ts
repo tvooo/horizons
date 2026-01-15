@@ -11,6 +11,7 @@ export class TaskModel {
   id: string
   title: string
   notes: string | null
+  workspaceId: string
   listId: string | null
   completed: boolean
   scheduledDate: ScheduledDate | null
@@ -27,6 +28,7 @@ export class TaskModel {
     this.id = String(data.id)
     this.title = data.title
     this.notes = data.notes
+    this.workspaceId = data.workspaceId
     this.listId = data.listId ? String(data.listId) : null
     this.completed = data.completed
     this.scheduledDate =

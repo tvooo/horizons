@@ -1,8 +1,13 @@
 import type {
   BackendList,
   BackendTask,
+  BackendWorkspace,
+  BackendWorkspaceInvite,
+  BackendWorkspaceMember,
+  CreateInviteRequest,
   CreateListRequest,
   CreateTaskRequest,
+  CreateWorkspaceRequest,
   UpdateListRequest,
   UpdateTaskRequest,
 } from './types'
@@ -89,6 +94,117 @@ export class APIClient {
       body: JSON.stringify(data),
     })
     if (!response.ok) throw new Error('Failed to update task')
+    return response.json()
+  }
+
+  // Workspaces
+  async getWorkspaces(): Promise<BackendWorkspace[]> {
+    const response = await fetch(`${this.baseUrl}/api/workspaces`, {
+      credentials: 'include',
+    })
+    if (!response.ok) throw new Error('Failed to fetch workspaces')
+    return response.json()
+  }
+
+  async getWorkspace(id: string): Promise<BackendWorkspace> {
+    const response = await fetch(`${this.baseUrl}/api/workspaces/${id}`, {
+      credentials: 'include',
+    })
+    if (!response.ok) throw new Error('Failed to fetch workspace')
+    return response.json()
+  }
+
+  async createWorkspace(data: CreateWorkspaceRequest): Promise<BackendWorkspace> {
+    const response = await fetch(`${this.baseUrl}/api/workspaces`, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      credentials: 'include',
+      body: JSON.stringify(data),
+    })
+    if (!response.ok) throw new Error('Failed to create workspace')
+    return response.json()
+  }
+
+  async updateWorkspace(id: string, data: { name: string }): Promise<BackendWorkspace> {
+    const response = await fetch(`${this.baseUrl}/api/workspaces/${id}`, {
+      method: 'PATCH',
+      headers: { 'Content-Type': 'application/json' },
+      credentials: 'include',
+      body: JSON.stringify(data),
+    })
+    if (!response.ok) throw new Error('Failed to update workspace')
+    return response.json()
+  }
+
+  async deleteWorkspace(id: string): Promise<void> {
+    const response = await fetch(`${this.baseUrl}/api/workspaces/${id}`, {
+      method: 'DELETE',
+      credentials: 'include',
+    })
+    if (!response.ok) throw new Error('Failed to delete workspace')
+  }
+
+  async getWorkspaceMembers(workspaceId: string): Promise<BackendWorkspaceMember[]> {
+    const response = await fetch(`${this.baseUrl}/api/workspaces/${workspaceId}/members`, {
+      credentials: 'include',
+    })
+    if (!response.ok) throw new Error('Failed to fetch workspace members')
+    return response.json()
+  }
+
+  async removeWorkspaceMember(workspaceId: string, userId: string): Promise<void> {
+    const response = await fetch(
+      `${this.baseUrl}/api/workspaces/${workspaceId}/members/${userId}`,
+      {
+        method: 'DELETE',
+        credentials: 'include',
+      },
+    )
+    if (!response.ok) throw new Error('Failed to remove workspace member')
+  }
+
+  async getWorkspaceInvites(workspaceId: string): Promise<BackendWorkspaceInvite[]> {
+    const response = await fetch(`${this.baseUrl}/api/workspaces/${workspaceId}/invites`, {
+      credentials: 'include',
+    })
+    if (!response.ok) throw new Error('Failed to fetch workspace invites')
+    return response.json()
+  }
+
+  async createWorkspaceInvite(
+    workspaceId: string,
+    data?: CreateInviteRequest,
+  ): Promise<BackendWorkspaceInvite> {
+    const response = await fetch(`${this.baseUrl}/api/workspaces/${workspaceId}/invites`, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      credentials: 'include',
+      body: JSON.stringify(data || {}),
+    })
+    if (!response.ok) throw new Error('Failed to create workspace invite')
+    return response.json()
+  }
+
+  async deleteWorkspaceInvite(workspaceId: string, inviteId: string): Promise<void> {
+    const response = await fetch(
+      `${this.baseUrl}/api/workspaces/${workspaceId}/invites/${inviteId}`,
+      {
+        method: 'DELETE',
+        credentials: 'include',
+      },
+    )
+    if (!response.ok) throw new Error('Failed to delete workspace invite')
+  }
+
+  async joinWorkspace(code: string): Promise<BackendWorkspace> {
+    const response = await fetch(`${this.baseUrl}/api/workspaces/join/${code}`, {
+      method: 'POST',
+      credentials: 'include',
+    })
+    if (!response.ok) {
+      const error = await response.json()
+      throw new Error(error.error || 'Failed to join workspace')
+    }
     return response.json()
   }
 
