@@ -1,7 +1,6 @@
 import { isPast } from 'date-fns'
 import { action, computed, makeObservable, observable, runInAction } from 'mobx'
 import type { APIClient } from '../api/client'
-import { toBackendTaskId } from '../api/converter'
 import type { BackendScheduledDate, PeriodType } from '../api/types'
 import { isCurrentPeriod } from '../utils/dateUtils'
 import { generateFractionalIndex } from '../utils/fractionalIndexing'
@@ -70,7 +69,7 @@ export class RootStore {
 
     const backendTask = await this.api.createTask({
       title,
-      listId: listId ? Number.parseInt(listId, 10) : undefined,
+      listId,
       scheduledDate,
       scheduleOrder,
     })
@@ -90,7 +89,7 @@ export class RootStore {
     const backendList = await this.api.createList({
       name,
       type,
-      parentListId: parentListId ? Number.parseInt(parentListId, 10) : undefined,
+      parentListId: parentListId ?? undefined,
     })
 
     const newList = new ListModel(backendList, this)
@@ -107,12 +106,12 @@ export class RootStore {
       title?: string
       notes?: string
       scheduledDate?: BackendScheduledDate
-      listId?: number | null
+      listId?: string | null
       onIce?: boolean
       scheduleOrder?: string
     },
   ) {
-    await this.api.updateTask(toBackendTaskId(taskId), updates)
+    await this.api.updateTask(taskId, updates)
   }
 
   async updateList(
@@ -120,14 +119,14 @@ export class RootStore {
     updates: {
       name?: string
       type?: 'area' | 'project' | 'list'
-      parentListId?: number | null
+      parentListId?: string | null
       scheduledDate?: BackendScheduledDate | null
       archived?: boolean
       onIce?: boolean
       notes?: string
     },
   ) {
-    await this.api.updateList(Number.parseInt(listId, 10), updates)
+    await this.api.updateList(listId, updates)
   }
 
   async updateListParent(listId: string, parentListId: string | null) {
@@ -142,8 +141,8 @@ export class RootStore {
     })
 
     try {
-      await this.api.updateList(Number.parseInt(listId, 10), {
-        parentListId: parentListId ? Number.parseInt(parentListId, 10) : null,
+      await this.api.updateList(listId, {
+        parentListId,
       })
     } catch (err) {
       runInAction(() => {
@@ -255,5 +254,9 @@ export class RootStore {
   // Export/Import
   async exportData() {
     return this.api.exportData()
+  }
+
+  async importData(data: unknown) {
+    return this.api.importData(data)
   }
 }

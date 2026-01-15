@@ -85,6 +85,13 @@
       "when": 1768210638558,
       "tag": "0011_damp_sunfire",
       "breakpoints": true
+    },
+    {
+      "idx": 12,
+      "version": "6",
+      "when": 1768314212296,
+      "tag": "0012_strong_demogoblin",
+      "breakpoints": true
     }
   ]
 }

@@ -52,7 +52,7 @@ export const verifications = sqliteTable('verifications', {
 })
 
 export const lists = sqliteTable('lists', {
-  id: integer('id').primaryKey({ autoIncrement: true }),
+  id: text('id').primaryKey().notNull(),
   name: text('name').notNull(),
   type: text('type', { enum: ['area', 'project', 'list'] })
     .notNull()
@@ -61,7 +61,7 @@ export const lists = sqliteTable('lists', {
     .notNull()
     .references(() => users.id, { onDelete: 'cascade' }),
   // biome-ignore lint/suspicious/noExplicitAny: Cannot reference itself, apparently
-  parentListId: integer('parent_list_id').references((): any => lists.id, { onDelete: 'set null' }),
+  parentListId: text('parent_list_id').references((): any => lists.id, { onDelete: 'set null' }),
   archived: integer('archived', { mode: 'boolean' }).notNull().default(false),
   scheduledPeriodType: text('scheduled_period_type', {
     enum: ['day', 'week', 'month', 'quarter', 'year'],
@@ -75,13 +75,13 @@ export const lists = sqliteTable('lists', {
 })
 
 export const tasks = sqliteTable('tasks', {
-  id: integer('id').primaryKey({ autoIncrement: true }),
+  id: text('id').primaryKey().notNull(),
   title: text('title').notNull(),
   notes: text('notes'),
   userId: text('user_id')
     .notNull()
     .references(() => users.id, { onDelete: 'cascade' }),
-  listId: integer('list_id').references(() => lists.id, { onDelete: 'cascade' }),
+  listId: text('list_id').references(() => lists.id, { onDelete: 'cascade' }),
   completed: integer('completed', { mode: 'boolean' }).notNull().default(false),
   scheduledPeriodType: text('scheduled_period_type', {
     enum: ['day', 'week', 'month', 'quarter', 'year'],

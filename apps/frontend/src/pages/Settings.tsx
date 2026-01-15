@@ -43,23 +43,14 @@ export const Settings = observer(() => {
       const text = await file.text()
       const data = JSON.parse(text)
 
-      // TODO: Implement import endpoint
-      const response = await fetch('http://localhost:3000/api/import', {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-        },
-        credentials: 'include',
-        body: JSON.stringify(data),
-      })
+      const result = await store.importData(data)
 
-      if (!response.ok) {
-        const error = await response.json()
-        throw new Error(error.error || 'Import failed')
-      }
+      alert(
+        `Import successful! Imported ${result.imported.lists} lists and ${result.imported.tasks} tasks.${result.conflicts ? ' (Some IDs were remapped due to conflicts.)' : ''}`,
+      )
 
-      alert('Data imported successfully! Please refresh the page.')
-      window.location.reload()
+      // Reload data from server
+      await store.loadData()
     } catch (error) {
       console.error('Import failed:', error)
       setImportError(error instanceof Error ? error.message : 'Failed to import data')
@@ -112,9 +103,6 @@ export const Settings = observer(() => {
               className="hidden"
             />
           </label>
-          <p className="mt-2 text-gray-500 text-xs">
-            Note: Import is not yet implemented. Please wait for the next update.
-          </p>
         </div>
       </div>
     </ListPage>

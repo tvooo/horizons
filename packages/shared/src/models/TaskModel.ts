@@ -172,7 +172,7 @@ export class TaskModel {
 
     try {
       await this.rootStore.updateTask(this.id, {
-        listId: listId ? Number.parseInt(listId, 10) : undefined,
+        listId: listId || null,
       })
     } catch (err) {
       // Rollback on error
