@@ -276,4 +276,17 @@ export class RootStore {
   async importData(data: unknown) {
     return this.api.importData(data)
   }
+
+  // API Tokens
+  async getTokens() {
+    return this.api.getTokens()
+  }
+
+  async createToken(name: string) {
+    return this.api.createToken(name)
+  }
+
+  async deleteToken(id: string) {
+    return this.api.deleteToken(id)
+  }
 }

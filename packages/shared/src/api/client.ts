@@ -1,8 +1,10 @@
 import type {
+  ApiTokenInfo,
   BackendList,
   BackendTask,
   CreateListRequest,
   CreateTaskRequest,
+  CreateTokenResponse,
   UpdateListRequest,
   UpdateTaskRequest,
 } from './types'
@@ -124,5 +126,33 @@ export class APIClient {
       throw new Error(error.error || 'Failed to import data')
     }
     return response.json()
+  }
+
+  // API Tokens
+  async getTokens(): Promise<ApiTokenInfo[]> {
+    const response = await fetch(`${this.baseUrl}/api/tokens`, {
+      credentials: 'include',
+    })
+    if (!response.ok) throw new Error('Failed to fetch tokens')
+    return response.json()
+  }
+
+  async createToken(name: string): Promise<CreateTokenResponse> {
+    const response = await fetch(`${this.baseUrl}/api/tokens`, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      credentials: 'include',
+      body: JSON.stringify({ name }),
+    })
+    if (!response.ok) throw new Error('Failed to create token')
+    return response.json()
+  }
+
+  async deleteToken(id: string): Promise<void> {
+    const response = await fetch(`${this.baseUrl}/api/tokens/${id}`, {
+      method: 'DELETE',
+      credentials: 'include',
+    })
+    if (!response.ok) throw new Error('Failed to delete token')
   }
 }

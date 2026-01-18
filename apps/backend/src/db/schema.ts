@@ -1,5 +1,5 @@
 import { sql } from 'drizzle-orm'
-import { integer, sqliteTable, text } from 'drizzle-orm/sqlite-core'
+import { index, integer, sqliteTable, text } from 'drizzle-orm/sqlite-core'
 
 // Users table for authentication
 export const users = sqliteTable('users', {
@@ -107,3 +107,23 @@ export type List = typeof lists.$inferSelect
 export type NewList = typeof lists.$inferInsert
 export type Task = typeof tasks.$inferSelect
 export type NewTask = typeof tasks.$inferInsert
+
+// API Tokens for webhook authentication
+export const apiTokens = sqliteTable(
+  'api_tokens',
+  {
+    id: text('id').primaryKey(),
+    userId: text('user_id')
+      .notNull()
+      .references(() => users.id, { onDelete: 'cascade' }),
+    name: text('name').notNull(),
+    tokenHash: text('token_hash').notNull(),
+    tokenPrefix: text('token_prefix').notNull(),
+    lastUsedAt: integer('last_used_at', { mode: 'timestamp' }),
+    createdAt: integer('created_at', { mode: 'timestamp' }).notNull().default(sql`(unixepoch())`),
+  },
+  (table) => [index('api_tokens_token_hash_idx').on(table.tokenHash)],
+)
+
+export type ApiToken = typeof apiTokens.$inferSelect
+export type NewApiToken = typeof apiTokens.$inferInsert
