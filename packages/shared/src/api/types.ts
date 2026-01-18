@@ -79,3 +79,15 @@ export interface UpdateTaskRequest {
   scheduleOrder?: string
   listOrder?: string
 }
+
+export interface ApiTokenInfo {
+  id: string
+  name: string
+  tokenPrefix: string
+  lastUsedAt: string | null
+  createdAt: string
+}
+
+export interface CreateTokenResponse extends ApiTokenInfo {
+  token: string
+}

@@ -1,6 +1,7 @@
 import { Download, Upload } from 'lucide-react'
 import { observer } from 'mobx-react-lite'
 import { useState } from 'react'
+import { ApiTokenManager } from '../components/ApiTokenManager'
 import { useRootStore } from '../models/RootStoreContext'
 import { ListPage } from './ListPage'
 
@@ -103,6 +104,15 @@ export const Settings = observer(() => {
               className="hidden"
             />
           </label>
+        </div>
+
+        {/* API Tokens Section */}
+        <div className="rounded-lg border border-gray-200 bg-white p-6">
+          <h2 className="mb-2 font-semibold text-lg">API Tokens</h2>
+          <p className="mb-4 text-gray-600 text-sm">
+            Create tokens to allow external services to add tasks to your inbox via webhooks.
+          </p>
+          <ApiTokenManager />
         </div>
       </div>
     </ListPage>
