@@ -8,6 +8,7 @@ export const users = sqliteTable('users', {
   email: text('email').notNull().unique(),
   emailVerified: integer('email_verified', { mode: 'boolean' }).notNull().default(false),
   image: text('image'),
+  isAdmin: integer('is_admin', { mode: 'boolean' }).notNull().default(false),
   createdAt: integer('created_at', { mode: 'timestamp' }).notNull().default(sql`(unixepoch())`),
   updatedAt: integer('updated_at', { mode: 'timestamp' }).notNull().default(sql`(unixepoch())`),
 })

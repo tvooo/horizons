@@ -1,0 +1,10 @@
+{
+  "extends": "../../tsconfig.base.json",
+  "compilerOptions": {
+    "outDir": "./dist",
+    "types": ["bun-types"],
+    "jsx": "react-jsx",
+    "jsxImportSource": "hono/jsx"
+  },
+  "include": ["src/**/*", "../backend/src/db/**/*"]
+}
