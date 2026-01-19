@@ -22,10 +22,16 @@ interface StaticPage {
   name: string
   icon: LucideIcon
   href: string
+  badge?: (rs: ReturnType<typeof useRootStore>) => string | number | null
 }
 
 const STATIC_PAGES: StaticPage[] = [
-  { name: 'Inbox', icon: InboxIcon, href: '/inbox' },
+  {
+    name: 'Inbox',
+    icon: InboxIcon,
+    href: '/inbox',
+    badge: (rs) => rs.inboxTasks.length || null,
+  },
   { name: 'Now', icon: SunIcon, href: '/now' },
   { name: 'Upcoming', icon: CalendarDaysIcon, href: '/upcoming' },
   { name: 'On Ice', icon: IceCreamConeIcon, href: '/on-ice' },
@@ -90,7 +96,13 @@ export const Sidebar = observer(({ onAddListClick, isMobileOpen, onMobileClose }
 
         <div className="flex-1 overflow-y-auto">
           {STATIC_PAGES.map((page) => (
-            <SidebarNavItem key={page.href} href={page.href} icon={page.icon} name={page.name} />
+            <SidebarNavItem
+              key={page.href}
+              href={page.href}
+              icon={page.icon}
+              name={page.name}
+              badge={page.badge?.(store)}
+            />
           ))}
 
           <h3 className="mt-6 mb-3 font-semibold text-gray-500 text-xs uppercase tracking-wider">
