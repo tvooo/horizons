@@ -7,9 +7,10 @@ interface SidebarNavItemProps {
   href: string
   icon: LucideIcon
   name: string
+  badge?: string | number | null
 }
 
-export function SidebarNavItem({ href, icon: Icon, name }: SidebarNavItemProps) {
+export function SidebarNavItem({ href, icon: Icon, name, badge }: SidebarNavItemProps) {
   return (
     <NavLink
       to={href}
@@ -26,6 +27,11 @@ export function SidebarNavItem({ href, icon: Icon, name }: SidebarNavItemProps) 
     >
       <Icon size={16} className="shrink-0 text-gray-500" />
       <span className="flex-1">{name}</span>
+      {badge ? (
+        <span className="ml-2 inline-flex min-w-[20px] items-center justify-center rounded-full bg-gray-200 px-2 py-0.5 font-medium text-gray-700 text-xs">
+          {badge}
+        </span>
+      ) : null}
     </NavLink>
   )
 }
