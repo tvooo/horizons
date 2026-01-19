@@ -2,7 +2,11 @@ import { betterAuth } from 'better-auth'
 import { drizzleAdapter } from 'better-auth/adapters/drizzle'
 import { accounts, db, sessions, users, verifications } from '../db'
 
+const port = Number(process.env.PORT) || 3001
+
 export const auth = betterAuth({
+  baseURL: process.env.BETTER_AUTH_URL || `http://localhost:${port}`,
+  secret: process.env.BETTER_AUTH_SECRET,
   database: drizzleAdapter(db, {
     provider: 'sqlite',
     schema: {
