@@ -54,6 +54,12 @@ jobs:
           git remote add dokku dokku@${{ secrets.DOKKU_HOST }}:horizons
           git push dokku HEAD:main
 
+      - name: Deploy admin to Dokku
+        run: |
+          git remote remove dokku-admin 2>/dev/null || true
+          git remote add dokku-admin dokku@${{ secrets.DOKKU_HOST }}:horizons-admin
+          git push dokku-admin HEAD:main
+
       - name: Notify success
         if: success()
         run: |

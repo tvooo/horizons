@@ -1,0 +1,21 @@
+{
+  "name": "admin",
+  "type": "module",
+  "scripts": {
+    "build:css": "bunx tailwindcss -i src/styles/input.css -o src/styles/output.css --minify",
+    "dev": "bun run build:css && bun --watch src/index.tsx",
+    "start": "bun run build:css && bun src/index.tsx",
+    "type-check": "tsc --noEmit",
+    "make-admin": "bun src/scripts/make-admin.ts"
+  },
+  "dependencies": {
+    "better-auth": "^1.4.9",
+    "drizzle-orm": "^0.45.1",
+    "hono": "^4.6.0"
+  },
+  "devDependencies": {
+    "@tailwindcss/cli": "^4.1.18",
+    "@types/bun": "latest",
+    "tailwindcss": "^4.1.18"
+  }
+}
