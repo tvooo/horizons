@@ -1,11 +1,11 @@
 import { zValidator } from '@hono/zod-validator'
 import { createId } from '@paralleldrive/cuid2'
-import { and, eq } from 'drizzle-orm'
+import { and, eq, inArray } from 'drizzle-orm'
 import { Hono } from 'hono'
 import { z } from 'zod'
 import { db } from '../db'
 import { tasks } from '../db/schema'
-import { getUser, requireAuth } from '../middleware/auth'
+import { getUser, getUserWorkspaceIds, requireAuth } from '../middleware/auth'
 
 const app = new Hono()
 
@@ -19,6 +19,7 @@ const scheduledDateSchema = z.object({
 
 const createTaskSchema = z.object({
   title: z.string().min(1),
+  workspaceId: z.string().min(1),
   notes: z.string().optional(),
   listId: z.string().optional(),
   completed: z.boolean().optional(),
@@ -39,10 +40,16 @@ const updateTaskSchema = z.object({
   listOrder: z.string().optional(),
 })
 
-// GET /api/tasks - Get all tasks
+// GET /api/tasks - Get all tasks from user's workspaces
 app.get('/', async (c) => {
   const user = getUser(c)
-  const allTasks = await db.select().from(tasks).where(eq(tasks.userId, user.id))
+  const workspaceIds = await getUserWorkspaceIds(user.id)
+
+  if (workspaceIds.length === 0) {
+    return c.json([])
+  }
+
+  const allTasks = await db.select().from(tasks).where(inArray(tasks.workspaceId, workspaceIds))
   return c.json(allTasks)
 })
 
@@ -50,11 +57,16 @@ app.get('/', async (c) => {
 app.get('/:id', async (c) => {
   const id = c.req.param('id')
   const user = getUser(c)
+  const workspaceIds = await getUserWorkspaceIds(user.id)
+
+  if (workspaceIds.length === 0) {
+    return c.json({ error: 'Task not found' }, 404)
+  }
 
   const task = await db
     .select()
     .from(tasks)
-    .where(and(eq(tasks.id, id), eq(tasks.userId, user.id)))
+    .where(and(eq(tasks.id, id), inArray(tasks.workspaceId, workspaceIds)))
 
   if (task.length === 0) {
     return c.json({ error: 'Task not found' }, 404)
@@ -67,6 +79,12 @@ app.get('/:id', async (c) => {
 app.post('/', zValidator('json', createTaskSchema), async (c) => {
   const data = c.req.valid('json')
   const user = getUser(c)
+  const workspaceIds = await getUserWorkspaceIds(user.id)
+
+  // Verify user has access to the workspace
+  if (!workspaceIds.includes(data.workspaceId)) {
+    return c.json({ error: 'Workspace not found' }, 404)
+  }
 
   const result = await db
     .insert(tasks)
@@ -74,7 +92,7 @@ app.post('/', zValidator('json', createTaskSchema), async (c) => {
       id: createId(),
       title: data.title,
       notes: data.notes,
-      userId: user.id,
+      workspaceId: data.workspaceId,
       listId: data.listId,
       completed: data.completed ?? false,
       scheduledPeriodType: data.scheduledDate?.periodType,
@@ -127,10 +145,16 @@ app.patch('/:id', zValidator('json', updateTaskSchema), async (c) => {
     updateData.onIce = false
   }
 
+  const workspaceIds = await getUserWorkspaceIds(user.id)
+
+  if (workspaceIds.length === 0) {
+    return c.json({ error: 'Task not found' }, 404)
+  }
+
   const result = await db
     .update(tasks)
     .set(updateData)
-    .where(and(eq(tasks.id, id), eq(tasks.userId, user.id)))
+    .where(and(eq(tasks.id, id), inArray(tasks.workspaceId, workspaceIds)))
     .returning()
 
   if (result.length === 0) {

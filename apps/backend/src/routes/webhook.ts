@@ -7,7 +7,7 @@ import { tasks } from '../db/schema'
 import { requireApiToken } from '../middleware/apiToken'
 // getUser works with API token auth because requireApiToken sets user context
 // in the same format as requireAuth (session-based auth)
-import { getUser } from '../middleware/auth'
+import { getUser, getUserWorkspaceIds } from '../middleware/auth'
 
 const app = new Hono()
 
@@ -24,13 +24,19 @@ app.post('/inbox', zValidator('json', createInboxTaskSchema), async (c) => {
   const user = getUser(c)
   const data = c.req.valid('json')
 
+  // Get user's first workspace (personal workspace) for inbox tasks
+  const workspaceIds = await getUserWorkspaceIds(user.id)
+  if (workspaceIds.length === 0) {
+    return c.json({ error: 'No workspace available' }, 400)
+  }
+
   const result = await db
     .insert(tasks)
     .values({
       id: createId(),
       title: data.title,
       notes: data.notes,
-      userId: user.id,
+      workspaceId: workspaceIds[0], // Use first workspace (personal)
       listId: null, // Inbox = null listId
       completed: false,
       onIce: false,

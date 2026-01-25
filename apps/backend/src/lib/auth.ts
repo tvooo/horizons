@@ -1,3 +1,4 @@
+import { createId } from '@paralleldrive/cuid2'
 import { betterAuth } from 'better-auth'
 import { drizzleAdapter } from 'better-auth/adapters/drizzle'
 import { db } from '../db'
@@ -13,6 +14,27 @@ export const auth = betterAuth({
       verification: schema.verifications,
     },
   }),
+  databaseHooks: {
+    user: {
+      create: {
+        after: async (user) => {
+          // Create a personal workspace for the new user
+          const workspaceId = createId()
+          await db.insert(schema.workspaces).values({
+            id: workspaceId,
+            name: 'Personal',
+            type: 'personal',
+          })
+          await db.insert(schema.workspaceMembers).values({
+            id: createId(),
+            workspaceId,
+            userId: user.id,
+            role: 'owner',
+          })
+        },
+      },
+    },
+  },
   emailAndPassword: {
     enabled: true,
     requireEmailVerification: false, // Set to true in production with email service

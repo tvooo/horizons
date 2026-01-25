@@ -11,6 +11,7 @@ import listsRoutes from './routes/lists'
 import tasksRoutes from './routes/tasks'
 import tokensRoutes from './routes/tokens'
 import webhookRoutes from './routes/webhook'
+import workspacesRoutes from './routes/workspaces'
 
 const __filename = fileURLToPath(import.meta.url)
 const __dirname = dirname(__filename)
@@ -36,6 +37,7 @@ app.route('/api/export', exportRoutes)
 app.route('/api/import', importRoutes)
 app.route('/api/tokens', tokensRoutes)
 app.route('/api/webhook', webhookRoutes)
+app.route('/api/workspaces', workspacesRoutes)
 
 // Serve static files in production
 if (process.env.NODE_ENV === 'production') {

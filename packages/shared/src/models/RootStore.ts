@@ -1,13 +1,15 @@
 import { isPast } from 'date-fns'
 import { action, computed, makeObservable, observable, runInAction } from 'mobx'
 import type { APIClient } from '../api/client'
-import type { BackendScheduledDate, PeriodType } from '../api/types'
+import type { BackendScheduledDate, BackendWorkspace, PeriodType } from '../api/types'
 import { isCurrentPeriod } from '../utils/dateUtils'
 import { generateFractionalIndex } from '../utils/fractionalIndexing'
 import { ListModel } from './ListModel'
 import { TaskModel } from './TaskModel'
 
 export class RootStore {
+  workspaces: BackendWorkspace[] = []
+  currentWorkspaceId: string | null = null
   lists: ListModel[] = []
   tasks: TaskModel[] = []
   loading = true
@@ -19,17 +21,21 @@ export class RootStore {
     this.api = api
 
     makeObservable(this, {
+      workspaces: observable,
+      currentWorkspaceId: observable,
       lists: observable,
       tasks: observable,
       loading: observable,
       focusedAreaId: observable,
       loadData: action,
+      setCurrentWorkspace: action,
       createTask: action,
       createList: action,
       updateTask: action,
       updateList: action,
       updateListParent: action,
       setFocusedArea: action,
+      currentWorkspace: computed,
       inboxTasks: computed,
       nowTasks: computed,
       nowLists: computed,
@@ -44,12 +50,19 @@ export class RootStore {
 
   async loadData() {
     try {
-      const [backendLists, backendTasks] = await Promise.all([
+      const [backendWorkspaces, backendLists, backendTasks] = await Promise.all([
+        this.api.getWorkspaces(),
         this.api.getLists(),
         this.api.getTasks(),
       ])
 
       runInAction(() => {
+        this.workspaces = backendWorkspaces
+        // Set default workspace to first personal workspace, or first available
+        if (!this.currentWorkspaceId && backendWorkspaces.length > 0) {
+          const personalWorkspace = backendWorkspaces.find((w) => w.type === 'personal')
+          this.currentWorkspaceId = personalWorkspace?.id ?? backendWorkspaces[0].id
+        }
         this.lists = backendLists.map((data) => new ListModel(data, this))
         this.tasks = backendTasks.map((data) => new TaskModel(data, this))
         this.loading = false
@@ -62,7 +75,20 @@ export class RootStore {
     }
   }
 
+  get currentWorkspace(): BackendWorkspace | null {
+    if (!this.currentWorkspaceId) return null
+    return this.workspaces.find((w) => w.id === this.currentWorkspaceId) ?? null
+  }
+
+  setCurrentWorkspace(workspaceId: string) {
+    this.currentWorkspaceId = workspaceId
+  }
+
   async createTask(title: string, listId?: string, scheduledDate?: BackendScheduledDate) {
+    if (!this.currentWorkspaceId) {
+      throw new Error('No workspace selected')
+    }
+
     const scheduleOrder = scheduledDate
       ? this.getNextScheduleOrderForPeriod(scheduledDate.periodType)
       : undefined
@@ -70,6 +96,7 @@ export class RootStore {
 
     const backendTask = await this.api.createTask({
       title,
+      workspaceId: this.currentWorkspaceId,
       listId,
       scheduledDate,
       scheduleOrder,
@@ -88,8 +115,13 @@ export class RootStore {
     type: 'area' | 'project' | 'list' = 'list',
     parentListId?: string,
   ) {
+    if (!this.currentWorkspaceId) {
+      throw new Error('No workspace selected')
+    }
+
     const backendList = await this.api.createList({
       name,
+      workspaceId: this.currentWorkspaceId,
       type,
       parentListId: parentListId ?? undefined,
     })
