@@ -52,15 +52,56 @@ export const verifications = sqliteTable('verifications', {
   createdAt: integer('created_at', { mode: 'timestamp' }).notNull().default(sql`(unixepoch())`),
 })
 
+// Workspaces for collaboration
+export const workspaces = sqliteTable('workspaces', {
+  id: text('id').primaryKey(),
+  name: text('name').notNull(),
+  type: text('type', { enum: ['personal', 'shared'] })
+    .notNull()
+    .default('shared'),
+  createdAt: integer('created_at', { mode: 'timestamp' }).notNull().default(sql`(unixepoch())`),
+  updatedAt: integer('updated_at', { mode: 'timestamp' }).notNull().default(sql`(unixepoch())`),
+})
+
+export const workspaceMembers = sqliteTable('workspace_members', {
+  id: text('id').primaryKey(),
+  workspaceId: text('workspace_id')
+    .notNull()
+    .references(() => workspaces.id, { onDelete: 'cascade' }),
+  userId: text('user_id')
+    .notNull()
+    .references(() => users.id, { onDelete: 'cascade' }),
+  role: text('role', { enum: ['owner', 'member'] })
+    .notNull()
+    .default('member'),
+  createdAt: integer('created_at', { mode: 'timestamp' }).notNull().default(sql`(unixepoch())`),
+  invitedBy: text('invited_by').references(() => users.id, { onDelete: 'set null' }),
+})
+
+export const workspaceInvites = sqliteTable('workspace_invites', {
+  id: text('id').primaryKey(),
+  workspaceId: text('workspace_id')
+    .notNull()
+    .references(() => workspaces.id, { onDelete: 'cascade' }),
+  code: text('code').notNull().unique(),
+  createdBy: text('created_by')
+    .notNull()
+    .references(() => users.id, { onDelete: 'cascade' }),
+  createdAt: integer('created_at', { mode: 'timestamp' }).notNull().default(sql`(unixepoch())`),
+  expiresAt: integer('expires_at', { mode: 'timestamp' }),
+  usageLimit: integer('usage_limit'),
+  usageCount: integer('usage_count').notNull().default(0),
+})
+
 export const lists = sqliteTable('lists', {
   id: text('id').primaryKey().notNull(),
   name: text('name').notNull(),
   type: text('type', { enum: ['area', 'project', 'list'] })
     .notNull()
     .default('list'),
-  userId: text('user_id')
+  workspaceId: text('workspace_id')
     .notNull()
-    .references(() => users.id, { onDelete: 'cascade' }),
+    .references(() => workspaces.id, { onDelete: 'cascade' }),
   // biome-ignore lint/suspicious/noExplicitAny: Cannot reference itself, apparently
   parentListId: text('parent_list_id').references((): any => lists.id, { onDelete: 'set null' }),
   archived: integer('archived', { mode: 'boolean' }).notNull().default(false),
@@ -79,9 +120,9 @@ export const tasks = sqliteTable('tasks', {
   id: text('id').primaryKey().notNull(),
   title: text('title').notNull(),
   notes: text('notes'),
-  userId: text('user_id')
+  workspaceId: text('workspace_id')
     .notNull()
-    .references(() => users.id, { onDelete: 'cascade' }),
+    .references(() => workspaces.id, { onDelete: 'cascade' }),
   listId: text('list_id').references(() => lists.id, { onDelete: 'cascade' }),
   completed: integer('completed', { mode: 'boolean' }).notNull().default(false),
   scheduledPeriodType: text('scheduled_period_type', {
@@ -108,6 +149,12 @@ export type List = typeof lists.$inferSelect
 export type NewList = typeof lists.$inferInsert
 export type Task = typeof tasks.$inferSelect
 export type NewTask = typeof tasks.$inferInsert
+export type Workspace = typeof workspaces.$inferSelect
+export type NewWorkspace = typeof workspaces.$inferInsert
+export type WorkspaceMember = typeof workspaceMembers.$inferSelect
+export type NewWorkspaceMember = typeof workspaceMembers.$inferInsert
+export type WorkspaceInvite = typeof workspaceInvites.$inferSelect
+export type NewWorkspaceInvite = typeof workspaceInvites.$inferInsert
 
 // API Tokens for webhook authentication
 export const apiTokens = sqliteTable(
