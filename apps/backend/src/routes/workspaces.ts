@@ -1,3 +1,4 @@
+import { randomBytes } from 'node:crypto'
 import { zValidator } from '@hono/zod-validator'
 import { createId } from '@paralleldrive/cuid2'
 import { and, eq } from 'drizzle-orm'
@@ -34,14 +35,9 @@ async function getMembership(workspaceId: string, userId: string) {
   return members[0] || null
 }
 
-// Helper to generate short random invite code
+// Helper to generate short random invite code using cryptographically secure random
 function generateInviteCode(): string {
-  const chars = 'abcdefghijklmnopqrstuvwxyz0123456789'
-  let code = ''
-  for (let i = 0; i < 8; i++) {
-    code += chars[Math.floor(Math.random() * chars.length)]
-  }
-  return code
+  return randomBytes(6).toString('base64url').slice(0, 8)
 }
 
 // GET /api/workspaces - Get all workspaces user is a member of
