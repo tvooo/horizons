@@ -50,3 +50,11 @@ ALTER TABLE `tasks` ADD COLUMN `workspace_id` text REFERENCES `workspaces`(`id`)
 
 -- Update tasks with workspace_id based on user_id
 UPDATE `tasks` SET `workspace_id` = 'ws_' || `user_id`;
+
+-- Drop the user_id columns (no longer needed, workspaces handle ownership)
+ALTER TABLE `lists` DROP COLUMN `user_id`;
+ALTER TABLE `tasks` DROP COLUMN `user_id`;
+
+-- Add indexes for workspace_id lookups
+CREATE INDEX `idx_lists_workspace` ON `lists`(`workspace_id`);
+CREATE INDEX `idx_tasks_workspace` ON `tasks`(`workspace_id`);

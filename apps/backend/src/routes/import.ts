@@ -5,7 +5,7 @@ import { Hono } from 'hono'
 import { z } from 'zod'
 import { db } from '../db'
 import { lists, tasks } from '../db/schema'
-import { getUser, getUserWorkspaceIds, requireAuth } from '../middleware/auth'
+import { getUser, getUserPersonalWorkspaceId, requireAuth } from '../middleware/auth'
 
 const app = new Hono()
 
@@ -56,12 +56,11 @@ app.post('/', zValidator('json', importSchema), async (c) => {
   const data = c.req.valid('json')
   const user = getUser(c)
 
-  // Get user's workspaces and use the first one (personal) for import
-  const workspaceIds = await getUserWorkspaceIds(user.id)
-  if (workspaceIds.length === 0) {
-    return c.json({ error: 'No workspace available for import' }, 400)
+  // Get user's personal workspace for import
+  const targetWorkspaceId = await getUserPersonalWorkspaceId(user.id)
+  if (!targetWorkspaceId) {
+    return c.json({ error: 'No personal workspace available for import' }, 400)
   }
-  const targetWorkspaceId = workspaceIds[0] // Use first workspace (typically personal)
 
   // Check for ID conflicts
   const listIds = data.lists.map((list) => list.id)

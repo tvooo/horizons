@@ -1,8 +1,8 @@
-import { eq } from 'drizzle-orm'
+import { and, eq } from 'drizzle-orm'
 import type { Context } from 'hono'
 import { createMiddleware } from 'hono/factory'
 import { db } from '../db'
-import { workspaceMembers } from '../db/schema'
+import { workspaceMembers, workspaces } from '../db/schema'
 import { auth } from '../lib/auth'
 
 export const requireAuth = createMiddleware(async (c, next) => {
@@ -31,4 +31,15 @@ export async function getUserWorkspaceIds(userId: string): Promise<string[]> {
     .from(workspaceMembers)
     .where(eq(workspaceMembers.userId, userId))
   return memberships.map((m) => m.workspaceId)
+}
+
+// Helper to get user's personal workspace ID
+export async function getUserPersonalWorkspaceId(userId: string): Promise<string | null> {
+  const result = await db
+    .select({ workspaceId: workspaceMembers.workspaceId })
+    .from(workspaceMembers)
+    .innerJoin(workspaces, eq(workspaceMembers.workspaceId, workspaces.id))
+    .where(and(eq(workspaceMembers.userId, userId), eq(workspaces.type, 'personal')))
+    .limit(1)
+  return result[0]?.workspaceId ?? null
 }
