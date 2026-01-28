@@ -93,49 +93,57 @@ export const workspaceInvites = sqliteTable('workspace_invites', {
   usageCount: integer('usage_count').notNull().default(0),
 })
 
-export const lists = sqliteTable('lists', {
-  id: text('id').primaryKey().notNull(),
-  name: text('name').notNull(),
-  type: text('type', { enum: ['area', 'project', 'list'] })
-    .notNull()
-    .default('list'),
-  workspaceId: text('workspace_id')
-    .notNull()
-    .references(() => workspaces.id, { onDelete: 'cascade' }),
-  // biome-ignore lint/suspicious/noExplicitAny: Cannot reference itself, apparently
-  parentListId: text('parent_list_id').references((): any => lists.id, { onDelete: 'set null' }),
-  archived: integer('archived', { mode: 'boolean' }).notNull().default(false),
-  scheduledPeriodType: text('scheduled_period_type', {
-    enum: ['day', 'week', 'month', 'quarter', 'year'],
-  }),
-  scheduledAnchorDate: integer('scheduled_anchor_date', { mode: 'timestamp' }),
-  onIce: integer('on_ice', { mode: 'boolean' }).notNull().default(false),
-  notes: text('notes'),
-  archivedAt: integer('archived_at', { mode: 'timestamp' }),
-  createdAt: integer('created_at', { mode: 'timestamp' }).notNull().default(sql`(unixepoch())`),
-  updatedAt: integer('updated_at', { mode: 'timestamp' }).notNull().default(sql`(unixepoch())`),
-})
+export const lists = sqliteTable(
+  'lists',
+  {
+    id: text('id').primaryKey().notNull(),
+    name: text('name').notNull(),
+    type: text('type', { enum: ['area', 'project', 'list'] })
+      .notNull()
+      .default('list'),
+    workspaceId: text('workspace_id')
+      .notNull()
+      .references(() => workspaces.id, { onDelete: 'cascade' }),
+    // biome-ignore lint/suspicious/noExplicitAny: Cannot reference itself, apparently
+    parentListId: text('parent_list_id').references((): any => lists.id, { onDelete: 'set null' }),
+    archived: integer('archived', { mode: 'boolean' }).notNull().default(false),
+    scheduledPeriodType: text('scheduled_period_type', {
+      enum: ['day', 'week', 'month', 'quarter', 'year'],
+    }),
+    scheduledAnchorDate: integer('scheduled_anchor_date', { mode: 'timestamp' }),
+    onIce: integer('on_ice', { mode: 'boolean' }).notNull().default(false),
+    notes: text('notes'),
+    archivedAt: integer('archived_at', { mode: 'timestamp' }),
+    createdAt: integer('created_at', { mode: 'timestamp' }).notNull().default(sql`(unixepoch())`),
+    updatedAt: integer('updated_at', { mode: 'timestamp' }).notNull().default(sql`(unixepoch())`),
+  },
+  (table) => [index('idx_lists_workspace').on(table.workspaceId)],
+)
 
-export const tasks = sqliteTable('tasks', {
-  id: text('id').primaryKey().notNull(),
-  title: text('title').notNull(),
-  notes: text('notes'),
-  workspaceId: text('workspace_id')
-    .notNull()
-    .references(() => workspaces.id, { onDelete: 'cascade' }),
-  listId: text('list_id').references(() => lists.id, { onDelete: 'cascade' }),
-  completed: integer('completed', { mode: 'boolean' }).notNull().default(false),
-  scheduledPeriodType: text('scheduled_period_type', {
-    enum: ['day', 'week', 'month', 'quarter', 'year'],
-  }),
-  scheduledAnchorDate: integer('scheduled_anchor_date', { mode: 'timestamp' }),
-  onIce: integer('on_ice', { mode: 'boolean' }).notNull().default(false),
-  scheduleOrder: text('schedule_order'),
-  listOrder: text('list_order'),
-  completedAt: integer('completed_at', { mode: 'timestamp' }),
-  createdAt: integer('created_at', { mode: 'timestamp' }).notNull().default(sql`(unixepoch())`),
-  updatedAt: integer('updated_at', { mode: 'timestamp' }).notNull().default(sql`(unixepoch())`),
-})
+export const tasks = sqliteTable(
+  'tasks',
+  {
+    id: text('id').primaryKey().notNull(),
+    title: text('title').notNull(),
+    notes: text('notes'),
+    workspaceId: text('workspace_id')
+      .notNull()
+      .references(() => workspaces.id, { onDelete: 'cascade' }),
+    listId: text('list_id').references(() => lists.id, { onDelete: 'cascade' }),
+    completed: integer('completed', { mode: 'boolean' }).notNull().default(false),
+    scheduledPeriodType: text('scheduled_period_type', {
+      enum: ['day', 'week', 'month', 'quarter', 'year'],
+    }),
+    scheduledAnchorDate: integer('scheduled_anchor_date', { mode: 'timestamp' }),
+    onIce: integer('on_ice', { mode: 'boolean' }).notNull().default(false),
+    scheduleOrder: text('schedule_order'),
+    listOrder: text('list_order'),
+    completedAt: integer('completed_at', { mode: 'timestamp' }),
+    createdAt: integer('created_at', { mode: 'timestamp' }).notNull().default(sql`(unixepoch())`),
+    updatedAt: integer('updated_at', { mode: 'timestamp' }).notNull().default(sql`(unixepoch())`),
+  },
+  (table) => [index('idx_tasks_workspace').on(table.workspaceId)],
+)
 
 export type User = typeof users.$inferSelect
 export type NewUser = typeof users.$inferInsert
