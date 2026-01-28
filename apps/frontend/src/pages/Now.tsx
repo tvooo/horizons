@@ -75,6 +75,7 @@ export const Now = observer(() => {
                 key={task.id}
                 task={task}
                 showList
+                showSchedule
                 periodType={periodType}
                 tasksInPeriod={tasks}
                 indexInPeriod={index}

@@ -53,6 +53,7 @@ export const TaskCheckbox = ({ checked, onChange, className, ...props }: TaskChe
 interface TaskItemProps {
   task: TaskModel
   showList?: boolean
+  showSchedule?: boolean
   periodType?: PeriodType
   tasksInPeriod?: TaskModel[]
   indexInPeriod?: number
@@ -66,6 +67,7 @@ export const TaskItem = observer(
   ({
     task,
     showList,
+    showSchedule,
     periodType,
     tasksInPeriod,
     indexInPeriod,
@@ -316,7 +318,7 @@ export const TaskItem = observer(
             )}
           </div>
 
-          <TaskSchedulePopover task={task} />
+          {showSchedule && <TaskSchedulePopover task={task} />}
         </div>
       </TaskItemContextMenu>
     )

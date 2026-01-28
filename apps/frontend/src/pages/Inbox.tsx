@@ -10,7 +10,7 @@ export const Inbox = observer(() => {
   return (
     <ListPage title="Inbox" onCreateTask={(title) => store.createTask(title)}>
       {inboxTasks.map((task) => (
-        <TaskItem key={task.id} task={task} />
+        <TaskItem key={task.id} task={task} showSchedule />
       ))}
     </ListPage>
   )

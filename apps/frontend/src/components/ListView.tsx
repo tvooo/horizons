@@ -103,6 +103,7 @@ export const ListView = observer(() => {
           reorderListId={listId}
           tasksInList={incompleteTasks}
           indexInList={index}
+          showSchedule
         />
       ))}
     </ListPage>
