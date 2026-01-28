@@ -6,7 +6,8 @@
     "start": "bun src/index.ts",
     "type-check": "tsc --noEmit",
     "db:generate": "drizzle-kit generate",
-    "db:migrate": "bun src/db/migrate.ts"
+    "db:migrate": "bun src/db/migrate.ts",
+    "db:backup": "bun run scripts/backup.ts"
   },
   "dependencies": {
     "@hono/zod-validator": "^0.4.1",
