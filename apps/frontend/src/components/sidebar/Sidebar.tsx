@@ -17,7 +17,6 @@ import { signOut, useSession } from '../../lib/auth-client'
 import { useRootStore } from '../../models/RootStoreContext'
 import { SidebarListItem } from './SidebarListItem'
 import { SidebarNavItem } from './SidebarNavItem'
-import { WorkspaceSelector } from './WorkspaceSelector'
 
 interface StaticPage {
   name: string
@@ -59,8 +58,6 @@ interface SidebarProps {
 
 export const Sidebar = observer(({ onAddListClick, isMobileOpen, onMobileClose }: SidebarProps) => {
   const store = useRootStore()
-  const areas = store.areas
-  const standaloneLists = store.getStandaloneLists()
   const { data: session } = useSession()
   const navigate = useNavigate()
 
@@ -102,8 +99,6 @@ export const Sidebar = observer(({ onAddListClick, isMobileOpen, onMobileClose }
         </button>
 
         <div className="flex-1 overflow-y-auto">
-          <WorkspaceSelector />
-
           {STATIC_PAGES.map((page) => (
             <SidebarNavItem
               key={page.href}
@@ -114,51 +109,63 @@ export const Sidebar = observer(({ onAddListClick, isMobileOpen, onMobileClose }
             />
           ))}
 
-          <h3 className="mt-6 mb-3 font-semibold text-gray-500 text-xs uppercase tracking-wider">
-            Lists
-          </h3>
+          {/* Lists grouped by workspace */}
+          {store.workspaces.map((workspace) => {
+            const areas = store.getAreasByWorkspace(workspace.id)
+            const standaloneLists = store.getStandaloneListsByWorkspace(workspace.id)
 
-          {/* All lists */}
-          <div className="space-y-1">
-            {/* Standalone lists (not inside an area) */}
-            {standaloneLists
-              .filter((list) => !list.archived && !list.onIce)
-              .sort(sortByListTypeAndName)
-              .map((list) => {
-                const children = list.type === 'list' ? getVisibleChildren(list.id) : []
-                return (
-                  <SidebarListItem key={list.id} list={list}>
-                    {children.map((childList) => (
-                      <SidebarListItem key={childList.id} list={childList} nestingLevel={1} />
-                    ))}
-                  </SidebarListItem>
-                )
-              })}
+            return (
+              <div key={workspace.id}>
+                <h3 className="mt-6 mb-3 font-semibold text-gray-500 text-xs uppercase tracking-wider">
+                  {workspace.name}
+                </h3>
 
-            {/* Areas with their children */}
-            {areas.map((area) => {
-              const areaChildren = getVisibleChildren(area.id)
-              return (
-                <SidebarListItem key={area.id} list={area}>
-                  {areaChildren.map((childList) => {
-                    const grandchildren =
-                      childList.type === 'list' ? getVisibleChildren(childList.id) : []
-                    return (
-                      <SidebarListItem key={childList.id} list={childList} nestingLevel={1}>
-                        {grandchildren.map((grandchildList) => (
-                          <SidebarListItem
-                            key={grandchildList.id}
-                            list={grandchildList}
-                            nestingLevel={2}
-                          />
-                        ))}
-                      </SidebarListItem>
-                    )
-                  })}
-                </SidebarListItem>
-              )
-            })}
-          </div>
+                <div className="space-y-1">
+                  {/* Standalone lists (not inside an area) */}
+                  {standaloneLists
+                    .filter((list) => !list.archived && !list.onIce)
+                    .sort(sortByListTypeAndName)
+                    .map((list) => {
+                      const children = list.type === 'list' ? getVisibleChildren(list.id) : []
+                      return (
+                        <SidebarListItem key={list.id} list={list}>
+                          {children.map((childList) => (
+                            <SidebarListItem key={childList.id} list={childList} nestingLevel={1} />
+                          ))}
+                        </SidebarListItem>
+                      )
+                    })}
+
+                  {/* Areas with their children */}
+                  {areas
+                    .filter((area) => !area.archived && !area.onIce)
+                    .sort(sortByListTypeAndName)
+                    .map((area) => {
+                      const areaChildren = getVisibleChildren(area.id)
+                      return (
+                        <SidebarListItem key={area.id} list={area}>
+                          {areaChildren.map((childList) => {
+                            const grandchildren =
+                              childList.type === 'list' ? getVisibleChildren(childList.id) : []
+                            return (
+                              <SidebarListItem key={childList.id} list={childList} nestingLevel={1}>
+                                {grandchildren.map((grandchildList) => (
+                                  <SidebarListItem
+                                    key={grandchildList.id}
+                                    list={grandchildList}
+                                    nestingLevel={2}
+                                  />
+                                ))}
+                              </SidebarListItem>
+                            )
+                          })}
+                        </SidebarListItem>
+                      )
+                    })}
+                </div>
+              </div>
+            )
+          })}
 
           {/* Add List Button */}
           <button

@@ -4,7 +4,7 @@ import { and, eq, inArray } from 'drizzle-orm'
 import { Hono } from 'hono'
 import { z } from 'zod'
 import { db } from '../db'
-import { tasks } from '../db/schema'
+import { lists, tasks } from '../db/schema'
 import { getUser, getUserWorkspaceIds, requireAuth } from '../middleware/auth'
 
 const app = new Hono()
@@ -38,6 +38,7 @@ const updateTaskSchema = z.object({
   onIce: z.boolean().optional(),
   scheduleOrder: z.string().nullable().optional(),
   listOrder: z.string().optional(),
+  workspaceId: z.string().optional(),
 })
 
 // GET /api/tasks - Get all tasks from user's workspaces
@@ -86,13 +87,27 @@ app.post('/', zValidator('json', createTaskSchema), async (c) => {
     return c.json({ error: 'Workspace not found' }, 404)
   }
 
+  // If creating in a list, use the list's workspace
+  let workspaceId = data.workspaceId
+  if (data.listId) {
+    const [list] = await db.select().from(lists).where(eq(lists.id, data.listId))
+    if (!list) {
+      return c.json({ error: 'List not found' }, 404)
+    }
+    if (!workspaceIds.includes(list.workspaceId)) {
+      return c.json({ error: 'List not found' }, 404)
+    }
+    // Use the list's workspace
+    workspaceId = list.workspaceId
+  }
+
   const result = await db
     .insert(tasks)
     .values({
       id: createId(),
       title: data.title,
       notes: data.notes,
-      workspaceId: data.workspaceId,
+      workspaceId,
       listId: data.listId,
       completed: data.completed ?? false,
       scheduledPeriodType: data.scheduledDate?.periodType,
@@ -111,6 +126,30 @@ app.patch('/:id', zValidator('json', updateTaskSchema), async (c) => {
   const id = c.req.param('id')
   const data = c.req.valid('json')
   const user = getUser(c)
+  const workspaceIds = await getUserWorkspaceIds(user.id)
+
+  if (workspaceIds.length === 0) {
+    return c.json({ error: 'Task not found' }, 404)
+  }
+
+  // If moving to a list, get the list's workspace
+  let workspaceId = data.workspaceId
+  if (data.listId) {
+    const [list] = await db.select().from(lists).where(eq(lists.id, data.listId))
+    if (!list) {
+      return c.json({ error: 'List not found' }, 404)
+    }
+    if (!workspaceIds.includes(list.workspaceId)) {
+      return c.json({ error: 'List not found' }, 404)
+    }
+    // Use the list's workspace
+    workspaceId = list.workspaceId
+  }
+
+  // Verify user has access to target workspace if explicitly changing workspace
+  if (workspaceId && !workspaceIds.includes(workspaceId)) {
+    return c.json({ error: 'Target workspace not found' }, 404)
+  }
 
   const updateData: Record<string, unknown> = {
     title: data.title,
@@ -119,6 +158,7 @@ app.patch('/:id', zValidator('json', updateTaskSchema), async (c) => {
     completed: data.completed,
     scheduleOrder: data.scheduleOrder,
     listOrder: data.listOrder,
+    workspaceId: workspaceId,
     updatedAt: new Date(),
   }
 
@@ -153,12 +193,6 @@ app.patch('/:id', zValidator('json', updateTaskSchema), async (c) => {
     updateData.onIce = true
   } else if (data.onIce === false) {
     updateData.onIce = false
-  }
-
-  const workspaceIds = await getUserWorkspaceIds(user.id)
-
-  if (workspaceIds.length === 0) {
-    return c.json({ error: 'Task not found' }, 404)
   }
 
   const result = await db

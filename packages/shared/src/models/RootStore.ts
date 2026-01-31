@@ -1,7 +1,13 @@
 import { isPast } from 'date-fns'
 import { action, computed, makeObservable, observable, runInAction } from 'mobx'
 import type { APIClient } from '../api/client'
-import type { BackendScheduledDate, BackendWorkspace, PeriodType } from '../api/types'
+import type {
+  BackendScheduledDate,
+  BackendWorkspace,
+  BackendWorkspaceInvite,
+  BackendWorkspaceMember,
+  PeriodType,
+} from '../api/types'
 import { isCurrentPeriod } from '../utils/dateUtils'
 import { generateFractionalIndex } from '../utils/fractionalIndexing'
 import { ListModel } from './ListModel'
@@ -9,7 +15,6 @@ import { TaskModel } from './TaskModel'
 
 export class RootStore {
   workspaces: BackendWorkspace[] = []
-  currentWorkspaceId: string | null = null
   lists: ListModel[] = []
   tasks: TaskModel[] = []
   loading = true
@@ -22,20 +27,18 @@ export class RootStore {
 
     makeObservable(this, {
       workspaces: observable,
-      currentWorkspaceId: observable,
       lists: observable,
       tasks: observable,
       loading: observable,
       focusedAreaId: observable,
       loadData: action,
-      setCurrentWorkspace: action,
       createTask: action,
       createList: action,
       updateTask: action,
       updateList: action,
       updateListParent: action,
       setFocusedArea: action,
-      currentWorkspace: computed,
+      personalWorkspace: computed,
       inboxTasks: computed,
       nowTasks: computed,
       nowLists: computed,
@@ -58,11 +61,6 @@ export class RootStore {
 
       runInAction(() => {
         this.workspaces = backendWorkspaces
-        // Set default workspace to first personal workspace, or first available
-        if (!this.currentWorkspaceId && backendWorkspaces.length > 0) {
-          const personalWorkspace = backendWorkspaces.find((w) => w.type === 'personal')
-          this.currentWorkspaceId = personalWorkspace?.id ?? backendWorkspaces[0].id
-        }
         this.lists = backendLists.map((data) => new ListModel(data, this))
         this.tasks = backendTasks.map((data) => new TaskModel(data, this))
         this.loading = false
@@ -75,18 +73,24 @@ export class RootStore {
     }
   }
 
-  get currentWorkspace(): BackendWorkspace | null {
-    if (!this.currentWorkspaceId) return null
-    return this.workspaces.find((w) => w.id === this.currentWorkspaceId) ?? null
-  }
-
-  setCurrentWorkspace(workspaceId: string) {
-    this.currentWorkspaceId = workspaceId
+  get personalWorkspace(): BackendWorkspace | null {
+    return this.workspaces.find((w) => w.type === 'personal') ?? null
   }
 
   async createTask(title: string, listId?: string, scheduledDate?: BackendScheduledDate) {
-    if (!this.currentWorkspaceId) {
-      throw new Error('No workspace selected')
+    // If creating in a list, use the list's workspace; otherwise use personal workspace
+    let workspaceId: string
+    if (listId) {
+      const list = this.getListById(listId)
+      if (!list) {
+        throw new Error('List not found')
+      }
+      workspaceId = list.workspaceId
+    } else {
+      if (!this.personalWorkspace) {
+        throw new Error('No personal workspace found')
+      }
+      workspaceId = this.personalWorkspace.id
     }
 
     const scheduleOrder = scheduledDate
@@ -96,7 +100,7 @@ export class RootStore {
 
     const backendTask = await this.api.createTask({
       title,
-      workspaceId: this.currentWorkspaceId,
+      workspaceId,
       listId,
       scheduledDate,
       scheduleOrder,
@@ -114,14 +118,16 @@ export class RootStore {
     name: string,
     type: 'area' | 'project' | 'list' = 'list',
     parentListId?: string,
+    workspaceId?: string,
   ) {
-    if (!this.currentWorkspaceId) {
-      throw new Error('No workspace selected')
+    const targetWorkspaceId = workspaceId ?? this.personalWorkspace?.id
+    if (!targetWorkspaceId) {
+      throw new Error('No personal workspace found')
     }
 
     const backendList = await this.api.createList({
       name,
-      workspaceId: this.currentWorkspaceId,
+      workspaceId: targetWorkspaceId,
       type,
       parentListId: parentListId ?? undefined,
     })
@@ -144,6 +150,7 @@ export class RootStore {
       onIce?: boolean
       scheduleOrder?: string | null
       listOrder?: string
+      workspaceId?: string
     },
   ) {
     await this.api.updateTask(taskId, updates)
@@ -263,6 +270,20 @@ export class RootStore {
     )
   }
 
+  getListsByWorkspace(workspaceId: string) {
+    return this.lists.filter((list) => list.workspaceId === workspaceId)
+  }
+
+  getAreasByWorkspace(workspaceId: string) {
+    return this.lists.filter((list) => list.workspaceId === workspaceId && list.isArea)
+  }
+
+  getStandaloneListsByWorkspace(workspaceId: string) {
+    return this.lists.filter(
+      (list) => list.workspaceId === workspaceId && !list.isArea && !list.parentListId,
+    )
+  }
+
   get focusedArea() {
     if (!this.focusedAreaId) return null
     return this.getListById(this.focusedAreaId)
@@ -320,5 +341,66 @@ export class RootStore {
 
   async deleteToken(id: string) {
     return this.api.deleteToken(id)
+  }
+
+  // Workspace Management
+  async createWorkspace(name: string): Promise<BackendWorkspace> {
+    const workspace = await this.api.createWorkspace(name)
+    runInAction(() => {
+      this.workspaces.push(workspace)
+    })
+    return workspace
+  }
+
+  async updateWorkspace(id: string, name: string): Promise<BackendWorkspace> {
+    const workspace = await this.api.updateWorkspace(id, name)
+    runInAction(() => {
+      const index = this.workspaces.findIndex((w) => w.id === id)
+      if (index !== -1) {
+        this.workspaces[index] = workspace
+      }
+    })
+    return workspace
+  }
+
+  async deleteWorkspace(id: string): Promise<void> {
+    await this.api.deleteWorkspace(id)
+    runInAction(() => {
+      this.workspaces = this.workspaces.filter((w) => w.id !== id)
+    })
+  }
+
+  async getWorkspaceMembers(workspaceId: string): Promise<BackendWorkspaceMember[]> {
+    return this.api.getWorkspaceMembers(workspaceId)
+  }
+
+  async removeWorkspaceMember(workspaceId: string, userId: string): Promise<void> {
+    return this.api.removeWorkspaceMember(workspaceId, userId)
+  }
+
+  async getWorkspaceInvites(workspaceId: string): Promise<BackendWorkspaceInvite[]> {
+    return this.api.getWorkspaceInvites(workspaceId)
+  }
+
+  async createWorkspaceInvite(
+    workspaceId: string,
+    options?: { expiresAt?: string; usageLimit?: number },
+  ): Promise<BackendWorkspaceInvite> {
+    return this.api.createWorkspaceInvite(workspaceId, options)
+  }
+
+  async deleteWorkspaceInvite(workspaceId: string, inviteId: string): Promise<void> {
+    return this.api.deleteWorkspaceInvite(workspaceId, inviteId)
+  }
+
+  async joinWorkspace(code: string): Promise<BackendWorkspace> {
+    const workspace = await this.api.joinWorkspace(code)
+    runInAction(() => {
+      // Add the workspace if not already in the list
+      if (!this.workspaces.find((w) => w.id === workspace.id)) {
+        this.workspaces.push(workspace)
+      }
+    })
+    return workspace
   }
 }

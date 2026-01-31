@@ -49,6 +49,7 @@ export class TaskModel {
     makeObservable(this, {
       title: observable,
       notes: observable,
+      workspaceId: observable,
       listId: observable,
       completed: observable,
       scheduledDate: observable,
@@ -195,16 +196,25 @@ export class TaskModel {
 
   async moveToList(listId: string | null) {
     const oldListId = this.listId
+    const oldWorkspaceId = this.workspaceId
+
+    // Get the target list's workspace if moving to a list
+    const targetList = listId ? this.rootStore.getListById(listId) : null
+    const newWorkspaceId = targetList?.workspaceId ?? this.workspaceId
+
     this.listId = listId
+    this.workspaceId = newWorkspaceId
     this.updatedAt = new Date()
 
     try {
       await this.rootStore.updateTask(this.id, {
         listId: listId || null,
+        workspaceId: newWorkspaceId,
       })
     } catch (err) {
       // Rollback on error
       this.listId = oldListId
+      this.workspaceId = oldWorkspaceId
       throw err
     }
   }
