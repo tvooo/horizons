@@ -15,7 +15,7 @@ import { useNavigate } from 'react-router-dom'
 import type { ListType } from 'shared'
 import { signOut, useSession } from '../../lib/auth-client'
 import { useRootStore } from '../../models/RootStoreContext'
-import { ListItem } from '../ListItem'
+import { SidebarListItem } from './SidebarListItem'
 import { SidebarNavItem } from './SidebarNavItem'
 import { WorkspaceSelector } from './WorkspaceSelector'
 
@@ -69,6 +69,12 @@ export const Sidebar = observer(({ onAddListClick, isMobileOpen, onMobileClose }
     navigate('/signin')
   }
 
+  const getVisibleChildren = (parentId: string) =>
+    store
+      .getChildLists(parentId)
+      .filter((list) => !list.archived && !list.onIce)
+      .sort(sortByListTypeAndName)
+
   return (
     <>
       {/* Mobile backdrop overlay */}
@@ -82,7 +88,7 @@ export const Sidebar = observer(({ onAddListClick, isMobileOpen, onMobileClose }
 
       {/* Sidebar */}
       <div
-        className={`fixed inset-y-0 left-0 z-50 flex w-full flex-col border-gray-300 bg-neutral-lighter p-4 transition-transform duration-300 ease-in-out md:static md:w-72 md:shrink-0 md:translate-x-0 ${isMobileOpen ? 'translate-x-0' : '-translate-x-full'}
+        className={`group/sidebar fixed inset-y-0 left-0 z-50 flex w-full flex-col border-gray-300 bg-neutral-lighter p-4 transition-transform duration-300 ease-in-out md:static md:w-72 md:shrink-0 md:translate-x-0 ${isMobileOpen ? 'translate-x-0' : '-translate-x-full'}
       `}
       >
         {/* Close button - Only visible on mobile */}
@@ -114,52 +120,44 @@ export const Sidebar = observer(({ onAddListClick, isMobileOpen, onMobileClose }
 
           {/* All lists */}
           <div className="space-y-1">
+            {/* Standalone lists (not inside an area) */}
             {standaloneLists
               .filter((list) => !list.archived && !list.onIce)
               .sort(sortByListTypeAndName)
-              .map((list) => (
-                <div key={list.id}>
-                  <ListItem list={list} />
-                  {/* Children of standalone lists (e.g., projects nested in lists) */}
-                  {list.type === 'list' &&
-                    store
-                      .getChildLists(list.id)
-                      .filter((childList) => !childList.archived && !childList.onIce)
-                      .sort(sortByListTypeAndName)
-                      .map((childList) => (
-                        <ListItem key={childList.id} list={childList} isNested />
-                      ))}
-                </div>
-              ))}
-            {areas.map((area) => (
-              <div key={area.id}>
-                <ListItem list={area} />
-                {store
-                  .getChildLists(area.id)
-                  .filter((childList) => !childList.archived && !childList.onIce)
-                  .sort(sortByListTypeAndName)
-                  .map((childList) => (
-                    <div key={childList.id}>
-                      <ListItem list={childList} isNested />
-                      {/* Third level: projects nested in lists (inside areas) */}
-                      {childList.type === 'list' &&
-                        store
-                          .getChildLists(childList.id)
-                          .filter(
-                            (grandchildList) => !grandchildList.archived && !grandchildList.onIce,
-                          )
-                          .sort(sortByListTypeAndName)
-                          .map((grandchildList) => (
-                            <ListItem
-                              key={grandchildList.id}
-                              list={grandchildList}
-                              nestingLevel={2}
-                            />
-                          ))}
-                    </div>
-                  ))}
-              </div>
-            ))}
+              .map((list) => {
+                const children = list.type === 'list' ? getVisibleChildren(list.id) : []
+                return (
+                  <SidebarListItem key={list.id} list={list}>
+                    {children.map((childList) => (
+                      <SidebarListItem key={childList.id} list={childList} nestingLevel={1} />
+                    ))}
+                  </SidebarListItem>
+                )
+              })}
+
+            {/* Areas with their children */}
+            {areas.map((area) => {
+              const areaChildren = getVisibleChildren(area.id)
+              return (
+                <SidebarListItem key={area.id} list={area}>
+                  {areaChildren.map((childList) => {
+                    const grandchildren =
+                      childList.type === 'list' ? getVisibleChildren(childList.id) : []
+                    return (
+                      <SidebarListItem key={childList.id} list={childList} nestingLevel={1}>
+                        {grandchildren.map((grandchildList) => (
+                          <SidebarListItem
+                            key={grandchildList.id}
+                            list={grandchildList}
+                            nestingLevel={2}
+                          />
+                        ))}
+                      </SidebarListItem>
+                    )
+                  })}
+                </SidebarListItem>
+              )
+            })}
           </div>
 
           {/* Add List Button */}
