@@ -33,6 +33,19 @@ export const TaskItemContextMenu = observer(({ task, children }: TaskItemContext
             </ContextMenu.SubTrigger>
             <ContextMenu.Portal>
               <ContextMenu.SubContent className="min-w-45 rounded-lg border border-gray-200 bg-white p-1 shadow-lg">
+                {/* Clear option - only shown if task is scheduled */}
+                {task.scheduledDate && (
+                  <>
+                    <ContextMenu.Item
+                      className="cursor-pointer rounded px-3 py-2 text-gray-500 text-sm outline-none hover:bg-gray-100 focus:bg-gray-100"
+                      onSelect={() => task.clearScheduledDate()}
+                    >
+                      Clear
+                    </ContextMenu.Item>
+                    <ContextMenu.Separator className="my-1 h-px bg-gray-200" />
+                  </>
+                )}
+
                 {/* Day options */}
                 {scheduleOptions
                   .filter((opt) => opt.periodType === 'day')

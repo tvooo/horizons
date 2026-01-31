@@ -59,6 +59,19 @@ export const ListItemContextMenu = observer(
               </ContextMenu.SubTrigger>
               <ContextMenu.Portal>
                 <ContextMenu.SubContent className="z-[60] min-w-45 rounded-lg border border-gray-200 bg-white p-1 shadow-lg">
+                  {/* Clear option - only shown if list is scheduled */}
+                  {list.scheduledDate && (
+                    <>
+                      <ContextMenu.Item
+                        className="cursor-pointer rounded px-3 py-2 text-gray-500 text-sm outline-none hover:bg-gray-100 focus:bg-gray-100"
+                        onSelect={() => list.clearScheduledDate()}
+                      >
+                        Clear
+                      </ContextMenu.Item>
+                      <ContextMenu.Separator className="my-1 h-px bg-gray-200" />
+                    </>
+                  )}
+
                   {scheduleOptions.map((option) => (
                     <div key={option.label}>
                       {option.separator && (

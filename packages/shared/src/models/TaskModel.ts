@@ -61,6 +61,7 @@ export class TaskModel {
       updateTitle: action,
       updateNotes: action,
       updateScheduledDate: action,
+      clearScheduledDate: action,
       setOnIce: action,
       moveToList: action,
       updateScheduleOrder: action,
@@ -148,6 +149,27 @@ export class TaskModel {
       this.scheduledDate = oldScheduledDate
       this.scheduleOrder = oldScheduleOrder
       this.onIce = oldOnIce
+      throw err
+    }
+  }
+
+  async clearScheduledDate() {
+    const oldScheduledDate = this.scheduledDate
+    const oldScheduleOrder = this.scheduleOrder
+
+    this.scheduledDate = null
+    this.scheduleOrder = null
+    this.updatedAt = new Date()
+
+    try {
+      await this.rootStore.updateTask(this.id, {
+        scheduledDate: null,
+        scheduleOrder: null,
+      })
+    } catch (err) {
+      // Rollback on error
+      this.scheduledDate = oldScheduledDate
+      this.scheduleOrder = oldScheduleOrder
       throw err
     }
   }

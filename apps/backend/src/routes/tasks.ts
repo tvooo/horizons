@@ -34,9 +34,9 @@ const updateTaskSchema = z.object({
   notes: z.string().optional(),
   listId: z.string().nullable().optional(),
   completed: z.boolean().optional(),
-  scheduledDate: scheduledDateSchema.optional(),
+  scheduledDate: scheduledDateSchema.nullable().optional(),
   onIce: z.boolean().optional(),
-  scheduleOrder: z.string().optional(),
+  scheduleOrder: z.string().nullable().optional(),
   listOrder: z.string().optional(),
 })
 
@@ -129,11 +129,21 @@ app.patch('/:id', zValidator('json', updateTaskSchema), async (c) => {
     updateData.completedAt = null
   }
 
-  // Mutual exclusion: scheduling clears onIce
-  if (data.scheduledDate) {
+  // Handle scheduledDate: set, clear, or leave unchanged
+  if (data.scheduledDate === null) {
+    // Explicitly clear the schedule
+    updateData.scheduledPeriodType = null
+    updateData.scheduledAnchorDate = null
+  } else if (data.scheduledDate) {
+    // Mutual exclusion: scheduling clears onIce
     updateData.scheduledPeriodType = data.scheduledDate.periodType
     updateData.scheduledAnchorDate = new Date(data.scheduledDate.anchorDate)
     updateData.onIce = false
+  }
+
+  // Handle scheduleOrder: set, clear, or leave unchanged
+  if (data.scheduleOrder === null) {
+    updateData.scheduleOrder = null
   }
 
   // Mutual exclusion: onIce clears scheduling
