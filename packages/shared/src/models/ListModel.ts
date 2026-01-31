@@ -51,6 +51,7 @@ export class ListModel {
       updatedAt: observable,
       updateName: action,
       updateScheduledDate: action,
+      clearScheduledDate: action,
       setArchived: action,
       setOnIce: action,
       updateNotes: action,
@@ -139,6 +140,24 @@ export class ListModel {
       runInAction(() => {
         this.scheduledDate = oldScheduledDate
         this.onIce = oldOnIce
+      })
+      throw err
+    }
+  }
+
+  async clearScheduledDate() {
+    const oldScheduledDate = this.scheduledDate
+
+    this.scheduledDate = null
+    this.updatedAt = new Date()
+
+    try {
+      await this.rootStore.updateList(this.id, {
+        scheduledDate: null,
+      })
+    } catch (err) {
+      runInAction(() => {
+        this.scheduledDate = oldScheduledDate
       })
       throw err
     }

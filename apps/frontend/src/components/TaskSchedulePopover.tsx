@@ -33,6 +33,20 @@ export const TaskSchedulePopover = observer(({ task }: TaskSchedulePopoverProps)
           align="end"
         >
           <div className="space-y-1">
+            {/* Clear option - only shown if task is scheduled */}
+            {task.scheduledDate && (
+              <>
+                <button
+                  type="button"
+                  onClick={() => task.clearScheduledDate()}
+                  className="w-full rounded px-3 py-2 text-left text-gray-500 text-sm hover:bg-gray-100"
+                >
+                  Clear
+                </button>
+                <div className="my-1 border-gray-200 border-t" />
+              </>
+            )}
+
             {/* Day options */}
             {scheduleOptions
               .filter((opt) => opt.periodType === 'day')

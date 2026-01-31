@@ -139,10 +139,10 @@ export class RootStore {
       completed?: boolean
       title?: string
       notes?: string
-      scheduledDate?: BackendScheduledDate
+      scheduledDate?: BackendScheduledDate | null
       listId?: string | null
       onIce?: boolean
-      scheduleOrder?: string
+      scheduleOrder?: string | null
       listOrder?: string
     },
   ) {

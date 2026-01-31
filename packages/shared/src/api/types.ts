@@ -110,9 +110,9 @@ export interface UpdateTaskRequest {
   notes?: string
   listId?: string | null
   completed?: boolean
-  scheduledDate?: BackendScheduledDate
+  scheduledDate?: BackendScheduledDate | null
   onIce?: boolean
-  scheduleOrder?: string
+  scheduleOrder?: string | null
   listOrder?: string
 }
 
