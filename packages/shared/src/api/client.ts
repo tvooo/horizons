@@ -255,7 +255,10 @@ export class APIClient {
       method: 'POST',
       credentials: 'include',
     })
-    if (!response.ok) throw new Error('Failed to join workspace')
+    if (!response.ok) {
+      const data = await response.json().catch(() => ({}))
+      throw new Error(data.error || 'Failed to join workspace')
+    }
     return response.json()
   }
 }

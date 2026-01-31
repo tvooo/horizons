@@ -3,34 +3,26 @@ import { X } from 'lucide-react'
 import { useState } from 'react'
 import { useRootStore } from '../models/RootStoreContext'
 
-interface AddListModalProps {
+interface AddWorkspaceModalProps {
   isOpen: boolean
   onClose: () => void
 }
 
-export function AddListModal({ isOpen, onClose }: AddListModalProps) {
+export function AddWorkspaceModal({ isOpen, onClose }: AddWorkspaceModalProps) {
   const store = useRootStore()
   const [name, setName] = useState('')
-  const [type, setType] = useState<'area' | 'project' | 'list'>('list')
-  const [workspaceId, setWorkspaceId] = useState<string>('')
   const [isSubmitting, setIsSubmitting] = useState(false)
 
-  // Set default workspace when modal opens
-  const defaultWorkspaceId = store.workspaces[0]?.id || ''
-  const selectedWorkspaceId = workspaceId || defaultWorkspaceId
-
   const handleSubmit = async () => {
-    if (!name.trim() || !selectedWorkspaceId) return
+    if (!name.trim()) return
 
     setIsSubmitting(true)
     try {
-      await store.createList(name.trim(), type, undefined, selectedWorkspaceId)
+      await store.createWorkspace(name.trim())
       setName('')
-      setType('list')
-      setWorkspaceId('')
       onClose()
     } catch (err) {
-      console.error('Failed to create list:', err)
+      console.error('Failed to create workspace:', err)
     } finally {
       setIsSubmitting(false)
     }
@@ -42,16 +34,19 @@ export function AddListModal({ isOpen, onClose }: AddListModalProps) {
         <Dialog.Overlay className="fixed inset-0 bg-black/50" />
         <Dialog.Content className="-translate-x-1/2 -translate-y-1/2 fixed top-1/2 left-1/2 max-h-[85vh] w-[90vw] max-w-md rounded-lg bg-white p-6 shadow-lg focus:outline-none">
           <Dialog.Title className="mb-4 font-semibold text-gray-900 text-lg">
-            Add New List
+            Add New Workspace
           </Dialog.Title>
 
           <div className="space-y-4">
             <div>
-              <label htmlFor="list-name" className="mb-1 block font-medium text-gray-700 text-sm">
+              <label
+                htmlFor="workspace-name"
+                className="mb-1 block font-medium text-gray-700 text-sm"
+              >
                 Name
               </label>
               <input
-                id="list-name"
+                id="workspace-name"
                 type="text"
                 value={name}
                 onChange={(e) => setName(e.target.value)}
@@ -61,46 +56,9 @@ export function AddListModal({ isOpen, onClose }: AddListModalProps) {
                     handleSubmit()
                   }
                 }}
-                placeholder="Enter list name"
+                placeholder="Enter workspace name"
                 className="w-full rounded border border-gray-300 px-3 py-2 focus:border-blue-500 focus:outline-none"
               />
-            </div>
-
-            <div>
-              <label htmlFor="list-type" className="mb-1 block font-medium text-gray-700 text-sm">
-                Type
-              </label>
-              <select
-                id="list-type"
-                value={type}
-                onChange={(e) => setType(e.target.value as 'area' | 'project' | 'list')}
-                className="w-full rounded border border-gray-300 px-3 py-2 focus:border-blue-500 focus:outline-none"
-              >
-                <option value="list">List</option>
-                <option value="project">Project</option>
-                <option value="area">Area</option>
-              </select>
-            </div>
-
-            <div>
-              <label
-                htmlFor="list-workspace"
-                className="mb-1 block font-medium text-gray-700 text-sm"
-              >
-                Workspace
-              </label>
-              <select
-                id="list-workspace"
-                value={selectedWorkspaceId}
-                onChange={(e) => setWorkspaceId(e.target.value)}
-                className="w-full rounded border border-gray-300 px-3 py-2 focus:border-blue-500 focus:outline-none"
-              >
-                {store.workspaces.map((workspace) => (
-                  <option key={workspace.id} value={workspace.id}>
-                    {workspace.name}
-                  </option>
-                ))}
-              </select>
             </div>
           </div>
 
@@ -118,7 +76,7 @@ export function AddListModal({ isOpen, onClose }: AddListModalProps) {
               disabled={!name.trim() || isSubmitting}
               className="rounded bg-blue-600 px-4 py-2 text-sm text-white hover:bg-blue-700 disabled:cursor-not-allowed disabled:bg-gray-300"
             >
-              {isSubmitting ? 'Creating...' : 'Create List'}
+              {isSubmitting ? 'Creating...' : 'Create Workspace'}
             </button>
           </div>
 

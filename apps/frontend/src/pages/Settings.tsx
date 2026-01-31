@@ -2,6 +2,7 @@ import { Download, Upload } from 'lucide-react'
 import { observer } from 'mobx-react-lite'
 import { useState } from 'react'
 import { ApiTokenManager } from '../components/ApiTokenManager'
+import { WorkspaceManager } from '../components/WorkspaceManager'
 import { useRootStore } from '../models/RootStoreContext'
 import { ListPage } from './ListPage'
 
@@ -65,6 +66,15 @@ export const Settings = observer(() => {
   return (
     <ListPage title="Settings">
       <div className="space-y-8">
+        {/* Workspaces Section */}
+        <div className="rounded-lg border border-gray-200 bg-white p-6">
+          <h2 className="mb-2 font-semibold text-lg">Workspaces</h2>
+          <p className="mb-4 text-gray-600 text-sm">
+            Manage your workspaces and invite others to collaborate.
+          </p>
+          <WorkspaceManager />
+        </div>
+
         {/* Export Section */}
         <div className="rounded-lg border border-gray-200 bg-white p-6">
           <h2 className="mb-2 font-semibold text-lg">Export Data</h2>

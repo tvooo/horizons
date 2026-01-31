@@ -114,6 +114,7 @@ export interface UpdateTaskRequest {
   onIce?: boolean
   scheduleOrder?: string | null
   listOrder?: string
+  workspaceId?: string
 }
 
 export interface ApiTokenInfo {

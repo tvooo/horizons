@@ -12,6 +12,7 @@ import { Sidebar } from './components/sidebar/Sidebar'
 import { RootStoreProvider, useRootStore } from './models/RootStoreContext'
 import { Archive } from './pages/Archive'
 import { Inbox } from './pages/Inbox'
+import { JoinWorkspace } from './pages/JoinWorkspace'
 import { Now } from './pages/Now'
 import { OnIce } from './pages/OnIce'
 import { Settings } from './pages/Settings'
@@ -92,6 +93,16 @@ function AppRoutes() {
       {/* Public routes */}
       <Route path="/signin" element={<SignIn />} />
       <Route path="/signup" element={<SignUp />} />
+
+      {/* Join workspace route (protected, but without sidebar) */}
+      <Route
+        path="/join/:code"
+        element={
+          <ProtectedRoute>
+            <JoinWorkspace />
+          </ProtectedRoute>
+        }
+      />
 
       {/* Protected routes */}
       <Route
