@@ -1,14 +1,18 @@
 import { Menu } from 'lucide-react'
 import { observer } from 'mobx-react-lite'
-import { useEffect, useMemo, useState } from 'react'
+import { useCallback, useEffect, useMemo, useState } from 'react'
 import { BrowserRouter, Navigate, Route, Routes, useLocation } from 'react-router-dom'
 import { RootStore } from 'shared'
 import { api } from './api/client'
 import { AddListModal } from './components/AddListModal'
+import { DebugPanel } from './components/DebugPanel'
 import { FocusModeUI } from './components/FocusModeUI'
 import { ListView } from './components/ListView'
 import { ProtectedRoute } from './components/ProtectedRoute'
 import { Sidebar } from './components/sidebar/Sidebar'
+import { useGlobalKeyboardShortcut } from './hooks/useGlobalKeyboardShortcut'
+import { DebugStore } from './models/DebugStore'
+import { DebugStoreProvider, useDebugStore } from './models/DebugStoreContext'
 import { RootStoreProvider, useRootStore } from './models/RootStoreContext'
 import { Archive } from './pages/Archive'
 import { Inbox } from './pages/Inbox'
@@ -22,9 +26,16 @@ import { Upcoming } from './pages/Upcoming'
 
 const AuthenticatedApp = observer(() => {
   const store = useRootStore()
+  const debugStore = useDebugStore()
   const [isAddListModalOpen, setIsAddListModalOpen] = useState(false)
   const [isMobileSidebarOpen, setIsMobileSidebarOpen] = useState(false)
   const location = useLocation()
+
+  const toggleDebugPanel = useCallback(() => {
+    debugStore.toggle()
+  }, [debugStore])
+
+  useGlobalKeyboardShortcut({ key: 'd', ctrl: true, shift: true }, toggleDebugPanel)
 
   // Close mobile sidebar on navigation
   // biome-ignore lint/correctness/useExhaustiveDependencies: setIsMobileSidebarOpen is stable from useState
@@ -46,7 +57,9 @@ const AuthenticatedApp = observer(() => {
 
   return (
     <>
-      <div className="flex h-screen w-screen flex-col overflow-hidden">
+      <div
+        className={`flex h-screen w-screen flex-col overflow-hidden ${debugStore.isOpen ? 'pb-7' : ''}`}
+      >
         <div className="flex flex-1 overflow-hidden">
           <Sidebar
             onAddListClick={() => setIsAddListModalOpen(true)}
@@ -83,6 +96,8 @@ const AuthenticatedApp = observer(() => {
       <AddListModal isOpen={isAddListModalOpen} onClose={() => setIsAddListModalOpen(false)} />
 
       <FocusModeUI />
+
+      <DebugPanel />
     </>
   )
 })
@@ -119,12 +134,15 @@ function AppRoutes() {
 
 function App() {
   const rootStore = useMemo(() => new RootStore(api), [])
+  const debugStore = useMemo(() => new DebugStore(), [])
 
   return (
     <RootStoreProvider value={rootStore}>
-      <BrowserRouter>
-        <AppRoutes />
-      </BrowserRouter>
+      <DebugStoreProvider value={debugStore}>
+        <BrowserRouter>
+          <AppRoutes />
+        </BrowserRouter>
+      </DebugStoreProvider>
     </RootStoreProvider>
   )
 }
