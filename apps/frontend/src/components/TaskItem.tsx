@@ -11,6 +11,7 @@ import { useNavigate } from 'react-router-dom'
 import type { PeriodType, TaskModel } from 'shared'
 import { generateFractionalIndex } from 'shared'
 import { twMerge } from 'tailwind-merge'
+import { useDebugStore } from '../models/DebugStoreContext'
 import { RoundedSquareFilledIcon } from './RoundedSquareFilledIcon'
 import { RoundedSquareIcon } from './RoundedSquareIcon'
 import { TaskItemContextMenu } from './TaskItemContextMenu'
@@ -76,6 +77,7 @@ export const TaskItem = observer(
     indexInList,
   }: TaskItemProps) => {
     const navigate = useNavigate()
+    const debugStore = useDebugStore()
     const [isEditing, setIsEditing] = useState(false)
     const [editValue, setEditValue] = useState(task.title)
     const [isDragging, setIsDragging] = useState(false)
@@ -295,6 +297,13 @@ export const TaskItem = observer(
                 }}
               >
                 {task.title}
+              </span>
+            )}
+            {debugStore.showTaskListDetails && (
+              <span className="ml-2 font-mono text-gray-400 text-xs">
+                {task.scheduleOrder && `sOrd:${task.scheduleOrder}`}
+                {task.scheduleOrder && task.listOrder && ' | '}
+                {task.listOrder && `lOrd:${task.listOrder}`}
               </span>
             )}
             {showList && task.list && (
