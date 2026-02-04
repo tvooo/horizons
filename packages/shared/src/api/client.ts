@@ -14,9 +14,18 @@ import type {
 
 export class APIClient {
   private baseUrl: string
+  clientId = ''
 
   constructor(baseUrl: string) {
     this.baseUrl = baseUrl
+  }
+
+  private mutationHeaders(): Record<string, string> {
+    const headers: Record<string, string> = { 'Content-Type': 'application/json' }
+    if (this.clientId) {
+      headers['X-Client-Id'] = this.clientId
+    }
+    return headers
   }
 
   // Lists
@@ -39,7 +48,7 @@ export class APIClient {
   async createList(data: CreateListRequest): Promise<BackendList> {
     const response = await fetch(`${this.baseUrl}/api/lists`, {
       method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
+      headers: this.mutationHeaders(),
       credentials: 'include',
       body: JSON.stringify(data),
     })
@@ -50,7 +59,7 @@ export class APIClient {
   async updateList(id: string, data: UpdateListRequest): Promise<BackendList> {
     const response = await fetch(`${this.baseUrl}/api/lists/${id}`, {
       method: 'PATCH',
-      headers: { 'Content-Type': 'application/json' },
+      headers: this.mutationHeaders(),
       credentials: 'include',
       body: JSON.stringify(data),
     })
@@ -78,7 +87,7 @@ export class APIClient {
   async createTask(data: CreateTaskRequest): Promise<BackendTask> {
     const response = await fetch(`${this.baseUrl}/api/tasks`, {
       method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
+      headers: this.mutationHeaders(),
       credentials: 'include',
       body: JSON.stringify(data),
     })
@@ -89,7 +98,7 @@ export class APIClient {
   async updateTask(id: string, data: UpdateTaskRequest): Promise<BackendTask> {
     const response = await fetch(`${this.baseUrl}/api/tasks/${id}`, {
       method: 'PATCH',
-      headers: { 'Content-Type': 'application/json' },
+      headers: this.mutationHeaders(),
       credentials: 'include',
       body: JSON.stringify(data),
     })

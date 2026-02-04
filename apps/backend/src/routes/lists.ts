@@ -6,6 +6,7 @@ import { z } from 'zod'
 import { db } from '../db'
 import { lists } from '../db/schema'
 import { getUser, getUserWorkspaceIds, requireAuth } from '../middleware/auth'
+import { wsManager } from '../ws/WebSocketManager'
 
 const app = new Hono()
 
@@ -98,6 +99,13 @@ app.post('/', zValidator('json', createListSchema), async (c) => {
     })
     .returning()
 
+  const clientId = c.req.header('X-Client-Id') || ''
+  wsManager.broadcast(
+    data.workspaceId,
+    { type: 'list:created', data: result[0], clientId },
+    clientId,
+  )
+
   return c.json(result[0], 201)
 })
 
@@ -155,6 +163,13 @@ app.patch('/:id', zValidator('json', updateListSchema), async (c) => {
   if (result.length === 0) {
     return c.json({ error: 'List not found' }, 404)
   }
+
+  const clientId = c.req.header('X-Client-Id') || ''
+  wsManager.broadcast(
+    result[0].workspaceId,
+    { type: 'list:updated', data: result[0], clientId },
+    clientId,
+  )
 
   return c.json(result[0])
 })

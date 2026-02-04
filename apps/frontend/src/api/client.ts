@@ -8,6 +8,6 @@ const getAPIBaseURL = () => {
   return import.meta.env.VITE_API_URL || 'http://localhost:3000'
 }
 
-const API_BASE_URL = getAPIBaseURL()
+export const API_BASE_URL = getAPIBaseURL()
 
 export const api = new APIClient(API_BASE_URL)
