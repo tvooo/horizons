@@ -12,6 +12,7 @@ export interface ApiResponse<T> {
 // API
 export { APIClient } from './api/client'
 export * from './api/types'
+export * from './api/wsTypes'
 // Config
 export { calendarConfig } from './config/calendar'
 // Models
@@ -26,3 +27,6 @@ export {
   generateFractionalIndex,
   isValidFractionalIndex,
 } from './utils/fractionalIndexing'
+// WebSocket
+export type { WSConnectionStatus } from './ws/WebSocketClient'
+export { WebSocketClient } from './ws/WebSocketClient'

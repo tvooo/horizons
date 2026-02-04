@@ -10,6 +10,7 @@ import type {
 } from '../api/types'
 import { isCurrentPeriod } from '../utils/dateUtils'
 import { generateFractionalIndex } from '../utils/fractionalIndexing'
+import { WebSocketClient, type WSConnectionStatus } from '../ws/WebSocketClient'
 import { ListModel } from './ListModel'
 import { TaskModel } from './TaskModel'
 
@@ -21,6 +22,7 @@ export class RootStore {
   focusedAreaId: string | null = null
 
   private api: APIClient
+  private wsClient: WebSocketClient | null = null
 
   constructor(api: APIClient) {
     this.api = api
@@ -48,6 +50,7 @@ export class RootStore {
       projects: computed,
       regularLists: computed,
       focusedArea: computed,
+      wsStatus: computed,
     })
   }
 
@@ -71,6 +74,23 @@ export class RootStore {
         this.loading = false
       })
     }
+  }
+
+  connectWebSocket(baseUrl: string) {
+    if (this.wsClient) return
+    this.wsClient = new WebSocketClient(this, baseUrl)
+    this.api.clientId = this.wsClient.clientId
+    this.wsClient.connect()
+  }
+
+  disconnectWebSocket() {
+    this.wsClient?.disconnect()
+    this.wsClient = null
+    this.api.clientId = ''
+  }
+
+  get wsStatus(): WSConnectionStatus {
+    return this.wsClient?.status ?? 'disconnected'
   }
 
   get personalWorkspace(): BackendWorkspace | null {

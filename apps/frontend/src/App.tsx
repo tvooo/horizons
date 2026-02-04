@@ -3,7 +3,7 @@ import { observer } from 'mobx-react-lite'
 import { useCallback, useEffect, useMemo, useState } from 'react'
 import { BrowserRouter, Navigate, Route, Routes, useLocation } from 'react-router-dom'
 import { RootStore } from 'shared'
-import { api } from './api/client'
+import { API_BASE_URL, api } from './api/client'
 import { AddListModal } from './components/AddListModal'
 import { DebugPanel } from './components/DebugPanel'
 import { FocusModeUI } from './components/FocusModeUI'
@@ -45,6 +45,8 @@ const AuthenticatedApp = observer(() => {
 
   useEffect(() => {
     store.loadData()
+    store.connectWebSocket(API_BASE_URL)
+    return () => store.disconnectWebSocket()
   }, [store])
 
   if (store.loading) {

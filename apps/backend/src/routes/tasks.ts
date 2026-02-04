@@ -6,6 +6,7 @@ import { z } from 'zod'
 import { db } from '../db'
 import { lists, tasks } from '../db/schema'
 import { getUser, getUserWorkspaceIds, requireAuth } from '../middleware/auth'
+import { wsManager } from '../ws/WebSocketManager'
 
 const app = new Hono()
 
@@ -118,6 +119,9 @@ app.post('/', zValidator('json', createTaskSchema), async (c) => {
     })
     .returning()
 
+  const clientId = c.req.header('X-Client-Id') || ''
+  wsManager.broadcast(workspaceId, { type: 'task:created', data: result[0], clientId }, clientId)
+
   return c.json(result[0], 201)
 })
 
@@ -204,6 +208,13 @@ app.patch('/:id', zValidator('json', updateTaskSchema), async (c) => {
   if (result.length === 0) {
     return c.json({ error: 'Task not found' }, 404)
   }
+
+  const clientId = c.req.header('X-Client-Id') || ''
+  wsManager.broadcast(
+    result[0].workspaceId,
+    { type: 'task:updated', data: result[0], clientId },
+    clientId,
+  )
 
   return c.json(result[0])
 })

@@ -1,8 +1,16 @@
 import { observer } from 'mobx-react-lite'
 import { useDebugStore } from '../models/DebugStoreContext'
+import { useRootStore } from '../models/RootStoreContext'
+
+const statusColor = {
+  connected: 'bg-green-500',
+  connecting: 'bg-yellow-500',
+  disconnected: 'bg-red-500',
+} as const
 
 export const DebugPanel = observer(() => {
   const debugStore = useDebugStore()
+  const rootStore = useRootStore()
 
   if (!debugStore.isOpen) return null
 
@@ -21,6 +29,10 @@ export const DebugPanel = observer(() => {
         />
         Show task order values
       </label>
+      <span className="flex items-center gap-1.5">
+        <span className={`inline-block h-2 w-2 rounded-full ${statusColor[rootStore.wsStatus]}`} />
+        WS {rootStore.wsStatus}
+      </span>
       <span className="ml-auto text-gray-400">{shortcutHint} to toggle</span>
     </div>
   )
