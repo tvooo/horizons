@@ -15,6 +15,7 @@ export interface BackendWorkspace {
   id: string
   name: string
   type: WorkspaceType
+  color: string | null
   role: WorkspaceRole
   createdAt: string
   updatedAt: string

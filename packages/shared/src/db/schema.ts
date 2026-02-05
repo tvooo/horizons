@@ -59,6 +59,7 @@ export const workspaces = sqliteTable('workspaces', {
   type: text('type', { enum: ['personal', 'shared'] })
     .notNull()
     .default('shared'),
+  color: text('color'),
   createdAt: integer('created_at', { mode: 'timestamp' }).notNull().default(sql`(unixepoch())`),
   updatedAt: integer('updated_at', { mode: 'timestamp' }).notNull().default(sql`(unixepoch())`),
 })
