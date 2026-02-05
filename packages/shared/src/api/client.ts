@@ -188,12 +188,15 @@ export class APIClient {
     return response.json()
   }
 
-  async updateWorkspace(id: string, name: string): Promise<BackendWorkspace> {
+  async updateWorkspace(
+    id: string,
+    updates: { name?: string; color?: string | null },
+  ): Promise<BackendWorkspace> {
     const response = await fetch(`${this.baseUrl}/api/workspaces/${id}`, {
       method: 'PATCH',
       headers: { 'Content-Type': 'application/json' },
       credentials: 'include',
-      body: JSON.stringify({ name }),
+      body: JSON.stringify(updates),
     })
     if (!response.ok) throw new Error('Failed to update workspace')
     return response.json()

@@ -372,8 +372,11 @@ export class RootStore {
     return workspace
   }
 
-  async updateWorkspace(id: string, name: string): Promise<BackendWorkspace> {
-    const workspace = await this.api.updateWorkspace(id, name)
+  async updateWorkspace(
+    id: string,
+    updates: { name?: string; color?: string | null },
+  ): Promise<BackendWorkspace> {
+    const workspace = await this.api.updateWorkspace(id, updates)
     runInAction(() => {
       const index = this.workspaces.findIndex((w) => w.id === id)
       if (index !== -1) {

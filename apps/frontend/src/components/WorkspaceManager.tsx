@@ -7,12 +7,26 @@ import {
   Plus,
   Trash2,
   UserMinus,
+  X,
 } from 'lucide-react'
 import { observer } from 'mobx-react-lite'
 import { useState } from 'react'
 import type { BackendWorkspaceInvite, BackendWorkspaceMember } from 'shared'
 import { useRootStore } from '../models/RootStoreContext'
 import { AddWorkspaceModal } from './AddWorkspaceModal'
+
+const WORKSPACE_COLORS = [
+  '#6166aa',
+  '#7c5ea5',
+  '#437659',
+  '#9c595e',
+  '#5985a5',
+  '#8a6840',
+  '#6a8a5a',
+  '#a0527a',
+  '#5a7a8a',
+  '#aa7c44',
+]
 
 interface WorkspaceDetails {
   members: BackendWorkspaceMember[]
@@ -72,7 +86,7 @@ export const WorkspaceManager = observer(() => {
     if (!editName.trim()) return
 
     try {
-      await store.updateWorkspace(workspaceId, editName.trim())
+      await store.updateWorkspace(workspaceId, { name: editName.trim() })
       setEditingWorkspaceId(null)
       setEditName('')
     } catch (error) {
@@ -260,6 +274,41 @@ export const WorkspaceManager = observer(() => {
                       )}
                     </div>
                   </div>
+
+                  {/* Color Swatches */}
+                  {isOwner && (
+                    <div className="flex items-center gap-1.5 border-gray-200 border-t px-4 py-2">
+                      <span className="mr-1 text-gray-500 text-xs">Color</span>
+                      {WORKSPACE_COLORS.map((color) => (
+                        <button
+                          key={color}
+                          type="button"
+                          onClick={() => store.updateWorkspace(workspace.id, { color })}
+                          className="flex size-5 items-center justify-center rounded-full border-2 transition-transform hover:scale-110"
+                          style={{
+                            backgroundColor: color,
+                            borderColor: workspace.color === color ? 'currentColor' : 'transparent',
+                            color,
+                          }}
+                          title={color}
+                        >
+                          {workspace.color === color && (
+                            <span className="block size-1.5 rounded-full bg-white" />
+                          )}
+                        </button>
+                      ))}
+                      {workspace.color && (
+                        <button
+                          type="button"
+                          onClick={() => store.updateWorkspace(workspace.id, { color: null })}
+                          className="flex size-5 items-center justify-center rounded-full border border-gray-300 text-gray-400 hover:border-gray-400 hover:text-gray-600"
+                          title="Clear color"
+                        >
+                          <X size={10} />
+                        </button>
+                      )}
+                    </div>
+                  )}
 
                   {/* Expanded Details (shared workspaces only) */}
                   {isExpanded && !isPersonal && (

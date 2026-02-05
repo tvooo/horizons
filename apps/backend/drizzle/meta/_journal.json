@@ -127,6 +127,13 @@
       "when": 1769581925796,
       "tag": "0017_bent_deathstrike",
       "breakpoints": true
+    },
+    {
+      "idx": 18,
+      "version": "6",
+      "when": 1770239180897,
+      "tag": "0018_colorful_goblin_queen",
+      "breakpoints": true
     }
   ]
 }

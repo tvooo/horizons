@@ -19,6 +19,7 @@ const createWorkspaceSchema = z.object({
 
 const updateWorkspaceSchema = z.object({
   name: z.string().min(1).optional(),
+  color: z.string().nullable().optional(),
 })
 
 const createInviteSchema = z.object({

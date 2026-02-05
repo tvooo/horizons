@@ -12,6 +12,7 @@ import type { PeriodType, TaskModel } from 'shared'
 import { generateFractionalIndex } from 'shared'
 import { twMerge } from 'tailwind-merge'
 import { useDebugStore } from '../models/DebugStoreContext'
+import { useRootStore } from '../models/RootStoreContext'
 import { RoundedSquareFilledIcon } from './RoundedSquareFilledIcon'
 import { RoundedSquareIcon } from './RoundedSquareIcon'
 import { TaskItemContextMenu } from './TaskItemContextMenu'
@@ -77,7 +78,9 @@ export const TaskItem = observer(
     indexInList,
   }: TaskItemProps) => {
     const navigate = useNavigate()
+    const store = useRootStore()
     const debugStore = useDebugStore()
+    const workspaceColor = store.workspaces.find((w) => w.id === task.workspaceId)?.color
     const [isEditing, setIsEditing] = useState(false)
     const [editValue, setEditValue] = useState(task.title)
     const [isDragging, setIsDragging] = useState(false)
@@ -308,6 +311,12 @@ export const TaskItem = observer(
             )}
             {showList && task.list && (
               <div className="flex items-center gap-1 text-xs">
+                {workspaceColor && (
+                  <span
+                    className="inline-block size-1.5 shrink-0 rounded-full"
+                    style={{ backgroundColor: workspaceColor }}
+                  />
+                )}
                 <TaskListPopover task={task}>
                   <button
                     type="button"
