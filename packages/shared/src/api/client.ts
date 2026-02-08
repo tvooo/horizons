@@ -13,11 +13,15 @@ import type {
 } from './types'
 
 export class APIClient {
-  private baseUrl: string
+  protected baseUrl: string
   clientId = ''
 
   constructor(baseUrl: string) {
     this.baseUrl = baseUrl
+  }
+
+  protected doFetch(url: string, init?: RequestInit): Promise<Response> {
+    return fetch(url, init)
   }
 
   private mutationHeaders(): Record<string, string> {
@@ -30,7 +34,7 @@ export class APIClient {
 
   // Lists
   async getLists(): Promise<BackendList[]> {
-    const response = await fetch(`${this.baseUrl}/api/lists`, {
+    const response = await this.doFetch(`${this.baseUrl}/api/lists`, {
       credentials: 'include',
     })
     if (!response.ok) throw new Error('Failed to fetch lists')
@@ -38,7 +42,7 @@ export class APIClient {
   }
 
   async getList(id: string): Promise<BackendList> {
-    const response = await fetch(`${this.baseUrl}/api/lists/${id}`, {
+    const response = await this.doFetch(`${this.baseUrl}/api/lists/${id}`, {
       credentials: 'include',
     })
     if (!response.ok) throw new Error('Failed to fetch list')
@@ -46,7 +50,7 @@ export class APIClient {
   }
 
   async createList(data: CreateListRequest): Promise<BackendList> {
-    const response = await fetch(`${this.baseUrl}/api/lists`, {
+    const response = await this.doFetch(`${this.baseUrl}/api/lists`, {
       method: 'POST',
       headers: this.mutationHeaders(),
       credentials: 'include',
@@ -57,7 +61,7 @@ export class APIClient {
   }
 
   async updateList(id: string, data: UpdateListRequest): Promise<BackendList> {
-    const response = await fetch(`${this.baseUrl}/api/lists/${id}`, {
+    const response = await this.doFetch(`${this.baseUrl}/api/lists/${id}`, {
       method: 'PATCH',
       headers: this.mutationHeaders(),
       credentials: 'include',
@@ -69,7 +73,7 @@ export class APIClient {
 
   // Tasks
   async getTasks(): Promise<BackendTask[]> {
-    const response = await fetch(`${this.baseUrl}/api/tasks`, {
+    const response = await this.doFetch(`${this.baseUrl}/api/tasks`, {
       credentials: 'include',
     })
     if (!response.ok) throw new Error('Failed to fetch tasks')
@@ -77,7 +81,7 @@ export class APIClient {
   }
 
   async getTask(id: string): Promise<BackendTask> {
-    const response = await fetch(`${this.baseUrl}/api/tasks/${id}`, {
+    const response = await this.doFetch(`${this.baseUrl}/api/tasks/${id}`, {
       credentials: 'include',
     })
     if (!response.ok) throw new Error('Failed to fetch task')
@@ -85,7 +89,7 @@ export class APIClient {
   }
 
   async createTask(data: CreateTaskRequest): Promise<BackendTask> {
-    const response = await fetch(`${this.baseUrl}/api/tasks`, {
+    const response = await this.doFetch(`${this.baseUrl}/api/tasks`, {
       method: 'POST',
       headers: this.mutationHeaders(),
       credentials: 'include',
@@ -96,7 +100,7 @@ export class APIClient {
   }
 
   async updateTask(id: string, data: UpdateTaskRequest): Promise<BackendTask> {
-    const response = await fetch(`${this.baseUrl}/api/tasks/${id}`, {
+    const response = await this.doFetch(`${this.baseUrl}/api/tasks/${id}`, {
       method: 'PATCH',
       headers: this.mutationHeaders(),
       credentials: 'include',
@@ -108,7 +112,7 @@ export class APIClient {
 
   // Export/Import
   async exportData(): Promise<{ blob: Blob; filename: string }> {
-    const response = await fetch(`${this.baseUrl}/api/export`, {
+    const response = await this.doFetch(`${this.baseUrl}/api/export`, {
       credentials: 'include',
     })
     if (!response.ok) throw new Error('Failed to export data')
@@ -127,7 +131,7 @@ export class APIClient {
   async importData(
     data: unknown,
   ): Promise<{ success: boolean; imported: { lists: number; tasks: number }; conflicts: boolean }> {
-    const response = await fetch(`${this.baseUrl}/api/import`, {
+    const response = await this.doFetch(`${this.baseUrl}/api/import`, {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
       credentials: 'include',
@@ -142,7 +146,7 @@ export class APIClient {
 
   // API Tokens
   async getTokens(): Promise<ApiTokenInfo[]> {
-    const response = await fetch(`${this.baseUrl}/api/tokens`, {
+    const response = await this.doFetch(`${this.baseUrl}/api/tokens`, {
       credentials: 'include',
     })
     if (!response.ok) throw new Error('Failed to fetch tokens')
@@ -150,7 +154,7 @@ export class APIClient {
   }
 
   async createToken(name: string): Promise<CreateTokenResponse> {
-    const response = await fetch(`${this.baseUrl}/api/tokens`, {
+    const response = await this.doFetch(`${this.baseUrl}/api/tokens`, {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
       credentials: 'include',
@@ -161,7 +165,7 @@ export class APIClient {
   }
 
   async deleteToken(id: string): Promise<void> {
-    const response = await fetch(`${this.baseUrl}/api/tokens/${id}`, {
+    const response = await this.doFetch(`${this.baseUrl}/api/tokens/${id}`, {
       method: 'DELETE',
       credentials: 'include',
     })
@@ -170,7 +174,7 @@ export class APIClient {
 
   // Workspaces
   async getWorkspaces(): Promise<BackendWorkspace[]> {
-    const response = await fetch(`${this.baseUrl}/api/workspaces`, {
+    const response = await this.doFetch(`${this.baseUrl}/api/workspaces`, {
       credentials: 'include',
     })
     if (!response.ok) throw new Error('Failed to fetch workspaces')
@@ -178,7 +182,7 @@ export class APIClient {
   }
 
   async createWorkspace(name: string): Promise<BackendWorkspace> {
-    const response = await fetch(`${this.baseUrl}/api/workspaces`, {
+    const response = await this.doFetch(`${this.baseUrl}/api/workspaces`, {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
       credentials: 'include',
@@ -192,7 +196,7 @@ export class APIClient {
     id: string,
     updates: { name?: string; color?: string | null },
   ): Promise<BackendWorkspace> {
-    const response = await fetch(`${this.baseUrl}/api/workspaces/${id}`, {
+    const response = await this.doFetch(`${this.baseUrl}/api/workspaces/${id}`, {
       method: 'PATCH',
       headers: { 'Content-Type': 'application/json' },
       credentials: 'include',
@@ -203,7 +207,7 @@ export class APIClient {
   }
 
   async deleteWorkspace(id: string): Promise<void> {
-    const response = await fetch(`${this.baseUrl}/api/workspaces/${id}`, {
+    const response = await this.doFetch(`${this.baseUrl}/api/workspaces/${id}`, {
       method: 'DELETE',
       credentials: 'include',
     })
@@ -211,7 +215,7 @@ export class APIClient {
   }
 
   async getWorkspaceMembers(workspaceId: string): Promise<BackendWorkspaceMember[]> {
-    const response = await fetch(`${this.baseUrl}/api/workspaces/${workspaceId}/members`, {
+    const response = await this.doFetch(`${this.baseUrl}/api/workspaces/${workspaceId}/members`, {
       credentials: 'include',
     })
     if (!response.ok) throw new Error('Failed to fetch workspace members')
@@ -219,7 +223,7 @@ export class APIClient {
   }
 
   async removeWorkspaceMember(workspaceId: string, userId: string): Promise<void> {
-    const response = await fetch(
+    const response = await this.doFetch(
       `${this.baseUrl}/api/workspaces/${workspaceId}/members/${userId}`,
       {
         method: 'DELETE',
@@ -230,7 +234,7 @@ export class APIClient {
   }
 
   async getWorkspaceInvites(workspaceId: string): Promise<BackendWorkspaceInvite[]> {
-    const response = await fetch(`${this.baseUrl}/api/workspaces/${workspaceId}/invites`, {
+    const response = await this.doFetch(`${this.baseUrl}/api/workspaces/${workspaceId}/invites`, {
       credentials: 'include',
     })
     if (!response.ok) throw new Error('Failed to fetch workspace invites')
@@ -241,7 +245,7 @@ export class APIClient {
     workspaceId: string,
     options?: { expiresAt?: string; usageLimit?: number },
   ): Promise<BackendWorkspaceInvite> {
-    const response = await fetch(`${this.baseUrl}/api/workspaces/${workspaceId}/invites`, {
+    const response = await this.doFetch(`${this.baseUrl}/api/workspaces/${workspaceId}/invites`, {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
       credentials: 'include',
@@ -252,7 +256,7 @@ export class APIClient {
   }
 
   async deleteWorkspaceInvite(workspaceId: string, inviteId: string): Promise<void> {
-    const response = await fetch(
+    const response = await this.doFetch(
       `${this.baseUrl}/api/workspaces/${workspaceId}/invites/${inviteId}`,
       {
         method: 'DELETE',
@@ -263,7 +267,7 @@ export class APIClient {
   }
 
   async joinWorkspace(code: string): Promise<BackendWorkspace> {
-    const response = await fetch(`${this.baseUrl}/api/workspaces/join/${code}`, {
+    const response = await this.doFetch(`${this.baseUrl}/api/workspaces/join/${code}`, {
       method: 'POST',
       credentials: 'include',
     })

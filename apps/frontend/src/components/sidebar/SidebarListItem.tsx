@@ -1,7 +1,7 @@
 import clsx from 'clsx'
 import { ChevronRight, DotIcon } from 'lucide-react'
 import { observer } from 'mobx-react-lite'
-import { useState } from 'react'
+import { Children, useState } from 'react'
 import { Link, useMatch } from 'react-router-dom'
 import type { ListModel } from 'shared'
 import { twMerge } from 'tailwind-merge'
@@ -43,7 +43,7 @@ export const SidebarListItem = observer(
 
     const [isCollapsed, setIsCollapsed] = useState(() => getInitialCollapsed(list.id))
 
-    const hasChildren = !!children
+    const hasChildren = Children.count(children) > 0
     const isCollapsible = list.isArea && hasChildren
 
     const toggleCollapsed = (e: React.MouseEvent) => {
