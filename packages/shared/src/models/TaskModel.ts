@@ -197,24 +197,29 @@ export class TaskModel {
   async moveToList(listId: string | null) {
     const oldListId = this.listId
     const oldWorkspaceId = this.workspaceId
+    const oldListOrder = this.listOrder
 
     // Get the target list's workspace if moving to a list
     const targetList = listId ? this.rootStore.getListById(listId) : null
     const newWorkspaceId = targetList?.workspaceId ?? this.workspaceId
+    const newListOrder = listId ? this.rootStore.getNextListOrderForList(listId) : null
 
     this.listId = listId
     this.workspaceId = newWorkspaceId
+    this.listOrder = newListOrder
     this.updatedAt = new Date()
 
     try {
       await this.rootStore.updateTask(this.id, {
         listId: listId || null,
         workspaceId: newWorkspaceId,
+        listOrder: newListOrder,
       })
     } catch (err) {
       // Rollback on error
       this.listId = oldListId
       this.workspaceId = oldWorkspaceId
+      this.listOrder = oldListOrder
       throw err
     }
   }

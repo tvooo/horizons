@@ -169,7 +169,7 @@ export class RootStore {
       listId?: string | null
       onIce?: boolean
       scheduleOrder?: string | null
-      listOrder?: string
+      listOrder?: string | null
       workspaceId?: string
     },
   ) {

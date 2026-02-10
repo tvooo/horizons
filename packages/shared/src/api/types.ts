@@ -114,7 +114,7 @@ export interface UpdateTaskRequest {
   scheduledDate?: BackendScheduledDate | null
   onIce?: boolean
   scheduleOrder?: string | null
-  listOrder?: string
+  listOrder?: string | null
   workspaceId?: string
 }
 

@@ -38,7 +38,7 @@ const updateTaskSchema = z.object({
   scheduledDate: scheduledDateSchema.nullable().optional(),
   onIce: z.boolean().optional(),
   scheduleOrder: z.string().nullable().optional(),
-  listOrder: z.string().optional(),
+  listOrder: z.string().nullable().optional(),
   workspaceId: z.string().optional(),
 })
 
