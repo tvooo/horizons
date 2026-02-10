@@ -295,12 +295,18 @@ export class RootStore {
   }
 
   getAreasByWorkspace(workspaceId: string) {
-    return this.lists.filter((list) => list.workspaceId === workspaceId && list.isArea)
+    return this.lists.filter(
+      (list) => list.workspaceId === workspaceId && list.isArea && this.isListInFocus(list),
+    )
   }
 
   getStandaloneListsByWorkspace(workspaceId: string) {
     return this.lists.filter(
-      (list) => list.workspaceId === workspaceId && !list.isArea && !list.parentListId,
+      (list) =>
+        list.workspaceId === workspaceId &&
+        !list.isArea &&
+        !list.parentListId &&
+        this.isListInFocus(list),
     )
   }
 
