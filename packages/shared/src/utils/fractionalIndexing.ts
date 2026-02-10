@@ -64,8 +64,13 @@ function getIndexAfter(index: string): string {
  * Gets an index between two indices.
  */
 function getIndexBetween(before: string, after: string): string {
+  // Handle duplicate order values by appending midpoint to differentiate
+  if (before === after) {
+    return before + MIDPOINT_CHAR
+  }
+
   // Make sure before < after
-  if (before >= after) {
+  if (before > after) {
     throw new Error(`Invalid order: before (${before}) must be less than after (${after})`)
   }
 
