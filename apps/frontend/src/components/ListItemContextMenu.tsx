@@ -117,7 +117,7 @@ export const ListItemContextMenu = observer(
                       <div className="px-3 py-2 text-gray-500 text-sm">No areas available</div>
                     ) : (
                       areas
-                        .filter((area) => area.id !== list.id)
+                        .filter((area) => area.id !== list.id && !area.archived)
                         .map((area) => (
                           <ContextMenu.Item
                             key={area.id}
