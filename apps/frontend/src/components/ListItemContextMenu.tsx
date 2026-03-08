@@ -227,6 +227,17 @@ export const ListItemContextMenu = observer(
                 </ContextMenu.Portal>
               </ContextMenu.Sub>
             )}
+            <ContextMenu.Separator className="my-1 h-px bg-gray-200" />
+
+            <ContextMenu.Item
+              className="cursor-pointer rounded px-3 py-2 text-sm outline-none hover:bg-gray-100 focus:bg-gray-100 data-[disabled]:cursor-not-allowed data-[disabled]:text-gray-400 data-[disabled]:hover:bg-transparent"
+              onSelect={() => list.setArchived(true)}
+              disabled={list.numberOfOpenTasks > 0}
+            >
+              {list.numberOfOpenTasks > 0
+                ? `Archive (${list.numberOfOpenTasks} open task${list.numberOfOpenTasks === 1 ? '' : 's'})`
+                : 'Archive'}
+            </ContextMenu.Item>
           </ContextMenu.Content>
         </ContextMenu.Portal>
       </ContextMenu.Root>
