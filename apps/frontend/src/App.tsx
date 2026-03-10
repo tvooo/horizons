@@ -5,6 +5,7 @@ import { BrowserRouter, Navigate, Route, Routes, useLocation } from 'react-route
 import { RootStore } from 'shared'
 import { API_BASE_URL, api } from './api/client'
 import { AddListModal } from './components/AddListModal'
+import { CommandPalette } from './components/CommandPalette'
 import { DebugPanel } from './components/DebugPanel'
 import { FocusModeUI } from './components/FocusModeUI'
 import { ListView } from './components/ListView'
@@ -96,6 +97,8 @@ const AuthenticatedApp = observer(() => {
       </div>
 
       <AddListModal isOpen={isAddListModalOpen} onClose={() => setIsAddListModalOpen(false)} />
+
+      <CommandPalette />
 
       <FocusModeUI />
 
